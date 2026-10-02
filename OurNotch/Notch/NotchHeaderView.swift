@@ -1,7 +1,9 @@
 import SwiftUI
 
-/// The always-visible notch: days together on the left of the camera, ♡ on the right.
-struct ClosedNotchView: View {
+/// The row beside the camera: days together on the left, ♡ on the right.
+/// Closed, it is the whole notch. Open, the same row stretches wider and the rest of the notch grows below it,
+/// so it never has to be swapped out mid-animation.
+struct NotchHeaderView: View {
     let state: AppState
     let notchSize: CGSize
 
@@ -12,8 +14,8 @@ struct ClosedNotchView: View {
                 .foregroundStyle(.white)
                 .frame(width: Config.Notch.closedSideWidth)
 
-            // Nothing drawn behind the camera is visible, so leave it empty.
-            Color.clear.frame(width: notchSize.width)
+            // Nothing drawn behind the camera is visible, so leave at least its width empty.
+            Spacer(minLength: notchSize.width)
 
             Image(systemName: "heart.fill")
                 .font(.system(size: 11))
