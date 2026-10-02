@@ -24,10 +24,11 @@ struct NotchGeometry: Equatable {
         return NotchGeometry(screenFrame: screen.frame, notchSize: Config.Notch.pillSize, hasNotch: false)
     }
 
-    /// The panel's frame: fixed at the open size plus padding, pinned top-center.
+    /// The panel's frame: fixed at the open size plus padding and room for pouring hearts, pinned top-center.
+    /// The extra area is transparent, so clicks pass through it.
     var panelFrame: CGRect {
         let size = CGSize(width: Config.Notch.openSize.width + Config.Notch.windowPadding * 2,
-                          height: Config.Notch.openSize.height + Config.Notch.windowPadding)
+                          height: Config.Notch.openSize.height + Config.Notch.pourRoom)
         return CGRect(x: screenFrame.midX - size.width / 2,
                       y: screenFrame.maxY - size.height,
                       width: size.width, height: size.height)

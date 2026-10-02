@@ -5,6 +5,9 @@ enum Config {
     /// Placeholder until onboarding asks "How long have you been together?" (slice 4).
     static let placeholderTogetherSince = Calendar.current.date(from: DateComponents(year: 2023, month: 2, day: 14))!
 
+    /// Rapid heart taps within this pause are bundled into one save.
+    static let heartBundleDelay: Duration = .seconds(1)
+
     enum Notch {
         /// Size of the black shape when the notch is open.
         static let openSize = CGSize(width: 440, height: 150)
@@ -14,6 +17,8 @@ enum Config {
         static let pillSize = CGSize(width: 185, height: 32)
         /// Extra transparent room around the open shape, so springs can overshoot without clipping.
         static let windowPadding: CGFloat = 20
+        /// Transparent room below the open shape where hearts pour out.
+        static let pourRoom: CGFloat = 160
 
         static let hoverOpenDelay: Duration = .milliseconds(300)
         static let hoverCloseDelay: Duration = .milliseconds(100)

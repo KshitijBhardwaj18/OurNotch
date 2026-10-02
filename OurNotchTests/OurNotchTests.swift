@@ -24,3 +24,26 @@ struct TogetherTests {
         #expect([c.day, c.hour, c.minute, c.second] == [2, 3, 4, 5])
     }
 }
+
+struct HeartsTests {
+    @Test func missedHeartsAreTheDifference() {
+        #expect(Hearts.newCount(partnerSent: 12, lastShown: 9) == 3)
+        #expect(Hearts.newCount(partnerSent: 9, lastShown: 9) == 0)
+        #expect(Hearts.newCount(partnerSent: 2, lastShown: 9) == 0) // partner reinstalled; never negative
+    }
+
+    @Test func threeOrMoreSplashFewerPour() {
+        #expect(Hearts.effect(forNew: 0) == nil)
+        #expect(Hearts.effect(forNew: 1) == .pour)
+        #expect(Hearts.effect(forNew: 2) == .pour)
+        #expect(Hearts.effect(forNew: 3) == .splash)
+        #expect(Hearts.effect(forNew: 12) == .splash)
+    }
+
+    @Test func sentThenDelivered() {
+        #expect(DeliveryStatus.of(sent: 0, saved: 0, partnerSeen: 0) == .none)
+        #expect(DeliveryStatus.of(sent: 5, saved: 4, partnerSeen: 4) == .sending)
+        #expect(DeliveryStatus.of(sent: 5, saved: 5, partnerSeen: 4) == .sent)
+        #expect(DeliveryStatus.of(sent: 5, saved: 5, partnerSeen: 5) == .delivered)
+    }
+}

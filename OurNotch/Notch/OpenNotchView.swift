@@ -1,8 +1,9 @@
 import SwiftUI
 
-/// The expanded notch: time together counting up live, and the heart button.
+/// The expanded notch: time together counting up live, and the heart button with its status.
 struct OpenNotchView: View {
     let state: AppState
+    let effects: HeartsEffect
     let notchSize: CGSize
 
     var body: some View {
@@ -13,7 +14,13 @@ struct OpenNotchView: View {
             HStack(alignment: .center) {
                 timeTogether
                 Spacer()
-                heartButton
+                VStack(spacing: 4) {
+                    heartButton
+                    Text(state.heartStatus.label)
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .frame(height: 12)
+                }
             }
             .padding(.horizontal, 18)
             .frame(maxHeight: .infinity)
@@ -41,12 +48,13 @@ struct OpenNotchView: View {
 
     private var heartButton: some View {
         Button {
-            // Sending a heart arrives in slice 2.
+            state.sendHeart()
+            effects.pour()
         } label: {
             Image(systemName: "heart.fill")
                 .font(.system(size: 30))
                 .foregroundStyle(Color.rose)
-                .frame(width: 64, height: 64)
+                .frame(width: 60, height: 60)
                 .background(Color.rose.opacity(0.15), in: Circle())
         }
         .buttonStyle(.plain)
