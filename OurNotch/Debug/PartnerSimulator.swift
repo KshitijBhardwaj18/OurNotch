@@ -28,6 +28,9 @@ final class PartnerSimulator {
 private struct PartnerSimulatorView: View {
     let state: AppState
 
+    @State private var draft = "hi babe how are you? love you"
+    @State private var mode: BannerMode = .three
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Acts as your love, on this Mac. Test tool only.")
@@ -39,6 +42,20 @@ private struct PartnerSimulatorView: View {
                 Button("Send ❤ ×3") { (0..<3).forEach { _ in state.sendHeart() } }
             }
 
+            VStack(alignment: .leading, spacing: 8) {
+                TextField("Message", text: $draft)
+                HStack {
+                    Picker("Scroll", selection: $mode) {
+                        Text(BannerMode.three.label).tag(BannerMode.three)
+                        Text(BannerMode.untilOpened.label).tag(BannerMode.untilOpened)
+                    }
+                    .labelsHidden()
+                    .fixedSize()
+                    Button("Send message") { state.sendMessage(draft, mode: mode) }
+                        .disabled(MessageRules.check(draft) == .empty)
+                }
+            }
+
             Grid(alignment: .leading, verticalSpacing: 6) {
                 GridRow {
                     Text("Hearts sent").foregroundStyle(.secondary)
@@ -46,7 +63,15 @@ private struct PartnerSimulatorView: View {
                 }
                 GridRow {
                     Text("Hearts received").foregroundStyle(.secondary)
-                    Text("\(state.lastShownHearts)")
+                    Text("\(state.heartsReceived)")
+                }
+                GridRow {
+                    Text("Message sent").foregroundStyle(.secondary)
+                    Text(state.messageStatus.label)
+                }
+                GridRow {
+                    Text("Last message").foregroundStyle(.secondary)
+                    Text(state.partnerOutbox.message?.text ?? "none")
                 }
             }
             .monospacedDigit()

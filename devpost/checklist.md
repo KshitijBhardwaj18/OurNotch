@@ -31,7 +31,7 @@ Workflow (learner decision, `spec.md > Decisions and Open Issues`): each slice i
   Learner check: Open the Partner Simulator from the ♡ menu. Send 1 heart → watch hearts float out of your notch. Send 3 → the whole screen fills with hearts. Then hover your notch, tap ❤, and watch *sent ♡* turn into *delivered ♡* while the simulator counts it.
   Commit: `Add hearts between partners with pour and splash effects`
 
-- [ ] **3. A message scrolls across your notch**
+- [x] **3. A message scrolls across your notch**
   Becomes usable: In the open notch, type a short message, choose *3 times* or *until opened*, and send. From the simulator, send "hi babe how are you? love you" → it scrolls in a strip just below your notch, 3 times or until you open the notch. The open notch shows the last message received and *sent ♡ / delivered ♡* for yours. Too-long or empty messages can't be sent and show a gentle hint.
   Why now: The second half of the kernel. It reuses the outbox and status plumbing from slice 2, so it lands quickly and completes the full "oh, that's cool" loop on one Mac.
   PRD ref: `prd.md > Sending Messages`, `prd.md > States and Boundaries`
@@ -90,3 +90,6 @@ Activity mode:
 - Local mailbox stores one file per outbox (`outbox-<owner>.json`) instead of one shared file — it mirrors CloudKit's one-writer-per-row model, so the two identities never overwrite each other.
 - Notch panel grew 160 pt taller (transparent, click-through) — the pour needs room below the notch inside the same window.
 - Early checkpoint feedback (after slice 2): closed notch made 2 pt taller (`Config.Notch.closedExtraHeight`) to fully cover the camera; close animation rebuilt on Boring Notch's structure — a persistent header row (`NotchHeaderView`, replacing `ClosedNotchView`) with open content added below it, spring attached via `.animation(_:value:)`, `.compositingGroup()` — because swapping the whole content mid-spring jittered; `hidesOnDeactivate = false` on the panel because it vanished when the user switched apps. Learner confirmed it looks good.
+- Open notch grew from 150 to 196 pt tall — the message box and last-message line need their own rows below the counter and heart.
+- The current banner is saved locally in both modes, not only `untilOpened` — one saved value is simpler; a `three` banner interrupted by quitting simply replays on relaunch.
+- Sending from the notch is verified by a two-partner unit test on a temporary mailbox (send → partner sync → delivered), not by typing in the live notch — the terminal can't post keyboard/mouse events without Accessibility permission. Receiving, the 3-pass banner, and `untilOpened` across relaunch were verified live with screenshots.

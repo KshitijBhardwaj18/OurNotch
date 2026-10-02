@@ -19,13 +19,19 @@ final class AppState {
     var togetherSince: Date = Config.placeholderTogetherSince
     private(set) var myOutbox: Outbox
     private(set) var partnerOutbox = Outbox()
-    /// The partner's `heartsSent` already shown on this Mac.
-    private(set) var lastShownHearts: Int
+    /// The message currently scrolling under the notch, if any. Saved so `untilOpened` survives a restart.
+    private(set) var banner: Message?
     /// The last outbox the mailbox accepted. Differs from `myOutbox` while a save is pending or failed.
     private var savedOutbox: Outbox
 
+    var heartsReceived: Int { myOutbox.seenHearts }
+
     var heartStatus: DeliveryStatus {
-        .of(sent: myOutbox.heartsSent, saved: savedOutbox.heartsSent, partnerSeen: partnerOutbox.seenHearts)
+        .hearts(sent: myOutbox.heartsSent, saved: savedOutbox.heartsSent, partnerSeen: partnerOutbox.seenHearts)
+    }
+
+    var messageStatus: DeliveryStatus {
+        .message(id: myOutbox.message?.id, savedId: savedOutbox.message?.id, partnerSeenId: partnerOutbox.seenMessageId)
     }
 
     /// Called with the number of new hearts each time some arrive.
@@ -44,7 +50,7 @@ final class AppState {
         self.store = LocalStore(defaults: defaults)
         myOutbox = store.myOutbox ?? Outbox()
         savedOutbox = store.savedOutbox ?? Outbox()
-        lastShownHearts = store.lastShownHearts
+        banner = store.banner
     }
 
     /// Starts checking the partner's row. Anything missed while the app was closed shows on the first check.
@@ -57,6 +63,8 @@ final class AppState {
             }
         }
     }
+
+    // MARK: Sending
 
     /// Counts the heart locally right away; rapid taps are bundled into one save.
     func sendHeart() {
@@ -71,7 +79,36 @@ final class AppState {
         }
     }
 
-    /// Reads the partner's row, shows any new hearts, and retries an outbox that didn't save.
+    /// Replaces my latest message and saves it right away. Returns false if the text breaks the message rules.
+    @discardableResult
+    func sendMessage(_ text: String, mode: BannerMode) -> Bool {
+        guard case .valid(let clean) = MessageRules.check(text) else { return false }
+        myOutbox.message = Message(id: UUID(), text: clean, mode: mode, sentAt: .now)
+        store.myOutbox = myOutbox
+        Task { await save() }
+        return true
+    }
+
+    // MARK: Banner
+
+    /// The banner finished its 3 passes.
+    func bannerFinished() {
+        setBanner(nil)
+    }
+
+    /// Opening the notch dismisses an `untilOpened` banner; the message stays readable inside.
+    func notchOpened() {
+        if banner?.mode == .untilOpened { setBanner(nil) }
+    }
+
+    private func setBanner(_ message: Message?) {
+        banner = message
+        store.banner = message
+    }
+
+    // MARK: Syncing
+
+    /// Reads the partner's row, shows anything new, and retries an outbox that didn't save.
     func sync() async {
         if saveTask == nil, myOutbox != savedOutbox { await save() }
 
@@ -85,15 +122,23 @@ final class AppState {
         }
         partnerOutbox = partner
 
-        let new = Hearts.newCount(partnerSent: partner.heartsSent, lastShown: lastShownHearts)
-        guard new > 0 else { return }
-        log.notice("\(new) new heart(s) from partner")
-        lastShownHearts = partner.heartsSent
-        store.lastShownHearts = lastShownHearts
-        myOutbox.seenHearts = partner.heartsSent
+        var shownSomething = false
+        let newHearts = Hearts.newCount(partnerSent: partner.heartsSent, lastShown: myOutbox.seenHearts)
+        if newHearts > 0 {
+            log.notice("\(newHearts) new heart(s) from partner")
+            myOutbox.seenHearts = partner.heartsSent
+            onHeartsArrived?(newHearts)
+            shownSomething = true
+        }
+        if let message = partner.message, message.id != myOutbox.seenMessageId {
+            log.notice("New message from partner (\(message.mode.rawValue))")
+            myOutbox.seenMessageId = message.id
+            setBanner(message)
+            shownSomething = true
+        }
+        guard shownSomething else { return }
         store.myOutbox = myOutbox
-        onHeartsArrived?(new)
-        await save()
+        await save() // tells the partner "delivered"
     }
 
     private func save() async {
@@ -120,9 +165,9 @@ private struct LocalStore {
         get { decode("savedOutbox") }
         nonmutating set { encode(newValue, "savedOutbox") }
     }
-    var lastShownHearts: Int {
-        get { defaults.integer(forKey: "lastShownHearts") }
-        nonmutating set { defaults.set(newValue, forKey: "lastShownHearts") }
+    var banner: Message? {
+        get { decode("banner") }
+        nonmutating set { encode(newValue, "banner") }
     }
 
     private func decode<T: Decodable>(_ key: String) -> T? {
