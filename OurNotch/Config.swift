@@ -2,11 +2,16 @@ import SwiftUI
 
 /// Values that tune the app. Everything that might need adjusting lives here.
 enum Config {
-    /// Placeholder until onboarding asks "How long have you been together?" (slice 4).
-    static let placeholderTogetherSince = Calendar.current.date(from: DateComponents(year: 2023, month: 2, day: 14))!
-
     /// Rapid heart taps within this pause are bundled into one save.
     static let heartBundleDelay: Duration = .seconds(1)
+
+    enum Pairing {
+        /// How often the inviter checks whether their love has joined, while the waiting screen is open.
+        static let joinCheckInterval: Duration = .seconds(3)
+        static let codeLength = 6
+        /// Linked from the invite email. Placeholder until the website exists.
+        static let downloadURL = "https://github.com/KshitijBhardwaj18/OurNotch/releases"
+    }
 
     enum Message {
         static let maxWords = 10

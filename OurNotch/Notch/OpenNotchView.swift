@@ -38,7 +38,7 @@ struct OpenNotchView: View {
                 .foregroundStyle(.white.opacity(0.6))
             // Ticks every second, only while the notch is open.
             TimelineView(.periodic(from: .now, by: 1)) { context in
-                Text(Self.counter(Together.elapsed(since: state.togetherSince, now: context.date)))
+                Text(state.togetherSince.map { Self.counter(Together.elapsed(since: $0, now: context.date)) } ?? "…")
                     .font(.system(size: 22, weight: .semibold, design: .rounded).monospacedDigit())
                     .foregroundStyle(Color.blush)
             }

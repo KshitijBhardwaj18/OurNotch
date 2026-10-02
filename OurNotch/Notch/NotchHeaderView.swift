@@ -9,7 +9,8 @@ struct NotchHeaderView: View {
 
     var body: some View {
         HStack(spacing: 0) {
-            Text("\(Together.days(since: state.togetherSince))")
+            // Blank until the inviter's together-since date arrives.
+            Text(state.togetherSince.map { "\(Together.days(since: $0))" } ?? "")
                 .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
                 .frame(width: Config.Notch.closedSideWidth)

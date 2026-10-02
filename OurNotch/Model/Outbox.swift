@@ -2,6 +2,8 @@ import Foundation
 
 /// One partner's row in the shared mailbox. Only its owner writes it; the partner reads it.
 struct Outbox: Codable, Equatable {
+    /// Set by the inviter only; the joiner reads it from here.
+    var togetherSince: Date?
     /// Running total of hearts this partner has sent. Never goes down.
     var heartsSent = 0
     /// The partner's `heartsSent` value this Mac has already shown. Tells the sender "delivered".
