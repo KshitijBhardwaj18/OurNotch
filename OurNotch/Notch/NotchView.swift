@@ -11,6 +11,9 @@ struct NotchView: View {
     let geometry: NotchGeometry
 
     @State private var isOpen = false
+    @State private var isHovering = false
+    /// True while the message field has focus; the notch stays open so typing isn't cut off.
+    @State private var isEditing = false
     @State private var hoverTask: Task<Void, Never>?
 
     private static let openRadii: (top: CGFloat, bottom: CGFloat) = (14, 24)
@@ -35,11 +38,17 @@ struct NotchView: View {
                 .frame(height: closedHeight)
 
             if isOpen {
-                OpenNotchView(state: state, effects: effects)
+                OpenNotchView(state: state, effects: effects, isEditing: $isEditing)
                     .padding(.bottom, 12)
                     .transition(.scale(scale: 0.8, anchor: .top)
                         .combined(with: .opacity)
                         .animation(.smooth(duration: 0.35)))
+            } else if let banner = state.banner {
+                MessageBanner(message: banner, onFinished: state.bannerFinished)
+                    .id(banner.id) // a new message restarts the scroll
+                    .frame(height: Config.Message.bannerHeight)
+                    .padding(.bottom, 4)
+                    .transition(.opacity)
             }
         }
         .padding(.horizontal, radii.top) // keep content clear of the curved ears
@@ -48,9 +57,16 @@ struct NotchView: View {
         .clipShape(NotchShape(topRadius: radii.top, bottomRadius: radii.bottom))
         .compositingGroup()
         .animation(isOpen ? Self.openSpring : Self.closeSpring, value: isOpen)
+        .animation(.smooth, value: state.banner?.id)
         .contentShape(Rectangle())
         .onHover(perform: hoverChanged)
         .sensoryFeedback(.alignment, trigger: isOpen)
+        .onChange(of: isOpen) { _, open in
+            if open { state.notchOpened() }
+        }
+        .onChange(of: isEditing) { _, editing in
+            if !editing && !isHovering { isOpen = false }
+        }
     }
 
     private var radii: (top: CGFloat, bottom: CGFloat) { isOpen ? Self.openRadii : Self.closedRadii }
@@ -60,16 +76,18 @@ struct NotchView: View {
     private var size: CGSize {
         if isOpen { return Config.Notch.openSize }
         let width = geometry.notchSize.width + Config.Notch.closedSideWidth * 2 + Self.closedRadii.top * 2
-        return CGSize(width: width, height: closedHeight)
+        let bannerRoom = state.banner == nil ? 0 : Config.Message.bannerHeight + 4
+        return CGSize(width: width, height: closedHeight + bannerRoom)
     }
 
     /// Waits briefly before opening or closing so a mouse passing by doesn't flicker the notch.
     /// One cancellable task means only the latest hover change wins.
     private func hoverChanged(_ hovering: Bool) {
+        isHovering = hovering
         hoverTask?.cancel()
         hoverTask = Task {
             try? await Task.sleep(for: hovering ? Config.Notch.hoverOpenDelay : Config.Notch.hoverCloseDelay)
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled, hovering || !isEditing else { return }
             isOpen = hovering
         }
     }

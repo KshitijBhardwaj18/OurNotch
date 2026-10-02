@@ -8,9 +8,19 @@ enum Config {
     /// Rapid heart taps within this pause are bundled into one save.
     static let heartBundleDelay: Duration = .seconds(1)
 
+    enum Message {
+        static let maxWords = 10
+        static let maxCharacters = 60
+        static let maxWordLength = 15
+        /// How fast the banner scrolls, in points per second.
+        static let bannerSpeed: CGFloat = 35
+        /// Height the closed notch grows by while a banner is showing.
+        static let bannerHeight: CGFloat = 22
+    }
+
     enum Notch {
         /// Size of the black shape when the notch is open.
-        static let openSize = CGSize(width: 440, height: 150)
+        static let openSize = CGSize(width: 440, height: 196)
         /// Width added on each side of the camera in the closed notch, for the days count and ♡.
         static let closedSideWidth: CGFloat = 44
         /// How far the closed shape reaches below the menu bar, so it fully covers the camera housing.
