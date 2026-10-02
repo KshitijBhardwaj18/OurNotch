@@ -63,11 +63,12 @@ Workflow (learner decision, `spec.md > Decisions and Open Issues`): each slice i
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 2 (hearts pour and splash from the simulator), so feedback on the look, animations, and notch layout can shape messages and onboarding
+- [x] Early usable behavior explored — after slice 2 (hearts pour and splash from the simulator), so feedback on the look, animations, and notch layout can shape messages and onboarding
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
 
+- [ ] Retry: notch occasionally disappeared during the slice 2 checkpoint; `hidesOnDeactivate` fixed the app-switch case, but the learner's remaining trigger wasn't identified (full-screen app or desktop switch suspected)
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
@@ -88,3 +89,4 @@ Activity mode:
 - Slice 1 screenshot check replaced by a window-server check (layer 27 = menu bar + 3, 480×170 at top-center over a 179×32 notch) — this terminal lacks Screen Recording permission; the visual check moves to the slice 2 hands-on checkpoint.
 - Local mailbox stores one file per outbox (`outbox-<owner>.json`) instead of one shared file — it mirrors CloudKit's one-writer-per-row model, so the two identities never overwrite each other.
 - Notch panel grew 160 pt taller (transparent, click-through) — the pour needs room below the notch inside the same window.
+- Early checkpoint feedback (after slice 2): closed notch made 2 pt taller (`Config.Notch.closedExtraHeight`) to fully cover the camera; close animation rebuilt on Boring Notch's structure — a persistent header row (`NotchHeaderView`, replacing `ClosedNotchView`) with open content added below it, spring attached via `.animation(_:value:)`, `.compositingGroup()` — because swapping the whole content mid-spring jittered; `hidesOnDeactivate = false` on the panel because it vanished when the user switched apps. Learner confirmed it looks good.

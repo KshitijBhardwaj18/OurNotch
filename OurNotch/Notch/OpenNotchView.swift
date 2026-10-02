@@ -1,46 +1,36 @@
 import SwiftUI
 
-/// The expanded notch: time together counting up live, and the heart button with its status.
+/// The part of the notch that grows below the header when it opens:
+/// time together counting up live, and the heart button with its status.
 struct OpenNotchView: View {
     let state: AppState
     let effects: HeartsEffect
-    let notchSize: CGSize
 
     var body: some View {
-        VStack(spacing: 0) {
-            // The top row sits beside the camera, which hides anything drawn behind it.
-            Color.clear.frame(height: notchSize.height)
-
-            HStack(alignment: .center) {
-                timeTogether
-                Spacer()
-                VStack(spacing: 4) {
-                    heartButton
-                    Text(state.heartStatus.label)
-                        .font(.system(size: 10, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .frame(height: 12)
-                }
+        HStack(alignment: .center) {
+            timeTogether
+            Spacer()
+            VStack(spacing: 4) {
+                heartButton
+                Text(state.heartStatus.label)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.6))
+                    .frame(height: 12)
             }
-            .padding(.horizontal, 18)
-            .frame(maxHeight: .infinity)
         }
+        .padding(.horizontal, 8)
+        .frame(maxHeight: .infinity)
     }
 
     private var timeTogether: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text("\(Together.days(since: state.togetherSince))")
-                    .font(.system(size: 34, weight: .semibold, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white)
-                Text("days together")
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.6))
-            }
+        VStack(alignment: .leading, spacing: 4) {
+            Text("together for")
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.6))
             // Ticks every second, only while the notch is open.
             TimelineView(.periodic(from: .now, by: 1)) { context in
                 Text(Self.counter(Together.elapsed(since: state.togetherSince, now: context.date)))
-                    .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
+                    .font(.system(size: 22, weight: .semibold, design: .rounded).monospacedDigit())
                     .foregroundStyle(Color.blush)
             }
         }
@@ -52,9 +42,9 @@ struct OpenNotchView: View {
             effects.pour()
         } label: {
             Image(systemName: "heart.fill")
-                .font(.system(size: 30))
+                .font(.system(size: 28))
                 .foregroundStyle(Color.rose)
-                .frame(width: 60, height: 60)
+                .frame(width: 56, height: 56)
                 .background(Color.rose.opacity(0.15), in: Circle())
         }
         .buttonStyle(.plain)

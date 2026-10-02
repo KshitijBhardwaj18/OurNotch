@@ -13,6 +13,8 @@ enum Config {
         static let openSize = CGSize(width: 440, height: 150)
         /// Width added on each side of the camera in the closed notch, for the days count and ♡.
         static let closedSideWidth: CGFloat = 44
+        /// How far the closed shape reaches below the menu bar, so it fully covers the camera housing.
+        static let closedExtraHeight: CGFloat = 2
         /// Used on Macs without a notch.
         static let pillSize = CGSize(width: 185, height: 32)
         /// Extra transparent room around the open shape, so springs can overshoot without clipping.
