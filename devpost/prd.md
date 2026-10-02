@@ -24,7 +24,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`, `scope.md > 
 ## Screens and Layout
 - **Onboarding window** (first launch only): welcome screens → Sign in with Apple → Invite / I have a code → "How long have you been together?" → permissions → done.
 - **Closed notch** (always visible): days-together number + a heart. This is also where incoming hearts pour out and incoming messages scroll.
-- **Open notch** (expands like Boring Notch): time together counting up live; a heart button; a message box with the scroll option; the last message received; sent/delivered feedback.
+- **Open notch** (expands like Boring Notch), organized into **tabs** like NotchBuddy (https://notchbuddy.app): a **Home** tab (your love's photo, time together counting up live, the heart button) and tabs for the other things (messages; the photo you show on your love's notch). One job per tab, so the small space never feels cluttered.
 - Everything inside the notch must be arranged carefully. It's a small space, and great UX is a requirement, not polish for later.
 
 ## Look and Feel
@@ -76,6 +76,14 @@ Source: `scope.md > The Core Loop`.
   - [ ] I see *Sent*, then *Delivered*.
   - [ ] My partner can see **the last message** in the open notch. Only the last one; there's no history.
 
+### Your Love's Photo
+Added after the slice 2 checkpoint (learner: the open notch felt cluttered; a photo that represents your partner "sounds cute").
+- As a partner, I want to choose one image that shows on my love's open notch, so it feels like me.
+  - [ ] I can pick an image from my Mac; it shows on my partner's open notch (Home tab), and stays there permanently.
+  - [ ] I can change it anytime; the new one replaces the old one. Only one image, no gallery.
+  - [ ] Before my love has chosen one, my notch shows a gentle empty state.
+  - [ ] Only the two of us can see it (encrypted like everything else).
+
 ## States and Boundaries
 - **First use / not signed in:** onboarding window; the notch isn't active yet.
 - **Signed in, not paired:** invite or enter-code options; the inviter sees a waiting state with the code.
@@ -83,7 +91,7 @@ Source: `scope.md > The Core Loop`.
 - **Partner's Mac asleep or offline:** hearts and the latest message wait; they're shown when the Mac comes back (see Missed Hearts). Status stays *Sent* until it arrives, then *Delivered*.
 - **Invalid code:** gentle error, try again.
 - **Message over the limit or empty:** send is disabled with a gentle hint.
-- **What persists:** pairing, together-since date, the last message, and the count of hearts not yet seen.
+- **What persists:** pairing, together-since date, the last message, the count of hearts not yet seen, and your love's photo.
 - **Privacy:** only the two partners can read their hearts and messages (`scope.md > The POC Boundary (Milestone 1)`: encrypted).
 - **iCloud storage full:** OurNotch still works (`scope.md > The POC Boundary (Milestone 1)`).
 
@@ -99,11 +107,11 @@ Source: `scope.md > The Core Loop`.
 - **Messages are limited to ~10 words**, plus a character cap and a per-word cap, so they fit the notch banner and can't be broken by one long word.
 
 ## What We're Building
-Onboarding with Sign in with Apple; pairing by invite code with a Mail-app invite; the together-since question; a permissions step; a closed notch with days together + heart; an open notch with a live counter, heart button, message box with scroll option, last message, and sent/delivered; incoming hearts (pour or full-screen splash for 3+ missed); an incoming scrolling message banner; delivery between two real Macs through CloudKit, encrypted, working even when iCloud storage is full.
+Onboarding with Sign in with Apple; a tabbed open notch with your love's photo; pairing by invite code with a Mail-app invite; the together-since question; a permissions step; a closed notch with days together + heart; an open notch with a live counter, heart button, message box with scroll option, last message, and sent/delivered; incoming hearts (pour or full-screen splash for 3+ missed); an incoming scrolling message banner; delivery between two real Macs through CloudKit, encrypted, working even when iCloud storage is full.
 
 ## Deferred From the POC
 - **Animated character you choose:** the product's signature later; a heart is enough to prove the loop.
-- **Gallery, favorite place, favorite photo:** these need their own screens and storage; Milestone 1 only shows days together.
+- **Gallery, favorite place:** these need their own screens and storage. (One partner photo moved into Milestone 1 after the slice 2 checkpoint.)
 - **Message history / full chat:** the last message proves messaging.
 - **Automatic invite emails sent by OurNotch:** these need an email server.
 - **Unpairing, re-pairing, signing out:** not needed to prove the loop.
