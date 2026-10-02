@@ -2,18 +2,18 @@
 import SwiftUI
 
 /// A stand-in for your love on this Mac, for testing without a second Mac. Debug builds only.
-/// It has its own identity and local storage, and talks through the same mailbox as the notch.
+/// It is a separate person: its own id, keys, and storage, talking through the same mailbox as the notch.
 @MainActor
 final class PartnerSimulator {
-    private let state = AppState(pairing: .devPartner,
-                                 mailbox: LocalFileMailbox(),
-                                 defaults: UserDefaults(suiteName: "OurNotch.PartnerSimulator")!)
+    static let suiteName = "OurNotch.PartnerSimulator"
+
+    private let model = SimulatorModel(store: LocalStore(defaults: UserDefaults(suiteName: suiteName)!),
+                                       mailbox: LocalFileMailbox())
     private var window: NSWindow?
 
     func show() {
-        state.start()
         if window == nil {
-            let window = NSWindow(contentViewController: NSHostingController(rootView: PartnerSimulatorView(state: state)))
+            let window = NSWindow(contentViewController: NSHostingController(rootView: PartnerSimulatorView(model: model)))
             window.title = "Partner Simulator"
             window.styleMask = [.titled, .closable]
             window.isReleasedWhenClosed = false
@@ -25,8 +25,56 @@ final class PartnerSimulator {
     }
 }
 
+@MainActor
+@Observable
+private final class SimulatorModel {
+    var name = "Nikki"
+    var typedCode = ""
+    var togetherSince = Calendar.current.date(from: DateComponents(year: 2023, month: 2, day: 14))!
+    private(set) var state: AppState?
+    private(set) var inviteCode: String?
+    private(set) var error: String?
+
+    @ObservationIgnored private let store: LocalStore
+    @ObservationIgnored private let mailbox: Mailbox
+    @ObservationIgnored private var service: PairingService { PairingService(mailbox: mailbox, store: store) }
+
+    init(store: LocalStore, mailbox: Mailbox) {
+        self.store = store
+        self.mailbox = mailbox
+        startIfPaired()
+    }
+
+    /// Plays the inviter: answers "together since" up front, then waits for the notch to join.
+    func invite() async {
+        store.togetherSince = togetherSince
+        do {
+            let code = try await service.createInvite(name: name)
+            inviteCode = code
+            _ = try await service.waitForJoin(code: code)
+            startIfPaired()
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func join() async {
+        do {
+            _ = try await service.join(code: typedCode, name: name)
+            startIfPaired()
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    private func startIfPaired() {
+        state = AppState(store: store, mailbox: mailbox)
+        state?.start()
+    }
+}
+
 private struct PartnerSimulatorView: View {
-    let state: AppState
+    @Bindable var model: SimulatorModel
 
     @State private var draft = "hi babe how are you? love you"
     @State private var mode: BannerMode = .three
@@ -36,6 +84,48 @@ private struct PartnerSimulatorView: View {
             Text("Acts as your love, on this Mac. Test tool only.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
+
+            if let state = model.state {
+                controls(state)
+            } else {
+                pairing
+            }
+        }
+        .padding(20)
+        .frame(width: 340, alignment: .leading)
+    }
+
+    private var pairing: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            TextField("Name", text: $model.name)
+
+            GroupBox("Join the notch's invite") {
+                HStack {
+                    TextField("Code", text: $model.typedCode)
+                    Button("Join") { Task { await model.join() } }
+                }
+            }
+
+            GroupBox("Or invite the notch") {
+                VStack(alignment: .leading) {
+                    DatePicker("Together since", selection: $model.togetherSince, displayedComponents: .date)
+                    if let code = model.inviteCode {
+                        Text("Code: \(code) — waiting…").textSelection(.enabled).monospaced()
+                    } else {
+                        Button("Invite") { Task { await model.invite() } }
+                    }
+                }
+            }
+
+            if let error = model.error {
+                Text(error).foregroundStyle(.red)
+            }
+        }
+    }
+
+    private func controls(_ state: AppState) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Paired with \(state.pairing.partnerName) (\(state.pairing.role.rawValue))")
 
             HStack {
                 Button("Send ❤") { state.sendHeart() }
@@ -76,8 +166,6 @@ private struct PartnerSimulatorView: View {
             }
             .monospacedDigit()
         }
-        .padding(20)
-        .frame(width: 320, alignment: .leading)
     }
 }
 #endif

@@ -1,22 +1,16 @@
+import CryptoKit
 import Foundation
 import Observation
 import os
-
-/// Who I am and who my partner is. A fixed dev pairing until onboarding (slice 4).
-struct Pairing {
-    let myId: String
-    let partnerId: String
-
-    static let devYou = Pairing(myId: "dev-you", partnerId: "dev-partner")
-    static let devPartner = Pairing(myId: "dev-partner", partnerId: "dev-you")
-}
 
 /// The single source of truth for one partner: my outbox, what my partner sent, and what I've shown.
 /// The notch and the Partner Simulator each own one.
 @MainActor
 @Observable
 final class AppState {
-    var togetherSince: Date = Config.placeholderTogetherSince
+    let pairing: Pairing
+    /// The inviter's answer to "How long have you been together?". The joiner receives it from the inviter's outbox.
+    private(set) var togetherSince: Date?
     private(set) var myOutbox: Outbox
     private(set) var partnerOutbox = Outbox()
     /// The message currently scrolling under the notch, if any. Saved so `untilOpened` survives a restart.
@@ -37,20 +31,30 @@ final class AppState {
     /// Called with the number of new hearts each time some arrive.
     @ObservationIgnored var onHeartsArrived: ((Int) -> Void)?
 
-    @ObservationIgnored private let pairing: Pairing
+    @ObservationIgnored private let key: SymmetricKey
     @ObservationIgnored private let mailbox: Mailbox
     @ObservationIgnored private let store: LocalStore
     @ObservationIgnored private var saveTask: Task<Void, Never>?
     @ObservationIgnored private var syncTask: Task<Void, Never>?
     @ObservationIgnored private let log = Logger(subsystem: "OurNotch", category: "sync")
 
-    init(pairing: Pairing, mailbox: Mailbox, defaults: UserDefaults = .standard) {
+    /// Returns nil until this identity has paired.
+    init?(store: LocalStore, mailbox: Mailbox) {
+        guard let pairing = store.pairing,
+              let key = try? Crypto.sharedKey(myPrivateKey: store.privateKey,
+                                              partnerPublicKey: pairing.partnerKey,
+                                              pairId: pairing.code) else { return nil }
         self.pairing = pairing
+        self.key = key
         self.mailbox = mailbox
-        self.store = LocalStore(defaults: defaults)
+        self.store = store
         myOutbox = store.myOutbox ?? Outbox()
         savedOutbox = store.savedOutbox ?? Outbox()
         banner = store.banner
+        togetherSince = store.togetherSince
+        if pairing.role == .inviter {
+            myOutbox.togetherSince = togetherSince // shared on the next save
+        }
     }
 
     /// Starts checking the partner's row. Anything missed while the app was closed shows on the first check.
@@ -114,13 +118,17 @@ final class AppState {
 
         let partner: Outbox
         do {
-            guard let data = try await mailbox.fetchOutbox(owner: pairing.partnerId) else { return }
-            partner = try JSONDecoder().decode(Outbox.self, from: data)
+            guard let sealed = try await mailbox.fetchOutbox(owner: pairing.partnerId) else { return }
+            partner = try JSONDecoder().decode(Outbox.self, from: Crypto.open(sealed, with: key))
         } catch {
             log.error("Fetching partner outbox failed: \(error.localizedDescription)")
             return
         }
         partnerOutbox = partner
+        if pairing.role == .joiner, let date = partner.togetherSince, date != togetherSince {
+            togetherSince = date
+            store.togetherSince = date
+        }
 
         var shownSomething = false
         let newHearts = Hearts.newCount(partnerSent: partner.heartsSent, lastShown: myOutbox.seenHearts)
@@ -144,37 +152,13 @@ final class AppState {
     private func save() async {
         let snapshot = myOutbox
         do {
-            try await mailbox.saveOutbox(try JSONEncoder().encode(snapshot), owner: pairing.myId)
+            let sealed = try Crypto.seal(JSONEncoder().encode(snapshot), with: key)
+            try await mailbox.saveOutbox(sealed, owner: pairing.myId)
             savedOutbox = snapshot
             store.savedOutbox = snapshot
         } catch {
             log.error("Saving outbox failed, will retry: \(error.localizedDescription)")
         }
-    }
-}
-
-/// This Mac's copy of the state, so counts survive restarts.
-private struct LocalStore {
-    let defaults: UserDefaults
-
-    var myOutbox: Outbox? {
-        get { decode("myOutbox") }
-        nonmutating set { encode(newValue, "myOutbox") }
-    }
-    var savedOutbox: Outbox? {
-        get { decode("savedOutbox") }
-        nonmutating set { encode(newValue, "savedOutbox") }
-    }
-    var banner: Message? {
-        get { decode("banner") }
-        nonmutating set { encode(newValue, "banner") }
-    }
-
-    private func decode<T: Decodable>(_ key: String) -> T? {
-        defaults.data(forKey: key).flatMap { try? JSONDecoder().decode(T.self, from: $0) }
-    }
-    private func encode<T: Encodable>(_ value: T?, _ key: String) {
-        defaults.set(value.flatMap { try? JSONEncoder().encode($0) }, forKey: key)
     }
 }
 

@@ -41,7 +41,7 @@ Workflow (learner decision, `spec.md > Decisions and Open Issues`): each slice i
   Learner check: Send "hi babe how are you? love you" from the simulator and watch it scroll under your notch. Try typing a long message in your notch and see the hint. Send one back and watch the simulator receive it.
   Commit: `Add scrolling message banner and message sending`
 
-- [ ] **4. Pair with your love, privately**
+- [x] **4. Pair with your love, privately**
   Becomes usable: First launch shows a small onboarding window: welcome → your name → *Invite your love* (shows a 6-letter code, *Send email* opens Mail with a cute invite, "waiting for your love…") or *I have a code* (enter code → "nikki ❤ invited you", or a gentle error for a bad/used code) → together-since date (inviter only) → *Open at login* toggle → done. The simulator joins using your code. From then on, outboxes are encrypted with a key only the two of you share, and days-together uses your real date.
   Why now: Pairing and encryption replace the fixed dev pairing once the kernel works. They come before CloudKit so the full journey — and the privacy promise — is proven locally first; CloudKit then only swaps how rows travel.
   PRD ref: `prd.md > The Core Journey` (steps 1-6), `prd.md > Onboarding and Sign In`, `prd.md > Pairing`, `prd.md > States and Boundaries` (Privacy)
@@ -93,3 +93,7 @@ Activity mode:
 - Open notch grew from 150 to 196 pt tall — the message box and last-message line need their own rows below the counter and heart.
 - The current banner is saved locally in both modes, not only `untilOpened` — one saved value is simpler; a `three` banner interrupted by quitting simply replays on relaunch.
 - Sending from the notch is verified by a two-partner unit test on a temporary mailbox (send → partner sync → delivered), not by typing in the live notch — the terminal can't post keyboard/mouse events without Accessibility permission. Receiving, the 3-pass banner, and `untilOpened` across relaunch were verified live with screenshots.
+- Private key stored in UserDefaults instead of the Keychain until slice 5 (marked `ponytail:` in `LocalStore.swift`) — ad-hoc "Sign to Run Locally" builds change signature every rebuild, so the Keychain would ask for the login password after each build and block automated tests. Slice 5 moves it to the Keychain once the app is signed with the company team. Needs the learner's OK.
+- The Partner Simulator can also *invite* (with its own together-since date), not only join — so the notch's "I have a code" path can be tested on one Mac. Debug-only "Reset Everything (test)" menu item added for fresh-install testing.
+- No partner `name` inside the encrypted outbox — names already travel in the Invite/Join records, and nothing reads them from the outbox.
+- Slice 4 live check limited to the window server (fresh install shows only the onboarding window; the notch stays inactive until paired); the full pairing flow is verified by unit tests through the real `PairingService` and mailbox — the terminal can't click the onboarding UI, and the learner was on a call. The learner's hands-on check covers the clicks.

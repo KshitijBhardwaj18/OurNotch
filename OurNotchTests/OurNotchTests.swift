@@ -77,18 +77,104 @@ struct MessageRulesTests {
     }
 }
 
+/// Two people on one temporary mailbox, each with its own local storage.
+private struct TwoPartners {
+    let mailbox = LocalFileMailbox(directory: .temporaryDirectory.appending(path: UUID().uuidString))
+    let you = LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
+    let partner = LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
+
+    var yourService: PairingService { PairingService(mailbox: mailbox, store: you) }
+    var partnerService: PairingService { PairingService(mailbox: mailbox, store: partner) }
+
+    /// You invite, your partner joins with the code.
+    @MainActor
+    func paired(togetherSince: Date? = nil) async throws -> (you: AppState, partner: AppState) {
+        you.togetherSince = togetherSince
+        let code = try await yourService.createInvite(name: "Kshitij")
+        _ = try await partnerService.join(code: code.lowercased(), name: "Nikki")
+        _ = try #require(try await yourService.checkForJoin(code: code))
+        return (try #require(AppState(store: you, mailbox: mailbox)),
+                try #require(AppState(store: partner, mailbox: mailbox)))
+    }
+}
+
+struct CryptoTests {
+    @Test func bothPartnersDeriveTheSameKeyAndOnlyItOpens() throws {
+        let mine = Crypto.PrivateKey(), theirs = Crypto.PrivateKey()
+        let myKey = try Crypto.sharedKey(myPrivateKey: mine, partnerPublicKey: theirs.publicKey.rawRepresentation, pairId: "ABC234")
+        let theirKey = try Crypto.sharedKey(myPrivateKey: theirs, partnerPublicKey: mine.publicKey.rawRepresentation, pairId: "ABC234")
+
+        let sealed = try Crypto.seal(Data("love you".utf8), with: myKey)
+        #expect(try Crypto.open(sealed, with: theirKey) == Data("love you".utf8))
+        #expect(sealed.range(of: Data("love you".utf8)) == nil)
+
+        let stranger = try Crypto.sharedKey(myPrivateKey: Crypto.PrivateKey(), partnerPublicKey: theirs.publicKey.rawRepresentation, pairId: "ABC234")
+        #expect(throws: (any Error).self) { try Crypto.open(sealed, with: stranger) }
+    }
+}
+
+struct PairingTests {
+    @Test func codesAvoidLookalikeCharacters() {
+        for _ in 0..<200 {
+            let code = PairingService.makeCode()
+            #expect(code.count == 6)
+            #expect(!code.contains { "0O1I".contains($0) })
+        }
+        #expect(PairingService.normalize(" abc-234 ") == "ABC234")
+    }
+
+    @Test func joinShowsWhoInvitedAndPairsBothSides() async throws {
+        let people = TwoPartners()
+        let code = try await people.yourService.createInvite(name: "Kshitij")
+        #expect(try await people.yourService.checkForJoin(code: code) == nil) // still waiting
+
+        let joined = try await people.partnerService.join(code: code, name: "Nikki")
+        #expect(joined.partnerName == "Kshitij")
+        #expect(joined.role == .joiner)
+
+        let inviter = try #require(try await people.yourService.checkForJoin(code: code))
+        #expect(inviter.partnerName == "Nikki")
+        #expect(inviter.partnerId == people.partner.myId)
+    }
+
+    @Test func madeUpAndUsedCodesAreRejected() async throws {
+        let people = TwoPartners()
+        await #expect(throws: PairingError.invalidCode) {
+            try await people.partnerService.join(code: "ZZZZZZ", name: "Nikki")
+        }
+        let code = try await people.yourService.createInvite(name: "Kshitij")
+        _ = try await people.partnerService.join(code: code, name: "Nikki")
+        let stranger = PairingService(mailbox: people.mailbox, store: LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!))
+        await #expect(throws: PairingError.usedCode) {
+            try await stranger.join(code: code, name: "Stranger")
+        }
+    }
+}
+
 @MainActor
 struct PartnersTests {
-    /// Two partners on one temporary mailbox, each with its own local storage.
-    private func pair() -> (you: AppState, partner: AppState) {
-        let mailbox = LocalFileMailbox(directory: .temporaryDirectory.appending(path: UUID().uuidString))
-        func defaults() -> UserDefaults { UserDefaults(suiteName: UUID().uuidString)! }
-        return (AppState(pairing: .devYou, mailbox: mailbox, defaults: defaults()),
-                AppState(pairing: .devPartner, mailbox: mailbox, defaults: defaults()))
+    @Test func outboxesAreEncryptedInTheMailbox() async throws {
+        let people = TwoPartners()
+        let (you, _) = try await people.paired()
+        you.sendMessage("hi babe how are you? love you", mode: .three)
+        try await Task.sleep(for: .milliseconds(100))
+        let stored = try #require(try await people.mailbox.fetchOutbox(owner: people.you.myId))
+        #expect(stored.range(of: Data("hi babe".utf8)) == nil)
+        #expect((try? JSONDecoder().decode(Outbox.self, from: stored)) == nil)
+    }
+
+    @Test func joinerReceivesTogetherSince() async throws {
+        let date = Date(timeIntervalSince1970: 1_676_332_800) // 2023-02-14
+        let (you, partner) = try await TwoPartners().paired(togetherSince: date)
+        #expect(you.togetherSince == date)
+        #expect(partner.togetherSince == nil)
+        await you.sync()      // saves the inviter's outbox with the date
+        await partner.sync()
+        #expect(partner.togetherSince == date)
     }
 
     @Test func messageArrivesAndIsDelivered() async throws {
-        let (you, partner) = pair()
+        let (you, partner) = try await TwoPartners().paired()
         #expect(you.sendMessage("hi babe how are you? love you", mode: .untilOpened))
         try await Task.sleep(for: .milliseconds(100)) // the save runs in its own task
         #expect(you.messageStatus == .sent)
@@ -104,7 +190,7 @@ struct PartnersTests {
     }
 
     @Test func heartsArriveAndAreDelivered() async throws {
-        let (you, partner) = pair()
+        let (you, partner) = try await TwoPartners().paired()
         var arrived = 0
         partner.onHeartsArrived = { arrived += $0 }
         (0..<3).forEach { _ in you.sendHeart() }
@@ -117,8 +203,8 @@ struct PartnersTests {
         #expect(you.heartStatus == .delivered)
     }
 
-    @Test func invalidMessageIsNotSent() {
-        let (you, _) = pair()
+    @Test func invalidMessageIsNotSent() async throws {
+        let (you, _) = try await TwoPartners().paired()
         #expect(!you.sendMessage("   ", mode: .three))
         #expect(you.myOutbox.message == nil)
     }

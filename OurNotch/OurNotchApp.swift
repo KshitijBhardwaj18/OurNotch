@@ -8,6 +8,7 @@ struct OurNotchApp: App {
         MenuBarExtra("OurNotch", systemImage: "heart") {
             #if DEBUG
             Button("Partner Simulator…") { appDelegate.partnerSimulator.show() }
+            Button("Reset Everything (test)") { appDelegate.resetForTesting() }
             Divider()
             #endif
             Button("Quit OurNotch") { NSApp.terminate(nil) }
@@ -16,25 +17,25 @@ struct OurNotchApp: App {
     }
 }
 
-/// Owns the app state, the heart effects, and the notch window.
+/// Shows onboarding until this Mac is paired, then owns the app state, the heart effects, and the notch window.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let state = AppState(pairing: .devYou, mailbox: LocalFileMailbox())
     let effects = HeartsEffect()
     #if DEBUG
     let partnerSimulator = PartnerSimulator()
     #endif
+    private let store = LocalStore(defaults: .standard)
+    private let mailbox = LocalFileMailbox()
+    private var state: AppState?
     private var panel: NotchPanel?
     private var geometry: NotchGeometry?
+    private var onboardingWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Unit tests run inside the app; they don't need a notch on screen.
         guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
 
-        state.onHeartsArrived = { [effects] count in effects.play(newHearts: count) }
-        state.start()
-
-        placeNotch()
+        if !startNotch() { showOnboarding() }
         NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
         ) { [weak self] _ in
@@ -42,10 +43,54 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /// Starts syncing and shows the notch. Returns false if this Mac isn't paired yet.
+    @discardableResult
+    private func startNotch() -> Bool {
+        guard let state = AppState(store: store, mailbox: mailbox) else { return false }
+        state.onHeartsArrived = { [effects] count in effects.play(newHearts: count) }
+        state.start()
+        self.state = state
+        placeNotch()
+        return true
+    }
+
+    // MARK: Onboarding
+
+    /// A regular window that needs typing, so the app briefly becomes a regular app (Dock icon, ⌘-Tab).
+    private func showOnboarding() {
+        let model = OnboardingModel(store: store, mailbox: mailbox) { [weak self] in self?.finishOnboarding() }
+        let window = NSWindow(contentViewController: NSHostingController(rootView: OnboardingView(model: model)))
+        window.title = "Welcome to OurNotch"
+        window.styleMask = [.titled, .closable]
+        window.isReleasedWhenClosed = false
+        window.center()
+        onboardingWindow = window
+
+        // Closing setup before pairing quits; there's nothing to show in the notch yet.
+        NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated {
+                if self?.state == nil { NSApp.terminate(nil) }
+            }
+        }
+
+        NSApp.setActivationPolicy(.regular)
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate()
+    }
+
+    private func finishOnboarding() {
+        startNotch()
+        onboardingWindow?.close()
+        onboardingWindow = nil
+        NSApp.setActivationPolicy(.accessory)
+    }
+
+    // MARK: Notch window
+
     /// Creates the notch window, or moves it when displays change. The notification fires
     /// often, so it only re-places when the notch geometry actually changed.
     private func placeNotch() {
-        guard let newGeometry = NotchGeometry.current(), newGeometry != geometry else { return }
+        guard let state, let newGeometry = NotchGeometry.current(), newGeometry != geometry else { return }
         geometry = newGeometry
 
         let panel = self.panel ?? NotchPanel(frame: newGeometry.panelFrame)
@@ -60,4 +105,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         panel.alphaValue = 1
         self.panel = panel
     }
+
+    #if DEBUG
+    /// Forgets both identities and the local mailbox, then quits, so the next launch is a fresh install.
+    func resetForTesting() {
+        if let bundleId = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: bundleId)
+        }
+        UserDefaults.standard.removePersistentDomain(forName: PartnerSimulator.suiteName)
+        try? FileManager.default.removeItem(at: LocalFileMailbox().directory)
+        NSApp.terminate(nil)
+    }
+    #endif
 }
