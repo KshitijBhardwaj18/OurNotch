@@ -6,22 +6,33 @@ struct OurNotchApp: App {
 
     var body: some Scene {
         MenuBarExtra("OurNotch", systemImage: "heart") {
+            #if DEBUG
+            Button("Partner Simulator…") { appDelegate.partnerSimulator.show() }
+            Divider()
+            #endif
             Button("Quit OurNotch") { NSApp.terminate(nil) }
                 .keyboardShortcut("q")
         }
     }
 }
 
-/// Owns the app state and the notch window.
+/// Owns the app state, the heart effects, and the notch window.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let state = AppState()
+    let state = AppState(pairing: .devYou, mailbox: LocalFileMailbox())
+    let effects = HeartsEffect()
+    #if DEBUG
+    let partnerSimulator = PartnerSimulator()
+    #endif
     private var panel: NotchPanel?
     private var geometry: NotchGeometry?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Unit tests run inside the app; they don't need a notch on screen.
         guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
+
+        state.onHeartsArrived = { [effects] count in effects.play(newHearts: count) }
+        state.start()
 
         placeNotch()
         NotificationCenter.default.addObserver(
@@ -38,7 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         geometry = newGeometry
 
         let panel = self.panel ?? NotchPanel(frame: newGeometry.panelFrame)
-        let hostingView = NSHostingView(rootView: NotchView(state: state, geometry: newGeometry))
+        let hostingView = NSHostingView(rootView: NotchView(state: state, effects: effects, geometry: newGeometry))
         hostingView.sizingOptions = [] // the window stays fixed; only the shape inside animates
 
         // Hidden while moving so the jump isn't visible.

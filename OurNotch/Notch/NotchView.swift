@@ -3,12 +3,24 @@ import SwiftUI
 /// The black shape at the top of the screen. Hovering opens it; leaving closes it.
 struct NotchView: View {
     let state: AppState
+    let effects: HeartsEffect
     let geometry: NotchGeometry
 
     @State private var isOpen = false
     @State private var hoverTask: Task<Void, Never>?
 
     var body: some View {
+        ZStack(alignment: .top) {
+            ForEach(effects.pours) { pour in
+                PourView(hearts: pour.hearts).padding(.top, size.height)
+            }
+            notch
+        }
+        // Pin everything to the top-center of the (larger, transparent) panel.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    private var notch: some View {
         content
             .padding(.horizontal, radii.top)
             .frame(width: size.width, height: size.height)
@@ -16,13 +28,11 @@ struct NotchView: View {
             .clipShape(NotchShape(topRadius: radii.top, bottomRadius: radii.bottom))
             .onHover(perform: hoverChanged)
             .sensoryFeedback(.alignment, trigger: isOpen)
-            // Pin the shape to the top-center of the (larger, transparent) panel.
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     @ViewBuilder private var content: some View {
         if isOpen {
-            OpenNotchView(state: state, notchSize: geometry.notchSize)
+            OpenNotchView(state: state, effects: effects, notchSize: geometry.notchSize)
                 .transition(.scale(scale: 0.85, anchor: .top).combined(with: .opacity))
         } else {
             ClosedNotchView(state: state, notchSize: geometry.notchSize)

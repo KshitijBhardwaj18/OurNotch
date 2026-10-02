@@ -21,7 +21,7 @@ Workflow (learner decision, `spec.md > Decisions and Open Issues`): each slice i
   Learner check: Run OurNotch from Xcode (⌘R). Look at your notch: you should see a number and a ♡ beside it. Hover over it — it should spring open with a live counter ticking seconds. Move away and it closes. Click the ♡ in the menu bar → Quit.
   Commit: `Add notch window with closed and open states`
 
-- [ ] **2. Your love's hearts pour out of your notch**
+- [x] **2. Your love's hearts pour out of your notch**
   Becomes usable: Open the Partner Simulator (♡ menu → *Partner Simulator*, Debug only). Tap ❤ there → soft hearts float out of your notch. Tap ❤×3 → a full-screen splash of hearts. Quit OurNotch, send hearts from the simulator, relaunch → the missed hearts appear. Tap the ♡ in your open notch → the simulator receives it and your notch shows *sent ♡* then *delivered ♡*.
   Why now: This is the unique kernel — a heart from your partner arriving in your notch. It comes right after the notch exists so the most important behavior is proven early, including the missed-hearts math you asked about.
   PRD ref: `prd.md > Sending Hearts`, `prd.md > Missed Hearts`, `prd.md > States and Boundaries`
@@ -86,3 +86,5 @@ Activity mode:
 
 - `Info.plist` replaced by build settings (`GENERATE_INFOPLIST_FILE`, `INFOPLIST_KEY_LSUIElement`); `Assets.xcassets` and `OurNotch.entitlements` deferred until something needs them (app icon, slice 5 CloudKit) — Xcode's folder-synced project generates the plist, and an empty asset catalog or entitlements file adds nothing yet.
 - Slice 1 screenshot check replaced by a window-server check (layer 27 = menu bar + 3, 480×170 at top-center over a 179×32 notch) — this terminal lacks Screen Recording permission; the visual check moves to the slice 2 hands-on checkpoint.
+- Local mailbox stores one file per outbox (`outbox-<owner>.json`) instead of one shared file — it mirrors CloudKit's one-writer-per-row model, so the two identities never overwrite each other.
+- Notch panel grew 160 pt taller (transparent, click-through) — the pour needs room below the notch inside the same window.
