@@ -20,7 +20,7 @@ struct OurNotchApp: App {
 /// Shows onboarding until this Mac is paired, then owns the app state, the heart effects, and the notch window.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let effects = HeartsEffect()
+    let effects = EmojiEffect()
     #if DEBUG
     let partnerSimulator = PartnerSimulator()
     #endif
@@ -30,6 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var panel: NotchPanel?
     private var geometry: NotchGeometry?
     private var onboardingWindow: NSWindow?
+    private var settingsWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Unit tests run inside the app; they don't need a notch on screen.
@@ -47,7 +48,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @discardableResult
     private func startNotch() -> Bool {
         guard let state = AppState(store: store, mailbox: mailbox) else { return false }
-        state.onHeartsArrived = { [effects] count in effects.play(newHearts: count) }
+        state.onEmojisArrived = { [effects] count, emoji in effects.play(newCount: count, emoji: emoji) }
         state.start()
         self.state = state
         placeNotch()
@@ -74,8 +75,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         NSApp.setActivationPolicy(.regular)
-        window.makeKeyAndOrderFront(nil)
-        NSApp.activate()
+        window.showInFront()
     }
 
     private func finishOnboarding() {
@@ -94,7 +94,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         geometry = newGeometry
 
         let panel = self.panel ?? NotchPanel(frame: newGeometry.panelFrame)
-        let hostingView = NSHostingView(rootView: NotchView(state: state, effects: effects, geometry: newGeometry))
+        let notch = NotchView(state: state, effects: effects, geometry: newGeometry) { [weak self] in self?.showSettings() }
+        let hostingView = NSHostingView(rootView: notch)
         hostingView.sizingOptions = [] // the window stays fixed; only the shape inside animates
 
         // Hidden while moving so the jump isn't visible.
@@ -104,6 +105,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         panel.orderFrontRegardless()
         panel.alphaValue = 1
         self.panel = panel
+    }
+
+    // MARK: Settings
+
+    func showSettings() {
+        if settingsWindow == nil {
+            let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView()))
+            window.title = "OurNotch Settings"
+            window.styleMask = [.titled, .closable]
+            window.isReleasedWhenClosed = false
+            window.center()
+            settingsWindow = window
+        }
+        settingsWindow?.showInFront()
     }
 
     #if DEBUG
@@ -117,4 +132,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.terminate(nil)
     }
     #endif
+}
+
+extension NSWindow {
+    /// Shows a window on whichever desktop (Space) the user is on, in front. OurNotch has no Dock icon,
+    /// so without this a window can open on another desktop where the user never sees it.
+    func showInFront() {
+        collectionBehavior.insert(.moveToActiveSpace)
+        NSApp.activate()
+        makeKeyAndOrderFront(nil)
+        orderFrontRegardless()
+    }
 }

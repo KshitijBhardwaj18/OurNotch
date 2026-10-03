@@ -1,6 +1,6 @@
 import Foundation
 
-/// Keeps messages short enough for the notch banner (`prd.md > Sending Messages`).
+/// Keeps notes short enough for the notch banner (`prd.md > Sending Messages`).
 enum MessageRules {
     enum Verdict: Equatable {
         /// Ready to send, with surrounding whitespace trimmed.
@@ -16,11 +16,15 @@ enum MessageRules {
         if text.isEmpty { return .empty }
 
         let words = text.split(whereSeparator: \.isWhitespace)
+        if text.count > Config.Message.maxCharacters { return .invalid(hint: "A little shorter ♡") }
         if words.count > Config.Message.maxWords { return .invalid(hint: "\(Config.Message.maxWords) words max ♡") }
-        if text.count > Config.Message.maxCharacters { return .invalid(hint: "a little shorter ♡") }
         if words.contains(where: { $0.count > Config.Message.maxWordLength }) {
-            return .invalid(hint: "one word is too long ♡")
+            return .invalid(hint: "One word is too long ♡")
         }
         return .valid(text)
+    }
+
+    static func wordCount(_ raw: String) -> Int {
+        raw.split(whereSeparator: \.isWhitespace).count
     }
 }

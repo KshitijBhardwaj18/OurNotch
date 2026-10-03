@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,200..700,0..1,0&display=block">
+<style>
+body{margin:0;background:#F5F5F7}
+a{color:#1D1D1F}a:hover{color:#FF2D55}
+</style>
+</helmet>
+<section id="v3" data-screen-label="OurNotch v3 · macOS" style="padding:96px;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;color:#1D1D1F;display:flex;flex-direction:column;gap:96px;width:3900px;-webkit-font-smoothing:antialiased">
+
+  <div style="display:flex;flex-direction:column;gap:14px;max-width:1300px">
+    <div style="font-size:20px;font-weight:600;color:#FF2D55">OurNotch · v3</div>
+    <div style="font-size:72px;font-weight:700;letter-spacing:-1.8px;line-height:1.04">Feels like it shipped with your Mac.</div>
+    <div style="font-size:24px;color:#6E6E73;line-height:1.45;max-width:1200px">SF Pro, system pink, grouped cards in #1C1C1E, a native segmented control for tabs, “Change Photo…” buttons — nothing custom where macOS already has an answer. Open notch <b style="color:#1D1D1F">520 × 272 pt</b>. All mockups at 2×.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Try it</div>
+    <div style="display:flex;gap:56px;align-items:flex-start">
+      <dc-import name="NotchMac" photo-style="{{ photoStyle }}" hover="{{ true }}" open="{{ false }}" frame-w="{{ 680 }}" frame-h="{{ 390 }}" incoming="{{ incoming }}" pour-key="{{ pourKey }}" splash-key="{{ splashKey }}" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1360px,780px"></dc-import>
+      <div style="display:flex;flex-direction:column;gap:12px;width:380px">
+        <div style="font-size:20px;color:#6E6E73;line-height:1.5">Hover the notch to open it. Send a heart, write a note, switch tabs. Simulate your love:</div>
+        <div onClick="{{ simMessage }}" style="height:52px;border-radius:12px;background:#FFFFFF;box-shadow:0 0 0 1px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);font-size:18px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer">Receive a note</div>
+        <div onClick="{{ simPour }}" style="height:52px;border-radius:12px;background:#FFFFFF;box-shadow:0 0 0 1px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);font-size:18px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer">Receive 2 hearts</div>
+        <div onClick="{{ simSplash }}" style="height:52px;border-radius:12px;background:#FFFFFF;box-shadow:0 0 0 1px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);font-size:18px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer">Receive 5 hearts</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Closed</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1200px);gap:48px">
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Idle</div><div style="font-size:18px;color:#6E6E73">270 × 34 · days left, system-pink heart right with a soft heartbeat</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ false }}" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,220px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Incoming note</div><div style="font-size:18px;color:#6E6E73">grows to 270 × 56 · name in pink, note scrolls right → left</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ false }}" incoming="hi babe how are you? love you" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,220px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">No date yet</div><div style="font-size:18px;color:#6E6E73">a tertiary ♡ holds the spot</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ false }}" has-date="{{ false }}" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,220px"></dc-import></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Photo treatment</div><div style="font-size:20px;color:#6E6E73">A fixed filter so whatever photo arrives sits calmly in the black notch. Default is Soft; switch with the <b style="color:#1D1D1F">photoStyle</b> tweak.</div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1200px);gap:48px">
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Soft (default)</div><div style="font-size:18px;color:#6E6E73">less saturation, warm pink soft-light, fades into the card at the bottom</div></div>
+        <dc-import name="NotchMac" photo-style="soft" open="{{ true }}" tab="home" partner-name="{{ partnerName }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Mono</div><div style="font-size:18px;color:#6E6E73">black & white with a pink soft-light wash — most uniform, very calm</div></div>
+        <dc-import name="NotchMac" photo-style="mono" open="{{ true }}" tab="home" partner-name="{{ partnerName }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Original</div><div style="font-size:18px;color:#6E6E73">no filter, for comparison</div></div>
+        <dc-import name="NotchMac" photo-style="none" open="{{ true }}" tab="home" partner-name="{{ partnerName }}" hint-size="1200px,624px"></dc-import></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Home · bento</div><div style="font-size:20px;color:#6E6E73">Everything from your love at a glance: the latest photo they sent, their latest note, and hours · weekends · seconds together (seconds tick live). Couple names top-left.</div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1200px);gap:48px">
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Default</div><div style="font-size:18px;color:#6E6E73">square 184 × 184 photo · note tile · three stat tiles</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="home" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Nothing from them yet</div><div style="font-size:18px;color:#6E6E73">no photo, no note — stats still count</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="home" has-photo="{{ false }}" has-message="{{ false }}" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">No date yet</div><div style="font-size:18px;color:#6E6E73">stats show “—” until your date is set</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="home" has-date="{{ false }}" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Camera dead zone</div><div style="font-size:18px;color:#6E6E73">names on the left end, settings on the right</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="home" partner-name="{{ partnerName }}" show-dead-zone="{{ true }}" hint-size="1200px,624px"></dc-import></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Note</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1200px);gap:48px">
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Empty</div><div style="font-size:18px;color:#6E6E73">their latest note · send disabled</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="message" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Typing</div><div style="font-size:18px;color:#6E6E73">native focus ring in pink · “Until opened” selected</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="message" text="miss you already, dinner tonight?" focused="{{ true }}" scroll-mode="open" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Over the limit</div><div style="font-size:18px;color:#6E6E73">send off · gentle hint replaces the count</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="message" text="you are my favorite person in the whole wide world ok" focused="{{ true }}" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Sending → sent</div><div style="font-size:18px;color:#6E6E73">field locks · “Sending…” then “Sent ♡”</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="message" text="miss you already, dinner tonight?" msg-status="sent" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Delivered</div><div style="font-size:18px;color:#6E6E73">“Delivered ♡” in pink · field clears after 2 s</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="message" text="miss you already, dinner tonight?" msg-status="delivered" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Emoji · send an emoji</div><div style="font-size:20px;color:#6E6E73">Its own tab, clearly labeled. Pick how it shows up on your love's screen: popping out of the notch, or floating across the whole screen.</div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1200px);gap:48px">
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Default</div><div style="font-size:18px;color:#6E6E73">title + one-line explanation · six emoji · “Out of the notch” selected</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="emoji" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Tapped 😘 · full screen</div><div style="font-size:18px;color:#6E6E73">emoji squishes and floats up · pink ring · “Sent 😘”</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="emoji" emoji-mode="full" sent-emoji="😘" emoji-status="sent" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Delivered</div><div style="font-size:18px;color:#6E6E73">“Delivered 🥰” in pink · clears after 3 s</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="emoji" sent-emoji="🥰" emoji-status="delivered" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">On their screen · out of the notch</div><div style="font-size:18px;color:#6E6E73">the emoji slips out under the notch, sways and fades · 1.5 s</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ false }}" frame-h="{{ 200 }}" pour-loop="{{ true }}" incoming-emoji="😘" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,400px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">On their screen · full screen</div><div style="font-size:18px;color:#6E6E73">click-through overlay · 18 copies float up · 3 s</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ false }}" frame-h="{{ 200 }}" splash-loop="{{ true }}" incoming-emoji="🥰" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,400px"></dc-import></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Photo · send a photo</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1200px);gap:48px">
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Empty</div><div style="font-size:18px;color:#6E6E73">“Choose Photo…” opens NSOpenPanel, then sends</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="photo" my-photo="{{ false }}" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">Set</div><div style="font-size:18px;color:#6E6E73">last photo you sent + delivery · “Send New Photo…”</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ true }}" tab="photo" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,624px"></dc-import></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Incoming hearts</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1200px);gap:48px">
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">1–2 hearts · pour</div><div style="font-size:18px;color:#6E6E73">slip out under the notch, sway ±6 pt, fade · 1.5 s</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ false }}" frame-h="{{ 200 }}" pour-loop="{{ true }}" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,400px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:22px;font-weight:600">3+ hearts · splash</div><div style="font-size:18px;color:#6E6E73">click-through overlay window · 18 hearts float up · 3 s</div></div>
+        <dc-import name="NotchMac" photo-style="{{ photoStyle }}" open="{{ false }}" frame-h="{{ 200 }}" splash-loop="{{ true }}" partner-name="{{ partnerName }}" show-dead-zone="{{ showDeadZone }}" hint-size="1200px,400px"></dc-import></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Onboarding</div><div style="font-size:20px;color:#6E6E73">420 × 440 pt · standard window, follows light/dark (last screen dark) · Setup Assistant layout: centered content, Back / Continue bottom-right</div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,840px);gap:48px">
+
+      <div style="zoom:2;width:420px;height:440px;border-radius:10px;background:#F6F6F6;box-shadow:0 20px 50px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.2);overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:28px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:none"><div style="width:12px;height:12px;border-radius:50%;background:#FF5F57"></div><div style="width:12px;height:12px;border-radius:50%;background:#FEBC2E"></div><div style="width:12px;height:12px;border-radius:50%;background:#28C840"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 40px;text-align:center">
+          <div style="width:72px;height:72px;border-radius:17px;background:linear-gradient(180deg,#FF5C7A,#FF2D55);box-shadow:0 4px 12px rgba(255,45,85,.3);display:flex;align-items:center;justify-content:center;margin-bottom:10px"><span style="font-family:'Material Symbols Rounded';font-variation-settings:'FILL' 1;font-size:38px;color:#FFFFFF">favorite</span></div>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-.3px">Welcome to OurNotch</div>
+          <div style="font-size:13px;color:#6E6E73;line-height:1.45">A little love note that lives in the top of your screen.</div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 20px;flex:none"><div style="height:28px;padding:0 18px;border-radius:6px;background:#FF2D55;color:#FFFFFF;font-size:13px;font-weight:500;display:flex;align-items:center">Get Started</div></div>
+      </div>
+
+      <div style="zoom:2;width:420px;height:440px;border-radius:10px;background:#F6F6F6;box-shadow:0 20px 50px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.2);overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:28px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:none"><div style="width:12px;height:12px;border-radius:50%;background:#FF5F57"></div><div style="width:12px;height:12px;border-radius:50%;background:#FEBC2E"></div><div style="width:12px;height:12px;border-radius:50%;background:#28C840"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 40px;text-align:center">
+          <span style="font-family:'Material Symbols Rounded';font-variation-settings:'wght' 300;font-size:44px;color:#FF2D55;margin-bottom:6px">person</span>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.3px">What should your love call you?</div>
+          <div style="font-size:13px;color:#6E6E73">Shown next to your hearts and notes.</div>
+          <div style="margin-top:14px;width:240px;height:28px;border-radius:6px;background:#FFFFFF;box-shadow:0 0 0 1px #FF2D55,0 0 0 4px rgba(255,45,85,.3);display:flex;align-items:center;padding:0 9px;box-sizing:border-box;font-size:13px">sam<span style="width:1px;height:15px;background:#1D1D1F;margin-left:1px"></span></div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex:none"><div style="display:flex;gap:6px"><div style="width:6px;height:6px;border-radius:50%;background:#C7C7CC"></div><div style="width:6px;height:6px;border-radius:50%;background:#1D1D1F"></div><div style="width:6px;height:6px;border-radius:50%;background:#C7C7CC"></div><div style="width:6px;height:6px;border-radius:50%;background:#C7C7CC"></div><div style="width:6px;height:6px;border-radius:50%;background:#C7C7CC"></div></div><div style="display:flex;gap:8px"><div style="height:28px;padding:0 16px;border-radius:6px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.2),0 1px 1px rgba(0,0,0,.06);font-size:13px;display:flex;align-items:center">Back</div><div style="height:28px;padding:0 16px;border-radius:6px;background:#FF2D55;color:#FFFFFF;font-size:13px;font-weight:500;display:flex;align-items:center">Continue</div></div></div>
+      </div>
+
+      <div style="zoom:2;width:420px;height:440px;border-radius:10px;background:#F6F6F6;box-shadow:0 20px 50px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.2);overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:28px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:none"><div style="width:12px;height:12px;border-radius:50%;background:#FF5F57"></div><div style="width:12px;height:12px;border-radius:50%;background:#FEBC2E"></div><div style="width:12px;height:12px;border-radius:50%;background:#28C840"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 36px;text-align:center">
+          <span style="font-family:'Material Symbols Rounded';font-variation-settings:'wght' 300;font-size:44px;color:#FF2D55;margin-bottom:6px">mail</span>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.3px">Invite your love</div>
+          <div style="font-size:13px;color:#6E6E73">Share this code — it's just for the two of you.</div>
+          <div style="margin-top:12px;padding:10px 22px;border-radius:8px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.15);font-family:'SF Mono',ui-monospace,Menlo,monospace;font-size:26px;font-weight:600;letter-spacing:6px">K7QM3X</div>
+          <div style="display:flex;gap:8px;margin-top:8px"><div style="height:28px;padding:0 14px;border-radius:6px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.2),0 1px 1px rgba(0,0,0,.06);font-size:13px;display:flex;align-items:center">Copy Code</div><div style="height:28px;padding:0 14px;border-radius:6px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.2),0 1px 1px rgba(0,0,0,.06);font-size:13px;display:flex;align-items:center">Send Email…</div></div>
+          <div style="display:flex;align-items:center;gap:7px;margin-top:10px;font-size:12px;color:#6E6E73"><div style="width:12px;height:12px;border-radius:50%;border:2px solid #D1D1D6;border-top-color:#FF2D55;box-sizing:border-box"></div>Waiting for your love to join…</div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex:none"><div style="font-size:13px;color:#FF2D55">I Have a Code</div><div style="height:28px;padding:0 16px;border-radius:6px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.2),0 1px 1px rgba(0,0,0,.06);font-size:13px;display:flex;align-items:center">Back</div></div>
+      </div>
+
+      <div style="zoom:2;width:420px;height:440px;border-radius:10px;background:#F6F6F6;box-shadow:0 20px 50px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.2);overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:28px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:none"><div style="width:12px;height:12px;border-radius:50%;background:#FF5F57"></div><div style="width:12px;height:12px;border-radius:50%;background:#FEBC2E"></div><div style="width:12px;height:12px;border-radius:50%;background:#28C840"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 36px;text-align:center">
+          <div style="width:64px;height:64px;border-radius:50%;background:#E5E5EA url(https://picsum.photos/id/1027/256/256) center/cover;box-shadow:0 0 0 3px #FFFFFF,0 2px 8px rgba(0,0,0,.15);margin-bottom:8px"></div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.3px">{{ partnerName }} <span style="color:#FF2D55">♥</span> invited you</div>
+          <div style="font-size:13px;color:#6E6E73">Code K7QM3X · joined today</div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:0 20px;flex:none"><div style="height:28px;padding:0 16px;border-radius:6px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.2),0 1px 1px rgba(0,0,0,.06);font-size:13px;display:flex;align-items:center">Back</div><div style="height:28px;padding:0 16px;border-radius:6px;background:#FF2D55;color:#FFFFFF;font-size:13px;font-weight:500;display:flex;align-items:center">Join {{ partnerName }}</div></div>
+      </div>
+
+      <div style="zoom:2;width:420px;height:440px;border-radius:10px;background:#F6F6F6;box-shadow:0 20px 50px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.2);overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:28px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:none"><div style="width:12px;height:12px;border-radius:50%;background:#FF5F57"></div><div style="width:12px;height:12px;border-radius:50%;background:#FEBC2E"></div><div style="width:12px;height:12px;border-radius:50%;background:#28C840"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 36px;text-align:center">
+          <span style="font-family:'Material Symbols Rounded';font-variation-settings:'wght' 300;font-size:44px;color:#FF2D55;margin-bottom:6px">calendar_month</span>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.3px">When did you get together?</div>
+          <div style="margin-top:12px;display:flex;align-items:center;gap:6px"><div style="height:28px;border-radius:6px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.2);display:flex;align-items:center;padding:0 10px;font-size:13px;gap:2px;font-variant-numeric:tabular-nums"><span style="background:#FF2D55;color:#FFFFFF;border-radius:3px;padding:0 2px">2</span>/14/2023</div><div style="width:16px;height:28px;border-radius:5px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:7px;color:#6E6E73;line-height:1.3"><span>▲</span><span>▼</span></div></div>
+          <div style="font-size:13px;color:#FF2D55;font-weight:500;margin-top:6px">That's 1,326 days ♡</div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex:none"><div style="font-size:13px;color:#FF2D55">Skip for Now</div><div style="display:flex;gap:8px"><div style="height:28px;padding:0 16px;border-radius:6px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.2),0 1px 1px rgba(0,0,0,.06);font-size:13px;display:flex;align-items:center">Back</div><div style="height:28px;padding:0 16px;border-radius:6px;background:#FF2D55;color:#FFFFFF;font-size:13px;font-weight:500;display:flex;align-items:center">Continue</div></div></div>
+      </div>
+
+      <div style="zoom:2;width:420px;height:440px;border-radius:10px;background:#F6F6F6;box-shadow:0 20px 50px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.2);overflow:hidden;display:flex;flex-direction:column">
+        <div style="height:28px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:none"><div style="width:12px;height:12px;border-radius:50%;background:#FF5F57"></div><div style="width:12px;height:12px;border-radius:50%;background:#FEBC2E"></div><div style="width:12px;height:12px;border-radius:50%;background:#28C840"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 36px;text-align:center">
+          <span style="font-family:'Material Symbols Rounded';font-variation-settings:'wght' 300;font-size:44px;color:#FF2D55;margin-bottom:6px">laptop_mac</span>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.3px">Keep your love close</div>
+          <div style="font-size:13px;color:#6E6E73;line-height:1.45">Your notch will be there every time you open your Mac.</div>
+          <div style="margin-top:12px;width:280px;border-radius:8px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:space-between;padding:10px 12px;box-sizing:border-box">
+            <span style="font-size:13px">Open at Login</span>
+            <div style="width:32px;height:18px;border-radius:9px;background:#FF2D55;position:relative"><div style="position:absolute;top:1px;right:1px;width:16px;height:16px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 2px rgba(0,0,0,.25)"></div></div>
+          </div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex:none"><div style="display:flex;gap:6px"><div style="width:6px;height:6px;border-radius:50%;background:#C7C7CC"></div><div style="width:6px;height:6px;border-radius:50%;background:#C7C7CC"></div><div style="width:6px;height:6px;border-radius:50%;background:#C7C7CC"></div><div style="width:6px;height:6px;border-radius:50%;background:#1D1D1F"></div><div style="width:6px;height:6px;border-radius:50%;background:#C7C7CC"></div></div><div style="display:flex;gap:8px"><div style="height:28px;padding:0 16px;border-radius:6px;background:#FFFFFF;box-shadow:0 0 0 .5px rgba(0,0,0,.2),0 1px 1px rgba(0,0,0,.06);font-size:13px;display:flex;align-items:center">Back</div><div style="height:28px;padding:0 16px;border-radius:6px;background:#FF2D55;color:#FFFFFF;font-size:13px;font-weight:500;display:flex;align-items:center">Continue</div></div></div>
+      </div>
+
+      <div style="zoom:2;width:420px;height:440px;border-radius:10px;background:#262626;box-shadow:0 20px 50px rgba(0,0,0,.3),0 0 0 .5px rgba(0,0,0,.6),inset 0 0 0 .5px rgba(255,255,255,.12);overflow:hidden;display:flex;flex-direction:column;color:#FFFFFF">
+        <div style="height:28px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:none"><div style="width:12px;height:12px;border-radius:50%;background:#FF5F57"></div><div style="width:12px;height:12px;border-radius:50%;background:#FEBC2E"></div><div style="width:12px;height:12px;border-radius:50%;background:#28C840"></div></div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:0 40px;text-align:center">
+          <div style="width:72px;height:72px;border-radius:17px;background:linear-gradient(180deg,#FF5C7A,#FF375F);display:flex;align-items:center;justify-content:center;margin-bottom:10px"><span style="font-family:'Material Symbols Rounded';font-variation-settings:'FILL' 1;font-size:38px;color:#FFFFFF">favorite</span></div>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-.3px">You're all set ♡</div>
+          <div style="font-size:13px;color:rgba(235,235,245,.6);line-height:1.45">Hover the notch anytime to send {{ partnerName }} a little love.</div>
+        </div>
+        <div style="height:56px;display:flex;align-items:center;justify-content:flex-end;padding:0 20px;flex:none"><div style="height:28px;padding:0 22px;border-radius:6px;background:#FF375F;color:#FFFFFF;font-size:13px;font-weight:500;display:flex;align-items:center">Done</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:40px;font-weight:700;letter-spacing:-.6px">Spec sheet</div><div style="font-size:20px;color:#6E6E73">points · SF Pro (system font) · .monospacedDigit() on all numbers · dark appearance forced inside the notch</div></div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;align-items:start">
+
+      <div style="background:#FFFFFF;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,.06);padding:36px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:24px;font-weight:700">Shape</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px 24px;font-size:18px;color:#6E6E73"><span>Closed</span><b style="color:#1D1D1F;font-weight:600">270 × 34 · ears 6 · r 12</b><span>Closed + note</span><b style="color:#1D1D1F;font-weight:600">270 × 56 · r 16</b><span>Open</span><b style="color:#1D1D1F;font-weight:600">520 × 272 · ears 14 · r 24</b><span>Camera dead zone</span><b style="color:#1D1D1F;font-weight:600">180 × 32, centered</b><span>Closed side slots</span><b style="color:#1D1D1F;font-weight:600">45 wide each</b><span>Note strip</span><b style="color:#1D1D1F;font-weight:600">y 34 · h 20 · inset 18</b><span>Fill</span><b style="color:#1D1D1F;font-weight:600">#000000</b></div>
+      </div>
+
+      <div style="background:#FFFFFF;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,.06);padding:36px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:24px;font-weight:700">Open layout</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px 24px;font-size:18px;color:#6E6E73"><span>Top row</span><b style="color:#1D1D1F;font-weight:600">h 34 · inset 22 · names only · max 148</b><span>Content card</span><b style="color:#1D1D1F;font-weight:600">488 × 184 · x 16 · y 40 · r 12 · pad 12</b><span>Photo tile</span><b style="color:#1D1D1F;font-weight:600">150 × 150 · r 12 (Photo tab)</b><span>Emoji buttons</span><b style="color:#1D1D1F;font-weight:600">6 × flex · h 38 · r 10 · gap 6 · emoji 20</b><span>Note (home)</span><b style="color:#1D1D1F;font-weight:600">avatar 30 · gap 10 · 17 medium, 2 lines</b><span>Text field</span><b style="color:#1D1D1F;font-weight:600">h 34 · r 9 · focus ring 3</b><span>Send</span><b style="color:#1D1D1F;font-weight:600">32 circle</b><span>Small segmented</span><b style="color:#1D1D1F;font-weight:600">h 24 · r 7 · item r 5</b><span>Separators</span><b style="color:#1D1D1F;font-weight:600">1 pt · white 8%</b><span>Tab segmented</span><b style="color:#1D1D1F;font-weight:600">300 × 28 · 4 items · r 8 · pad 2 · bottom 10</b><span>Emoji buttons</span><b style="color:#1D1D1F;font-weight:600">6 × flex · h 54 · r 12 · gap 6 · emoji 27</b><span>Home bento</span><b style="color:#1D1D1F;font-weight:600">square photo 184 × 184 r 14 · note tile · stats 1 : 1 : 2.1 · values 16 semibold · gap 8 · r 12</b><span>Tab item</span><b style="color:#1D1D1F;font-weight:600">h 24 · r 6 · icon 14 · gap 5</b></div>
+      </div>
+
+      <div style="background:#FFFFFF;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,.06);padding:36px;display:flex;flex-direction:column;gap:16px">
+        <div style="font-size:24px;font-weight:700">Color (dark)</div>
+        <div style="display:flex;align-items:center;gap:14px"><div style="width:40px;height:40px;border-radius:10px;background:#FF375F"></div><div style="flex:1;font-size:18px">systemPink · heart, send, focus</div><b style="font-size:18px;font-weight:600">#FF375F</b></div>
+        <div style="display:flex;align-items:center;gap:14px"><div style="width:40px;height:40px;border-radius:10px;background:#D92D50"></div><div style="flex:1;font-size:18px">pressed</div><b style="font-size:18px;font-weight:600">#D92D50</b></div>
+        <div style="display:flex;align-items:center;gap:14px"><div style="width:40px;height:40px;border-radius:10px;background:#1C1C1E"></div><div style="flex:1;font-size:18px">card · secondarySystemBackground</div><b style="font-size:18px;font-weight:600">#1C1C1E</b></div>
+        <div style="display:flex;align-items:center;gap:14px"><div style="width:40px;height:40px;border-radius:10px;background:#2C2C2E"></div><div style="flex:1;font-size:18px">field · tertiary fill</div><b style="font-size:18px;font-weight:600">#2C2C2E</b></div>
+        <div style="display:flex;align-items:center;gap:14px"><div style="width:40px;height:40px;border-radius:10px;background:#636366"></div><div style="flex:1;font-size:18px">selected segment · track #767680 @24%</div><b style="font-size:18px;font-weight:600">#636366</b></div>
+        <div style="display:flex;align-items:center;gap:14px"><div style="width:40px;height:40px;border-radius:10px;background:#000000;display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-size:15px;font-weight:600">Aa</div><div style="flex:1;font-size:18px">label</div><b style="font-size:18px;font-weight:600">#FFFFFF</b></div>
+        <div style="display:flex;align-items:center;gap:14px"><div style="width:40px;height:40px;border-radius:10px;background:#000000;display:flex;align-items:center;justify-content:center;color:rgba(235,235,245,.6);font-size:15px;font-weight:600">Aa</div><div style="flex:1;font-size:18px">secondaryLabel</div><b style="font-size:18px;font-weight:600">#EBEBF5 @60%</b></div>
+        <div style="display:flex;align-items:center;gap:14px"><div style="width:40px;height:40px;border-radius:10px;background:#000000;display:flex;align-items:center;justify-content:center;color:rgba(235,235,245,.3);font-size:15px;font-weight:600">Aa</div><div style="flex:1;font-size:18px">tertiaryLabel</div><b style="font-size:18px;font-weight:600">#EBEBF5 @30%</b></div>
+        <div style="font-size:16px;color:#6E6E73">onboarding (light) uses systemPink #FF2D55 on #F6F6F6</div>
+      </div>
+
+      <div style="background:#FFFFFF;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,.06);padding:36px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:24px;font-weight:700">Type · SF Pro</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px 24px;font-size:18px;color:#6E6E73"><span>Days count</span><b style="color:#1D1D1F;font-weight:600">26 semibold · −0.4</b><span>Photo title · “days”</span><b style="color:#1D1D1F;font-weight:600">15 semibold / medium</b><span>Last note</span><b style="color:#1D1D1F;font-weight:600">14 regular · 2 lines</b><span>Name · button · field</span><b style="color:#1D1D1F;font-weight:600">13 semibold / regular</b><span>Tabs · body · labels</span><b style="color:#1D1D1F;font-weight:600">12 medium / regular</b><span>Status · segmented</span><b style="color:#1D1D1F;font-weight:600">11.5 medium</b><span>Captions · counter</span><b style="color:#1D1D1F;font-weight:600">11 medium / regular</b><span>Closed days · marquee</span><b style="color:#1D1D1F;font-weight:600">12 semibold / medium</b></div>
+      </div>
+
+      <div style="background:#FFFFFF;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,.06);padding:36px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:24px;font-weight:700">SF Symbols</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px 24px;font-size:18px;color:#6E6E73"><span>Heart</span><b style="color:#1D1D1F;font-weight:600">heart.fill</b><span>Delivered</span><b style="color:#1D1D1F;font-weight:600">checkmark</b><span>Settings</span><b style="color:#1D1D1F;font-weight:600">gearshape</b><span>Tabs</span><b style="color:#1D1D1F;font-weight:600">house · bubble.left · face.smiling · photo</b><span>Last note</span><b style="color:#1D1D1F;font-weight:600">bubble.left.fill</b><span>Send</span><b style="color:#1D1D1F;font-weight:600">arrow.up.circle.fill</b><span>Empty photo</span><b style="color:#1D1D1F;font-weight:600">person.crop.square · photo.badge.plus</b><span>Onboarding</span><b style="color:#1D1D1F;font-weight:600">person · envelope · calendar · laptopcomputer</b></div>
+      </div>
+
+      <div style="background:#FFFFFF;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,.06);padding:36px;display:flex;flex-direction:column;gap:14px">
+        <div style="font-size:24px;font-weight:700">Controls &amp; motion</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px 24px;font-size:18px;color:#6E6E73"><span>Tabs</span><b style="color:#1D1D1F;font-weight:600">Picker(.segmented), small</b><span>Buttons</span><b style="color:#1D1D1F;font-weight:600">.borderedProminent / .bordered, small</b><span>Open / close</span><b style="color:#1D1D1F;font-weight:600">spring(response .45, damping .7)</b><span>Content in</span><b style="color:#1D1D1F;font-weight:600">fade .22 · delay .08 · scale .94→1</b><span>Close delay</span><b style="color:#1D1D1F;font-weight:600">.35 s after hover leaves</b><span>Heart press</span><b style="color:#1D1D1F;font-weight:600">scale .97 · tiny 3-heart burst</b><span>Idle heartbeat</span><b style="color:#1D1D1F;font-weight:600">double beat / 2.6 s</b><span>Marquee</span><b style="color:#1D1D1F;font-weight:600">≈ 40 pt/s</b></div>
+      </div>
+
+      <div style="background:#FFFFFF;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,.06);padding:36px;display:flex;flex-direction:column;gap:14px;grid-column:span 3">
+        <div style="font-size:24px;font-weight:700">Photo treatment — any photo blends into the notch</div>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:12px 24px;font-size:18px;color:#6E6E73;max-width:1100px"><span>1 · tone down</span><b style="color:#1D1D1F;font-weight:600">.saturation(0.75) · .brightness(−0.06) · .contrast(1.05)</b><span>2 · warm tint</span><b style="color:#1D1D1F;font-weight:600">overlay #FF375F @ 22%, .blendMode(.softLight)</b><span>3 · fade to card</span><b style="color:#1D1D1F;font-weight:600">LinearGradient clear → #1C1C1E @ 55%, bottom 45%</b><span>4 · edge</span><b style="color:#1D1D1F;font-weight:600">inner stroke white @ 8%, 0.5 pt</b><span>Other styles (tweak)</span><b style="color:#1D1D1F;font-weight:600">mono (grayscale + pink soft-light) · original</b></div>
+      </div>
+
+      <div style="background:#FFFFFF;border-radius:20px;box-shadow:0 0 0 1px rgba(0,0,0,.06);padding:36px;display:flex;flex-direction:column;gap:18px;grid-column:span 3">
+        <div style="font-size:24px;font-weight:700">Why each tab looks this way</div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:40px;font-size:20px;line-height:1.5;color:#6E6E73">
+          <div><b style="color:#1D1D1F">Home</b> — A bento of everything from your love: their latest photo gets the tall tile, their note sits beside it, and hours, weekends and live seconds sit underneath.</div>
+          <div><b style="color:#1D1D1F">Note</b> — Reads like a Messages reply: their latest note, a standard text field with a send circle, then a small segmented control for how it scrolls.</div>
+          <div><b style="color:#1D1D1F">Emoji</b> — A dedicated tab that says exactly what it does, six one-tap emoji, and one choice: out of the notch or full screen.</div>
+          <div><b style="color:#1D1D1F">Photo</b> — Send a new photo in one step; you see the last one you sent and whether it arrived.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;photoStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;soft&quot;,&quot;mono&quot;,&quot;none&quot;],&quot;default&quot;:&quot;soft&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showDeadZone&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;partnerName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;nikki&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { incoming: '', pourKey: 0, splashKey: 0 };
+  timers = [];
+  componentWillUnmount() { this.timers.forEach(clearTimeout); }
+  renderVals() {
+    const s = this.state;
+    return {
+      photoStyle: this.props.photoStyle || 'soft',
+      showDeadZone: this.props.showDeadZone ?? false,
+      partnerName: this.props.partnerName || 'nikki',
+      incoming: s.incoming, pourKey: s.pourKey, splashKey: s.splashKey,
+      simMessage: () => {
+        this.setState({ incoming: 'hi babe how are you? love you' });
+        this.timers.push(setTimeout(() => this.setState({ incoming: '' }), 16000));
+      },
+      simPour: () => this.setState(x => ({ pourKey: x.pourKey + 1 })),
+      simSplash: () => this.setState(x => ({ splashKey: x.splashKey + 1 }))
+    };
+  }
+}
+</script>
+</body>
+</html>
