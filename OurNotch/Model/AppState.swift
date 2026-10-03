@@ -1,3 +1,4 @@
+import AppKit
 import CryptoKit
 import Foundation
 import Observation
@@ -15,6 +16,10 @@ final class AppState {
     private(set) var partnerOutbox = Outbox()
     /// The message currently scrolling under the notch, if any. Saved so `untilOpened` survives a restart.
     private(set) var banner: Message?
+    /// The latest photo my partner sent me, shown on Home.
+    private(set) var partnerPhoto: NSImage?
+    /// The latest photo I sent, shown on the Photo tab.
+    private(set) var myPhoto: NSImage?
     /// The last outbox the mailbox accepted. Differs from `myOutbox` while a save is pending or failed.
     private var savedOutbox: Outbox
 
@@ -26,8 +31,12 @@ final class AppState {
         .counted(sent: myOutbox.emojisSent, saved: savedOutbox.emojisSent, partnerSeen: partnerOutbox.seenEmojis)
     }
 
+    var photoStatus: DeliveryStatus {
+        .latest(id: myOutbox.photo?.id, savedId: savedOutbox.photo?.id, partnerSeenId: partnerOutbox.seenPhotoId)
+    }
+
     var messageStatus: DeliveryStatus {
-        .message(id: myOutbox.message?.id, savedId: savedOutbox.message?.id, partnerSeenId: partnerOutbox.seenMessageId)
+        .latest(id: myOutbox.message?.id, savedId: savedOutbox.message?.id, partnerSeenId: partnerOutbox.seenMessageId)
     }
 
     /// Called when emojis arrive: how many are new, and the latest one (which decides how they appear).
@@ -36,12 +45,13 @@ final class AppState {
     @ObservationIgnored private let key: SymmetricKey
     @ObservationIgnored private let mailbox: Mailbox
     @ObservationIgnored private let store: LocalStore
+    @ObservationIgnored private let photos: PhotoCache
     @ObservationIgnored private var saveTask: Task<Void, Never>?
     @ObservationIgnored private var syncTask: Task<Void, Never>?
     @ObservationIgnored private let log = Logger(subsystem: "OurNotch", category: "sync")
 
     /// Returns nil until this identity has paired.
-    init?(store: LocalStore, mailbox: Mailbox) {
+    init?(store: LocalStore, mailbox: Mailbox, photosRoot: URL = PhotoCache.defaultRoot) {
         guard let pairing = store.pairing,
               let key = try? Crypto.sharedKey(myPrivateKey: store.privateKey,
                                               partnerPublicKey: pairing.partnerKey,
@@ -50,6 +60,9 @@ final class AppState {
         self.key = key
         self.mailbox = mailbox
         self.store = store
+        photos = PhotoCache(ownerId: pairing.myId, root: photosRoot)
+        myPhoto = photos.load(.mine).flatMap(NSImage.init(data:))
+        partnerPhoto = photos.load(.partner).flatMap(NSImage.init(data:))
         myOutbox = store.myOutbox ?? Outbox()
         savedOutbox = store.savedOutbox ?? Outbox()
         banner = store.banner
@@ -94,6 +107,30 @@ final class AppState {
         store.myOutbox = myOutbox
         Task { await save() }
         return true
+    }
+
+    /// Uploads the photo (encrypted) first, then points my outbox at it, so my partner never sees
+    /// a photo id whose image isn't there yet. Returns false if the upload failed.
+    func sendPhoto(_ jpeg: Data) async -> Bool {
+        do {
+            try await mailbox.savePhoto(Crypto.seal(jpeg, with: key), owner: pairing.myId)
+            try photos.save(jpeg, .mine)
+        } catch {
+            log.error("Sending photo failed: \(error.localizedDescription)")
+            return false
+        }
+        myPhoto = NSImage(data: jpeg)
+        myOutbox.photo = SentPhoto(id: UUID(), sentAt: .now)
+        store.myOutbox = myOutbox
+        await save()
+        return true
+    }
+
+    /// Sets (or clears, with nil) my mood and saves it right away.
+    func setMood(_ emoji: String?) {
+        myOutbox.mood = emoji
+        store.myOutbox = myOutbox
+        Task { await save() }
     }
 
     // MARK: Banner
@@ -147,9 +184,27 @@ final class AppState {
             setBanner(message)
             shownSomething = true
         }
+        if let photo = partner.photo, photo.id != myOutbox.seenPhotoId, await downloadPartnerPhoto() {
+            myOutbox.seenPhotoId = photo.id
+            shownSomething = true
+        }
         guard shownSomething else { return }
         store.myOutbox = myOutbox
         await save() // tells the partner "delivered"
+    }
+
+    private func downloadPartnerPhoto() async -> Bool {
+        do {
+            guard let sealed = try await mailbox.fetchPhoto(owner: pairing.partnerId) else { return false }
+            let jpeg = try Crypto.open(sealed, with: key)
+            try photos.save(jpeg, .partner)
+            partnerPhoto = NSImage(data: jpeg)
+            log.notice("New photo from partner")
+            return true
+        } catch {
+            log.error("Fetching partner photo failed: \(error.localizedDescription)")
+            return false
+        }
     }
 
     private func save() async {

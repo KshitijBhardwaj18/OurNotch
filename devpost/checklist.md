@@ -61,15 +61,15 @@ Workflow (learner decision, `spec.md > Decisions and Open Issues`): each slice i
   Learner check: Hover the notch and walk through Home, Note, Emoji, and Photo. Send a note and an emoji from the simulator and from your notch. Say whether it now feels like the design.
   Commit: `Redesign notch with tabs, notes, and emojis`
 
-- [ ] **6. Send your love a photo**
-  Becomes usable: The Photo tab sends a photo (Choose Photo… → square crop → encrypted upload → Sending → Delivered); it appears on your love's Home photo tile with `from nikki · 1h`. Every photo in the notch gets the Soft treatment by default; Settings offers Soft / Mono / Original.
+- [x] **6. Send your love a photo, and your mood**
+  Becomes usable: The Photo tab sends a photo (Choose Photo… → square crop → encrypted upload → Sending → Delivered); it appears on your love's Home photo tile with `from nikki · 1h`. Every photo in the notch gets the Soft treatment by default; Settings offers Soft / Mono / Original. A new Mood tab sets your mood (emoji + label); your love's closed notch shows your small round avatar and mood to the left of the camera, with the ❤️ heartbeat on the right.
   Why now: Builds on slice 5's Photo tab and Home tile; before CloudKit so CloudKit carries the photo from the start.
-  PRD ref: `prd.md > Your Love's Photo`
+  PRD ref: `prd.md > Your Love's Photo`, `prd.md > Your Mood`
   Spec ref: `spec.md > Components` (Partner Photo), `spec.md > Data Model`, `devpost/design_handoff/README.md` (Photo, Photo treatment)
   Build: `photoId` in the outbox, `Photo` record in the `Mailbox` (local file), NSOpenPanel + square crop + resize ≤ 512 px + JPEG + encryption, local cache of the partner's photo, Photo tab and Home tile wired, photo treatment modifier + Settings picker, simulator photo sending.
   Verify (mechanical): Tests for photo encrypt → store → fetch → decrypt, square crop size, and `photoId` change detection pass; the mailbox photo file is unreadable bytes. Run the app, send a photo each way, and capture the Home tile and Photo tab.
-  Learner check: Send a photo from the Photo tab and see it on the simulator; send one from the simulator and see it on your Home tile. Try Soft, Mono, and Original in Settings.
-  Commit: `Add sending a photo to your love`
+  Learner check: Send a photo from the Photo tab and see it on the simulator; send one from the simulator and see it on your Home tile and as the little avatar in your closed notch. Set a mood in the simulator and see it beside the avatar. Try Soft, Mono, and Original in Settings.
+  Commit: `Add sending a photo and your mood to your love`
 
 - [ ] **7. Hearts travel through iCloud**
   Becomes usable: The same app, but rows travel through Apple's CloudKit public database instead of a local file. Onboarding checks you're signed into iCloud (with *Open System Settings* / *Try again* if not). Hearts and messages from the simulator arrive through real CloudKit; changes are picked up by silent pings, with checks on launch, wake, and every 5 minutes as a safety net. Ready for a second Mac.
@@ -125,3 +125,6 @@ Activity mode:
 - Photo tab shows its empty state with a disabled *Choose Photo…* until slice 6.
 - Learner feedback on slice 5: open notch enlarged to 560 × 296 with an even 20 pt margin (content 520 × 200, photo square 200, 10 pt gaps) because the bento felt cramped; closed side slots widened 45 → 52 pt because the days count hugged the left edge; Settings moved inside the notch (the gear swaps the content area for a Settings card) because a separate window felt out of place.
 - Second padding pass: margins now measured from the notch's black body, not its frame (the 14 pt ears sit inside the frame, so cards were only ~6 pt from the edge); open notch 568 × 296 around a 500 × 200 bento; photo tile made portrait (180 × 200) and stats split 1 : 1 : 1.8 so "Weekends" and the seconds fit at full size.
+- Slice 5 review, round 3: the closed notch's hidden open-state row was wider than the closed shape and pushed the days count off-center (fixed: it may shrink); stat tiles now show a big centered number with the label underneath (photo tile 160 × 200).
+- Added **mood** to slice 6 (learner): a Mood tab of emoji + label moods, and the closed notch shows the partner's small avatar (their photo) + mood on the left, ❤️ heartbeat on the right; the days count leaves the closed notch. Cost explained: one emoji in the encrypted row, and the avatar reuses the photo.
+- Slice 6 verified: 23 tests (photos become ≤ 512 px square JPEGs, stored encrypted in the mailbox, downloaded + cached by the partner, Delivered; mood reaches the partner and clears). Live: the learner sent a photo from the simulator → Home tile with Soft treatment and "from manya · 1m", and the closed notch's avatar; Mood tab set → "Now 🎧 Focused"; simulator mood 🥺 → shown beside the avatar. Sending a photo *from* the notch is covered by the delivery test, not driven live. Placeholder partner name changed Nikki → Manya (learner). Closed side slots widened to 60 pt with a 10 pt inset so the avatar doesn't hug the curved edge. Tests no longer write photos to the real Application Support folder.

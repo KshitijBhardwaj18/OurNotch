@@ -84,6 +84,12 @@ Added after the slice 2 checkpoint (learner: the open notch felt cluttered; a ph
   - [ ] Before my love has chosen one, my notch shows a gentle empty state.
   - [ ] Only the two of us can see it (encrypted like everything else).
 
+### Your Mood
+Added at the slice 5 review (learner: the closed notch should feel like your partner, not a counter).
+- As a partner, I want to set my mood so my love sees how I'm doing at a glance.
+  - [ ] The open notch has a **Mood** tab with a set of moods, each an emoji with a label (e.g. 😴 Sleepy, 💻 Busy, 🥺 Missing you). Tapping one sets it; tapping it again clears it.
+  - [ ] My love's **closed notch** shows a small round avatar of me (from the photo I sent) and my mood emoji to the left of the camera; the ❤️ heartbeat stays on the right. The days count moves off the closed notch.
+
 ## States and Boundaries
 - **First use / not signed in:** onboarding window; the notch isn't active yet.
 - **Signed in, not paired:** invite or enter-code options; the inviter sees a waiting state with the code.

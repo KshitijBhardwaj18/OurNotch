@@ -14,6 +14,7 @@ enum LoginItem {
 struct SettingsPanel: View {
     @State private var opensAtLogin = LoginItem.isEnabled
     @State private var error: String?
+    @AppStorage(PhotoStyle.storageKey) private var photoStyle: PhotoStyle = .soft
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -32,6 +33,19 @@ struct SettingsPanel: View {
                     .labelsHidden()
                     .controlSize(.small)
                     .tint(.notchPink)
+            }
+            .padding(12)
+            .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
+
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Photo style").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
+                    Text("How photos blend into the dark notch.")
+                        .font(.system(size: 11.5))
+                        .foregroundStyle(Color.secondaryLabel)
+                }
+                Spacer()
+                SmallSegmented(options: PhotoStyle.allCases, selection: $photoStyle, label: \.label)
             }
             .padding(12)
             .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))

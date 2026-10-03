@@ -15,6 +15,10 @@ protocol Mailbox: Sendable {
     func saveOutbox(_ payload: Data, owner: String) async throws
     func fetchOutbox(owner: String) async throws -> Data?
 
+    /// The owner's latest photo, already encrypted. One per owner; a new one replaces the old.
+    func savePhoto(_ sealed: Data, owner: String) async throws
+    func fetchPhoto(owner: String) async throws -> Data?
+
     /// Throws `MailboxError.alreadyExists` if the code is taken.
     func createInvite(_ invite: Invite, code: String) async throws
     func fetchInvite(code: String) async throws -> Invite?
@@ -39,6 +43,14 @@ struct LocalFileMailbox: Mailbox {
 
     func fetchOutbox(owner: String) async throws -> Data? {
         try read(name: "outbox-\(owner)")
+    }
+
+    func savePhoto(_ sealed: Data, owner: String) async throws {
+        try write(sealed, name: "photo-\(owner)", ext: "bin")
+    }
+
+    func fetchPhoto(owner: String) async throws -> Data? {
+        try read(name: "photo-\(owner)", ext: "bin")
     }
 
     func createInvite(_ invite: Invite, code: String) async throws {
@@ -68,13 +80,13 @@ struct LocalFileMailbox: Mailbox {
         try read(name: name).map { try JSONDecoder().decode(T.self, from: $0) }
     }
 
-    private func write(_ data: Data, name: String) throws {
+    private func write(_ data: Data, name: String, ext: String = "json") throws {
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        try data.write(to: directory.appending(path: "\(name).json"), options: .atomic)
+        try data.write(to: directory.appending(path: "\(name).\(ext)"), options: .atomic)
     }
 
-    private func read(name: String) throws -> Data? {
-        let url = directory.appending(path: "\(name).json")
+    private func read(name: String, ext: String = "json") throws -> Data? {
+        let url = directory.appending(path: "\(name).\(ext)")
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
         return try Data(contentsOf: url)
     }

@@ -7,6 +7,11 @@ enum Config {
     static let emojiBundleDelay: Duration = .seconds(1)
     /// The one-tap emojis on the Emoji tab.
     static let emojis = ["❤️", "🥰", "😘", "🫶", "🤗", "🌹"]
+    /// Moods for the Mood tab: the emoji travels; the label explains it.
+    static let moods: [(emoji: String, label: String)] = [
+        ("🥰", "In love"), ("😊", "Happy"), ("🥺", "Missing you"), ("🎉", "Excited"), ("☕️", "On a break"), ("🍕", "Hungry"),
+        ("💻", "Busy"), ("🎧", "Focused"), ("🏃", "Out"), ("😴", "Sleepy"), ("😔", "Low"), ("🤒", "Unwell"),
+    ]
 
     enum Pairing {
         /// How often the inviter checks whether their love has joined, while the waiting screen is open.
@@ -35,8 +40,10 @@ enum Config {
         /// so the black body is this much narrower on each side.
         static let openEarRadius: CGFloat = 14
         static let openSize = CGSize(width: contentSize.width + (margin + openEarRadius) * 2, height: 296)
-        /// Width of the slots on each side of the camera in the closed notch, for the days count and ♥.
-        static let closedSideWidth: CGFloat = 52
+        /// Width of the slots on each side of the camera in the closed notch: avatar + mood on the left, ♥ on the right.
+        static let closedSideWidth: CGFloat = 60
+        /// Space between the closed notch's curved edge and its content.
+        static let closedInset: CGFloat = 10
         /// How far the closed shape reaches below the menu bar, so it fully covers the camera housing.
         static let closedExtraHeight: CGFloat = 2
         /// Used on Macs without a notch.
