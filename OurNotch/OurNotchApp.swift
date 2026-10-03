@@ -1,3 +1,4 @@
+import CloudKit
 import os
 import SwiftUI
 
@@ -12,6 +13,8 @@ struct OurNotchApp: App {
             Button("Reset Everything (test)") { appDelegate.resetForTesting() }
             Divider()
             #endif
+            Button("Save Diagnostics") { appDelegate.saveDiagnostics() }
+            Divider()
             Button("Quit OurNotch") { NSApp.terminate(nil) }
                 .keyboardShortcut("q")
         }
@@ -36,6 +39,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Unit tests run inside the app; they don't need a notch on screen.
         guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
+        Diagnostics.shared.record(Self.launchSummary)
 
         if !startNotch() { showOnboarding() }
         NotificationCenter.default.addObserver(
@@ -47,7 +51,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSWorkspace.shared.notificationCenter.addObserver(
             forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
         ) { [weak self] _ in
-            MainActor.assumeIsolated { self?.syncEveryone() }
+            MainActor.assumeIsolated {
+                Diagnostics.shared.record("Mac woke")
+                self?.syncEveryone(.wake)
+            }
         }
         NSApp.registerForRemoteNotifications()
     }
@@ -56,18 +63,60 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// CloudKit's silent ping: the partner's row changed.
     func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String: Any]) {
-        syncEveryone()
+        let subscription = CKNotification(fromRemoteNotificationDictionary: userInfo)?.subscriptionID ?? "unknown"
+        Diagnostics.shared.record("ping received (subscription \(subscription))")
+        syncEveryone(.ping)
+    }
+
+    func application(_ application: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        // Only the last few characters: enough to tell devices apart, not enough to reuse.
+        let token = deviceToken.map { String(format: "%02x", $0) }.joined()
+        Diagnostics.shared.record("registered for pings (token …\(token.suffix(6)))")
     }
 
     func application(_ application: NSApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        Logger(subsystem: "OurNotch", category: "cloud").error("No pings: \(error.localizedDescription, privacy: .public)")
+        Diagnostics.shared.record("ping registration FAILED: \(error.diagnosticDescription)")
     }
 
-    private func syncEveryone() {
-        state?.syncNow()
+    private func syncEveryone(_ source: SyncSource) {
+        state?.syncNow(source)
         #if DEBUG
-        partnerSimulator.syncNow()
+        partnerSimulator.syncNow(source)
         #endif
+    }
+
+    // MARK: Diagnostics
+
+    /// "OurNotch 0.1 (1) Release · macOS 26.6.2 · Mac16,12 · notch 179×32 · checks every 10 s"
+    private static var launchSummary: String {
+        let info = Bundle.main.infoDictionary
+        let version = "\(info?["CFBundleShortVersionString"] ?? "?") (\(info?["CFBundleVersion"] ?? "?"))"
+        #if DEBUG
+        let build = "Debug"
+        #else
+        let build = "Release"
+        #endif
+        var size = 0
+        sysctlbyname("hw.model", nil, &size, nil, 0)
+        var model = [CChar](repeating: 0, count: size)
+        sysctlbyname("hw.model", &model, &size, nil, 0)
+        let geometry = NotchGeometry.current()
+        let screen = geometry.map { "\($0.hasNotch ? "notch" : "no notch, pill") \(Int($0.notchSize.width))×\(Int($0.notchSize.height))" } ?? "no screen"
+        return "launched OurNotch \(version) \(build) · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · \(String(cString: model)) · \(screen) · checks every \(Config.Cloud.pollInterval)"
+    }
+
+    /// Downloads both Macs' logs into ~/Library/Logs/OurNotch/ and shows them in Finder.
+    func saveDiagnostics() {
+        Task {
+            let folder = FileManager.default.homeDirectoryForCurrentUser.appending(path: "Library/Logs/OurNotch")
+            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            try? Data(Diagnostics.shared.text.utf8).write(to: folder.appending(path: "this-mac.log"))
+            if let partnerId = state?.pairing.partnerId {
+                let partnerLog = (try? await mailbox.fetchDiagnostics(owner: partnerId)) ?? "(no log uploaded yet)"
+                try? Data(partnerLog.utf8).write(to: folder.appending(path: "partner-mac.log"))
+            }
+            NSWorkspace.shared.activateFileViewerSelecting([folder.appending(path: "this-mac.log")])
+        }
     }
 
     /// Starts syncing and shows the notch. Returns false if this Mac isn't paired yet.
@@ -76,6 +125,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard let state = AppState(store: store, mailbox: mailbox) else { return false }
         state.onEmojisArrived = { [effects] count, emoji in effects.play(newCount: count, emoji: emoji) }
         state.start()
+        Diagnostics.shared.startUploading(owner: state.pairing.myId, mailbox: mailbox)
         self.state = state
         placeNotch()
         return true

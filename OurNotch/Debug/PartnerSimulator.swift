@@ -11,7 +11,7 @@ final class PartnerSimulator {
                                        mailbox: CloudStore())
     private var window: NSWindow?
 
-    func syncNow() { model.state?.syncNow() }
+    func syncNow(_ source: SyncSource) { model.state?.syncNow(source) }
 
     func show() {
         if window == nil {
@@ -69,7 +69,7 @@ private final class SimulatorModel {
     }
 
     private func startIfPaired() {
-        state = AppState(store: store, mailbox: mailbox)
+        state = AppState(store: store, mailbox: mailbox, who: "sim")
         state?.start()
     }
 }

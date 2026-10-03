@@ -26,6 +26,10 @@ protocol Mailbox: Sendable {
     func createJoin(_ join: Join, code: String) async throws
     func fetchJoin(code: String) async throws -> Join?
 
+    /// The owner's latest diagnostics log (plain text, no message content). One per owner.
+    func saveDiagnostics(_ text: String, owner: String) async throws
+    func fetchDiagnostics(owner: String) async throws -> String?
+
     /// Whether the mailbox can be used right now (CloudKit needs an iCloud sign-in).
     func accountAvailable() async -> Bool
     /// Asks to be pinged when the partner's row changes, so checks happen within seconds.
@@ -61,6 +65,14 @@ struct LocalFileMailbox: Mailbox {
 
     func fetchPhoto(owner: String) async throws -> Data? {
         try read(name: "photo-\(owner)", ext: "bin")
+    }
+
+    func saveDiagnostics(_ text: String, owner: String) async throws {
+        try write(Data(text.utf8), name: "diag-\(owner)", ext: "log")
+    }
+
+    func fetchDiagnostics(owner: String) async throws -> String? {
+        try read(name: "diag-\(owner)", ext: "log").map { String(decoding: $0, as: UTF8.self) }
     }
 
     func createInvite(_ invite: Invite, code: String) async throws {

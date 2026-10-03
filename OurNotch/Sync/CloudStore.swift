@@ -1,5 +1,5 @@
 import CloudKit
-import os
+
 
 /// The real mailbox: CloudKit's public database, hosted by Apple with no server of our own.
 /// Each record has one writer (its creator); payloads arrive already encrypted.
@@ -10,11 +10,11 @@ import os
 /// | `Join`      | `join-<CODE>`     | joinerId, joinerName, joinerKey        |
 /// | `Outbox`    | `outbox-<userId>` | ownerId (queryable), payload           |
 /// | `Photo`     | `photo-<userId>`  | ownerId, image (asset)                 |
+/// | `Diagnostics` | `diag-<userId>` | ownerId, text (event log, no content)  |
 struct CloudStore: Mailbox {
     let pollInterval: Duration
     private let container: CKContainer
     private var database: CKDatabase { container.publicCloudDatabase }
-    private let log = Logger(subsystem: "OurNotch", category: "cloud")
 
     init(containerId: String = Config.Cloud.containerId, pollInterval: Duration = Config.Cloud.pollInterval) {
         container = CKContainer(identifier: containerId)
@@ -55,6 +55,19 @@ struct CloudStore: Mailbox {
     func fetchPhoto(owner: String) async throws -> Data? {
         guard let asset = try await fetch("photo-\(owner)")?["image"] as? CKAsset, let url = asset.fileURL else { return nil }
         return try Data(contentsOf: url)
+    }
+
+    // MARK: Diagnostics
+
+    func saveDiagnostics(_ text: String, owner: String) async throws {
+        let record = CKRecord(recordType: "Diagnostics", recordID: .init(recordName: "diag-\(owner)"))
+        record["ownerId"] = owner
+        record["text"] = text
+        try await upsert(record)
+    }
+
+    func fetchDiagnostics(owner: String) async throws -> String? {
+        try await fetch("diag-\(owner)")?["text"] as? String
     }
 
     // MARK: Pairing
@@ -103,9 +116,10 @@ struct CloudStore: Mailbox {
         subscription.notificationInfo = info
         do {
             _ = try await database.save(subscription)
-            log.notice("Watching partner outbox for pings")
+            let all = (try? await database.allSubscriptions().map(\.subscriptionID)) ?? []
+            await Diagnostics.shared.record("ping subscription saved: \(subscription.subscriptionID); this iCloud user has \(all.count): \(all.joined(separator: ", "))")
         } catch {
-            log.error("Couldn't subscribe to partner pings: \(error.localizedDescription, privacy: .public)")
+            await Diagnostics.shared.record("ping subscription FAILED: \(error.diagnosticDescription)")
         }
     }
 
@@ -141,7 +155,7 @@ struct CloudStore: Mailbox {
         do {
             return try await work()
         } catch let error as CKError where error.retryAfterSeconds != nil {
-            log.notice("CloudKit asked to wait \(error.retryAfterSeconds ?? 0) s")
+            await Diagnostics.shared.record("CloudKit busy (\(error.code.rawValue)); waiting \(error.retryAfterSeconds ?? 0) s")
             try await Task.sleep(for: .seconds(error.retryAfterSeconds ?? 1))
             return try await work()
         }

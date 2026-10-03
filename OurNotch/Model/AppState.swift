@@ -2,7 +2,11 @@ import AppKit
 import CryptoKit
 import Foundation
 import Observation
-import os
+
+/// Why a check of the partner's row ran. Logged with each check, so pings can be told apart from the timer.
+enum SyncSource: String {
+    case launch, poll, ping, wake
+}
 
 /// The single source of truth for one partner: my outbox, what my partner sent, and what I've shown.
 /// The notch and the Partner Simulator each own one.
@@ -46,13 +50,17 @@ final class AppState {
     @ObservationIgnored private let mailbox: Mailbox
     @ObservationIgnored private let store: LocalStore
     @ObservationIgnored private let photos: PhotoCache
+    /// Labels this identity's lines in the diagnostics log ("me", or "sim" for the Partner Simulator).
+    @ObservationIgnored private let who: String
     @ObservationIgnored private var saveTask: Task<Void, Never>?
     @ObservationIgnored private var syncTask: Task<Void, Never>?
     @ObservationIgnored private var isSyncing = false
-    @ObservationIgnored private let log = Logger(subsystem: "OurNotch", category: "sync")
+    /// A ping or wake that arrived mid-check; it runs right after, so a fresh change isn't missed.
+    @ObservationIgnored private var queuedSync: SyncSource?
+    @ObservationIgnored private var hasFetchedPartner = false
 
     /// Returns nil until this identity has paired.
-    init?(store: LocalStore, mailbox: Mailbox, photosRoot: URL = PhotoCache.defaultRoot) {
+    init?(store: LocalStore, mailbox: Mailbox, photosRoot: URL = PhotoCache.defaultRoot, who: String = "me") {
         guard let pairing = store.pairing,
               let key = try? Crypto.sharedKey(myPrivateKey: store.privateKey,
                                               partnerPublicKey: pairing.partnerKey,
@@ -61,6 +69,7 @@ final class AppState {
         self.key = key
         self.mailbox = mailbox
         self.store = store
+        self.who = who
         photos = PhotoCache(ownerId: pairing.myId, root: photosRoot)
         myPhoto = photos.load(.mine).flatMap(NSImage.init(data:))
         partnerPhoto = photos.load(.partner).flatMap(NSImage.init(data:))
@@ -73,24 +82,35 @@ final class AppState {
         }
     }
 
+    private func note(_ message: String) {
+        Diagnostics.shared.record(message, who: who)
+    }
+
     /// Starts checking the partner's row: right away (anything missed while the app was closed shows then),
     /// whenever a ping or wake-up calls `syncNow`, and every `pollInterval` as a safety net.
     func start() {
         guard syncTask == nil else { return }
+        note("started: paired with \(pairing.partnerName) as \(pairing.role.rawValue); checks every \(mailbox.pollInterval)")
         syncTask = Task { [weak self] in
             guard let self else { return }
             await self.mailbox.watchPartner(self.pairing.partnerId)
+            var source = SyncSource.launch
             while !Task.isCancelled {
-                await self.sync()
+                await self.sync(source)
+                source = .poll
                 try? await Task.sleep(for: self.mailbox.pollInterval)
             }
         }
     }
 
-    /// Checks now, e.g. after a ping or when the Mac wakes. Skipped if a check is already running.
-    func syncNow() {
-        guard !isSyncing else { return }
-        Task { await sync() }
+    /// Checks now, e.g. after a ping or when the Mac wakes. If a check is already running,
+    /// this one runs right after it instead of being dropped.
+    func syncNow(_ source: SyncSource) {
+        if isSyncing {
+            queuedSync = source
+        } else {
+            Task { await sync(source) }
+        }
     }
 
     // MARK: Sending
@@ -100,6 +120,7 @@ final class AppState {
         myOutbox.emojisSent += 1
         myOutbox.lastEmoji = SentEmoji(char: char, mode: mode)
         store.myOutbox = myOutbox
+        note("tap: emoji #\(myOutbox.emojisSent) \(char) (\(mode.rawValue))")
         saveTask?.cancel()
         saveTask = Task { [weak self] in
             try? await Task.sleep(for: Config.emojiBundleDelay)
@@ -115,6 +136,7 @@ final class AppState {
         guard case .valid(let clean) = MessageRules.check(text) else { return false }
         myOutbox.message = Message(id: UUID(), text: clean, mode: mode, sentAt: .now)
         store.myOutbox = myOutbox
+        note("tap: note (\(MessageRules.wordCount(clean)) words, \(mode.rawValue))")
         Task { await save() }
         return true
     }
@@ -122,13 +144,16 @@ final class AppState {
     /// Uploads the photo (encrypted) first, then points my outbox at it, so my partner never sees
     /// a photo id whose image isn't there yet. Returns false if the upload failed.
     func sendPhoto(_ jpeg: Data) async -> Bool {
+        note("tap: photo (\(jpeg.count / 1024) KB)")
+        let started = Date.now
         do {
             try await mailbox.savePhoto(Crypto.seal(jpeg, with: key), owner: pairing.myId)
             try photos.save(jpeg, .mine)
         } catch {
-            log.error("Sending photo failed: \(error.localizedDescription, privacy: .public)")
+            note("photo upload FAILED: \(error.diagnosticDescription)")
             return false
         }
+        note("photo uploaded in \(Self.ms(since: started))")
         myPhoto = NSImage(data: jpeg)
         myOutbox.photo = SentPhoto(id: UUID(), sentAt: .now)
         store.myOutbox = myOutbox
@@ -140,6 +165,7 @@ final class AppState {
     func setMood(_ emoji: String?) {
         myOutbox.mood = emoji
         store.myOutbox = myOutbox
+        note("tap: mood \(emoji ?? "cleared")")
         Task { await save() }
     }
 
@@ -163,72 +189,129 @@ final class AppState {
     // MARK: Syncing
 
     /// Reads the partner's row, shows anything new, and retries an outbox that didn't save.
-    func sync() async {
+    func sync(_ source: SyncSource = .poll) async {
         isSyncing = true
-        defer { isSyncing = false }
+        defer {
+            isSyncing = false
+            if let next = queuedSync {
+                queuedSync = nil
+                Task { await sync(next) }
+            }
+        }
         if saveTask == nil, myOutbox != savedOutbox { await save() }
 
+        let started = Date.now
         let partner: Outbox
         do {
-            guard let sealed = try await mailbox.fetchOutbox(owner: pairing.partnerId) else { return }
+            guard let sealed = try await mailbox.fetchOutbox(owner: pairing.partnerId) else {
+                if source != .poll { note("[\(source.rawValue)] partner has no outbox yet") }
+                return
+            }
             partner = try JSONDecoder().decode(Outbox.self, from: Crypto.open(sealed, with: key))
         } catch {
-            log.error("Fetching partner outbox failed: \(error.localizedDescription, privacy: .public)")
+            note("[\(source.rawValue)] fetch FAILED: \(error.diagnosticDescription)")
             return
         }
+        let fetchTime = Self.ms(since: started)
+        let previous = partnerOutbox
         partnerOutbox = partner
+        if hasFetchedPartner { logReceipts(old: previous, new: partner) }
+        hasFetchedPartner = true
         if pairing.role == .joiner, let date = partner.togetherSince, date != togetherSince {
             togetherSince = date
             store.togetherSince = date
+            note("[\(source.rawValue)] got together-since date")
         }
 
-        var shownSomething = false
+        var found: [String] = []
+        if partner.mood != previous.mood, hasFetchedPartner { found.append("mood \(partner.mood ?? "cleared")") }
         let newEmojis = Arrival.newCount(partnerSent: partner.emojisSent, lastShown: myOutbox.seenEmojis)
         if newEmojis > 0, let emoji = partner.lastEmoji {
-            log.notice("\(newEmojis) new emoji(s) from partner")
             myOutbox.seenEmojis = partner.emojisSent
             onEmojisArrived?(newEmojis, emoji)
-            shownSomething = true
+            found.append("\(newEmojis) emoji \(emoji.char) (\(emoji.mode.rawValue))")
         }
         if let message = partner.message, message.id != myOutbox.seenMessageId {
-            log.notice("New message from partner (\(message.mode.rawValue))")
             myOutbox.seenMessageId = message.id
             setBanner(message)
-            shownSomething = true
+            found.append("note (\(message.mode.rawValue), sent \(Self.ms(since: message.sentAt)) ago)")
         }
         if let photo = partner.photo, photo.id != myOutbox.seenPhotoId, await downloadPartnerPhoto() {
             myOutbox.seenPhotoId = photo.id
-            shownSomething = true
+            found.append("photo (sent \(Self.ms(since: photo.sentAt)) ago)")
         }
-        guard shownSomething else { return }
+
+        if !found.isEmpty {
+            note("[\(source.rawValue)] found \(found.joined(separator: ", ")); fetch \(fetchTime)")
+        } else if source != .poll {
+            note("[\(source.rawValue)] no change found; fetch \(fetchTime)")
+        }
+        let seenSomethingNew = myOutbox.seenEmojis != savedOutbox.seenEmojis
+            || myOutbox.seenMessageId != savedOutbox.seenMessageId
+            || myOutbox.seenPhotoId != savedOutbox.seenPhotoId
+        guard seenSomethingNew else { return }
         store.myOutbox = myOutbox
         await save() // tells the partner "delivered"
     }
 
+    /// Logs when my partner's Mac has shown what I sent: the "Delivered" moments.
+    private func logReceipts(old: Outbox, new: Outbox) {
+        if new.seenEmojis > old.seenEmojis { note("delivered: partner showed emojis up to #\(new.seenEmojis)") }
+        if new.seenMessageId != old.seenMessageId, new.seenMessageId == myOutbox.message?.id {
+            note("delivered: partner showed my note (sent \(Self.ms(since: myOutbox.message?.sentAt ?? .now)) ago)")
+        }
+        if new.seenPhotoId != old.seenPhotoId, new.seenPhotoId == myOutbox.photo?.id {
+            note("delivered: partner downloaded my photo (sent \(Self.ms(since: myOutbox.photo?.sentAt ?? .now)) ago)")
+        }
+    }
+
     private func downloadPartnerPhoto() async -> Bool {
+        let started = Date.now
         do {
             guard let sealed = try await mailbox.fetchPhoto(owner: pairing.partnerId) else { return false }
             let jpeg = try Crypto.open(sealed, with: key)
             try photos.save(jpeg, .partner)
             partnerPhoto = NSImage(data: jpeg)
-            log.notice("New photo from partner")
+            note("photo downloaded (\(jpeg.count / 1024) KB) in \(Self.ms(since: started))")
             return true
         } catch {
-            log.error("Fetching partner photo failed: \(error.localizedDescription, privacy: .public)")
+            note("photo download FAILED: \(error.diagnosticDescription)")
             return false
         }
     }
 
     private func save() async {
         let snapshot = myOutbox
+        let changes = Self.changes(from: savedOutbox, to: snapshot)
+        let started = Date.now
         do {
             let sealed = try Crypto.seal(JSONEncoder().encode(snapshot), with: key)
             try await mailbox.saveOutbox(sealed, owner: pairing.myId)
             savedOutbox = snapshot
             store.savedOutbox = snapshot
+            note("saved outbox (\(changes)) in \(Self.ms(since: started))")
         } catch {
-            log.error("Saving outbox failed, will retry: \(error.localizedDescription, privacy: .public)")
+            note("save FAILED (\(changes)), will retry: \(error.diagnosticDescription)")
         }
+    }
+
+    /// What differs between two outboxes, for the log — never the note's text.
+    private static func changes(from old: Outbox, to new: Outbox) -> String {
+        var parts: [String] = []
+        if new.emojisSent != old.emojisSent { parts.append("emojis \(old.emojisSent)→\(new.emojisSent)") }
+        if new.message != old.message { parts.append("note") }
+        if new.photo != old.photo { parts.append("photo") }
+        if new.mood != old.mood { parts.append("mood \(new.mood ?? "cleared")") }
+        if new.togetherSince != old.togetherSince { parts.append("date") }
+        if new.seenEmojis != old.seenEmojis { parts.append("seen emojis \(new.seenEmojis)") }
+        if new.seenMessageId != old.seenMessageId { parts.append("seen note") }
+        if new.seenPhotoId != old.seenPhotoId { parts.append("seen photo") }
+        return parts.isEmpty ? "no changes" : parts.joined(separator: ", ")
+    }
+
+    private static func ms(since date: Date) -> String {
+        let seconds = Date.now.timeIntervalSince(date)
+        return seconds < 10 ? "\(Int(seconds * 1000)) ms" : "\(Int(seconds)) s"
     }
 }
 

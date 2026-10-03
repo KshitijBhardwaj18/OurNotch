@@ -21,8 +21,17 @@ enum Config {
         #if DEBUG
         static let pollInterval: Duration = .seconds(3)
         #else
-        static let pollInterval: Duration = .seconds(300)
+        // ponytail: 10 s while pings are unverified on two Macs. ~0.1 requests/s per user, so 1,000 users
+        // would exceed CloudKit's free allowance; return to 300 s once pings are confirmed.
+        static let pollInterval: Duration = .seconds(10)
         #endif
+    }
+
+    enum Diagnostics {
+        /// Upload this Mac's event log to CloudKit so both partners' logs can be read from either Mac.
+        static let uploads = true
+        static let maxLines = 400
+        static let uploadInterval: Duration = .seconds(15)
     }
 
     enum Pairing {
