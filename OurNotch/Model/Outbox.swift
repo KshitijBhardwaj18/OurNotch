@@ -14,6 +14,17 @@ struct Outbox: Codable, Equatable {
     var message: Message?
     /// The partner's note this Mac has already shown.
     var seenMessageId: UUID?
+    /// The latest photo sent. The image itself travels separately, encrypted, as its own record.
+    var photo: SentPhoto?
+    /// The partner's photo this Mac has already downloaded.
+    var seenPhotoId: UUID?
+    /// My current mood emoji, shown beside my avatar in my partner's closed notch. Nil when cleared.
+    var mood: String?
+}
+
+struct SentPhoto: Codable, Equatable {
+    let id: UUID
+    let sentAt: Date
 }
 
 struct SentEmoji: Codable, Equatable {
@@ -93,11 +104,12 @@ enum DeliveryStatus: Equatable {
         return partnerSeen >= sent ? .delivered : .sent
     }
 
+    /// For "latest only" things like the note and the photo.
     /// - Parameters:
-    ///   - id: my latest note.
-    ///   - savedId: the latest note the mailbox has accepted.
-    ///   - partnerSeenId: the partner's `seenMessageId`.
-    static func message(id: UUID?, savedId: UUID?, partnerSeenId: UUID?) -> DeliveryStatus {
+    ///   - id: my latest one.
+    ///   - savedId: the latest one the mailbox has accepted.
+    ///   - partnerSeenId: the latest one my partner has shown.
+    static func latest(id: UUID?, savedId: UUID?, partnerSeenId: UUID?) -> DeliveryStatus {
         guard let id else { return .none }
         if savedId != id { return .sending }
         return partnerSeenId == id ? .delivered : .sent

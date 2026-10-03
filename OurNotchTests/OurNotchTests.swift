@@ -1,4 +1,5 @@
 import Foundation
+import ImageIO
 import Testing
 @testable import OurNotch
 
@@ -60,10 +61,10 @@ struct ArrivalTests {
 
     @Test func messageSentThenDelivered() {
         let id = UUID(), older = UUID()
-        #expect(DeliveryStatus.message(id: nil, savedId: nil, partnerSeenId: nil) == .none)
-        #expect(DeliveryStatus.message(id: id, savedId: older, partnerSeenId: older) == .sending)
-        #expect(DeliveryStatus.message(id: id, savedId: id, partnerSeenId: older) == .sent)
-        #expect(DeliveryStatus.message(id: id, savedId: id, partnerSeenId: id) == .delivered)
+        #expect(DeliveryStatus.latest(id: nil, savedId: nil, partnerSeenId: nil) == .none)
+        #expect(DeliveryStatus.latest(id: id, savedId: older, partnerSeenId: older) == .sending)
+        #expect(DeliveryStatus.latest(id: id, savedId: id, partnerSeenId: older) == .sent)
+        #expect(DeliveryStatus.latest(id: id, savedId: id, partnerSeenId: id) == .delivered)
     }
 }
 
@@ -92,6 +93,7 @@ struct MessageRulesTests {
 /// Two people on one temporary mailbox, each with its own local storage.
 private struct TwoPartners {
     let mailbox = LocalFileMailbox(directory: .temporaryDirectory.appending(path: UUID().uuidString))
+    let photosRoot = URL.temporaryDirectory.appending(path: UUID().uuidString)
     let you = LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
     let partner = LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
 
@@ -105,8 +107,8 @@ private struct TwoPartners {
         let code = try await yourService.createInvite(name: "Kshitij")
         _ = try await partnerService.join(code: code.lowercased(), name: "Nikki")
         _ = try #require(try await yourService.checkForJoin(code: code))
-        return (try #require(AppState(store: you, mailbox: mailbox)),
-                try #require(AppState(store: partner, mailbox: mailbox)))
+        return (try #require(AppState(store: you, mailbox: mailbox, photosRoot: photosRoot)),
+                try #require(AppState(store: partner, mailbox: mailbox, photosRoot: photosRoot)))
     }
 }
 
@@ -223,5 +225,72 @@ struct PartnersTests {
         let (you, _) = try await TwoPartners().paired()
         #expect(!you.sendMessage("   ", mode: .three))
         #expect(you.myOutbox.message == nil)
+    }
+}
+
+struct PhotoTests {
+    /// Writes a solid-color PNG of the given size to a temporary file.
+    private func imageFile(width: Int, height: Int) throws -> URL {
+        let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0,
+                                space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        context.setFillColor(CGColor(red: 1, green: 0.4, blue: 0.6, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        let url = URL.temporaryDirectory.appending(path: "\(UUID().uuidString).png")
+        let destination = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil)!
+        CGImageDestinationAddImage(destination, context.makeImage()!, nil)
+        CGImageDestinationFinalize(destination)
+        return url
+    }
+
+    private func pixelSize(_ jpeg: Data) -> (Int, Int) {
+        let image = CGImageSourceCreateImageAtIndex(CGImageSourceCreateWithData(jpeg as CFData, nil)!, 0, nil)!
+        return (image.width, image.height)
+    }
+
+    @Test func photosBecomeSmallSquareJPEGs() throws {
+        let big = try PhotoProcessing.squareJPEG(from: imageFile(width: 3000, height: 2000))
+        #expect(pixelSize(big) == (512, 512))
+        #expect(big.prefix(2) == Data([0xFF, 0xD8])) // JPEG
+        let small = try PhotoProcessing.squareJPEG(from: imageFile(width: 300, height: 400))
+        #expect(pixelSize(small) == (300, 300)) // never scaled up
+    }
+}
+
+@MainActor
+struct PhotoDeliveryTests {
+    @Test func photoArrivesEncryptedAndIsDelivered() async throws {
+        let people = TwoPartners()
+        let (you, partner) = try await people.paired()
+        let jpeg = Data([0xFF, 0xD8, 0xFF, 0xE0]) + Data("pretend photo".utf8)
+
+        #expect(await you.sendPhoto(jpeg))
+        #expect(you.photoStatus == .sent)
+        let stored = try #require(try await people.mailbox.fetchPhoto(owner: people.you.myId))
+        #expect(stored.prefix(2) != Data([0xFF, 0xD8])) // not a readable JPEG in the mailbox
+        #expect(stored.range(of: Data("pretend photo".utf8)) == nil)
+
+        await partner.sync()
+        #expect(partner.partnerOutbox.photo != nil)
+        #expect(PhotoCache(ownerId: people.partner.myId, root: people.photosRoot).load(.partner) == jpeg)
+
+        await you.sync()
+        #expect(you.photoStatus == .delivered)
+    }
+}
+
+@MainActor
+struct MoodTests {
+    @Test func moodReachesPartnerAndClears() async throws {
+        let (you, partner) = try await TwoPartners().paired()
+        you.setMood("😴")
+        try await Task.sleep(for: .milliseconds(100))
+        await partner.sync()
+        #expect(partner.partnerOutbox.mood == "😴")
+
+        you.setMood(nil)
+        try await Task.sleep(for: .milliseconds(100))
+        await partner.sync()
+        #expect(partner.partnerOutbox.mood == nil)
     }
 }

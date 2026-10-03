@@ -27,7 +27,7 @@ final class PartnerSimulator {
 @MainActor
 @Observable
 private final class SimulatorModel {
-    var name = "Nikki"
+    var name = "Manya"
     var typedCode = ""
     var togetherSince = Calendar.current.date(from: DateComponents(year: 2023, month: 2, day: 14))!
     private(set) var state: AppState?
@@ -159,6 +159,28 @@ private struct PartnerSimulatorView: View {
                 }
             }
 
+            Picker("Mood", selection: Binding(get: { state.myOutbox.mood ?? "" },
+                                              set: { state.setMood($0.isEmpty ? nil : $0) })) {
+                Text("No mood").tag("")
+                ForEach(Config.moods, id: \.emoji) { Text("\($0.emoji) \($0.label)").tag($0.emoji) }
+            }
+            .fixedSize()
+
+            HStack {
+                Button("Send photo…") {
+                    choosePhoto { url in
+                        Task {
+                            guard let jpeg = try? PhotoProcessing.squareJPEG(from: url) else { return }
+                            _ = await state.sendPhoto(jpeg)
+                        }
+                    }
+                }
+                if let photo = state.partnerPhoto {
+                    Image(nsImage: photo).resizable().scaledToFill().frame(width: 28, height: 28).clipShape(Circle())
+                    Text("their photo").foregroundStyle(.secondary)
+                }
+            }
+
             Grid(alignment: .leading, verticalSpacing: 6) {
                 GridRow {
                     Text("Emojis sent").foregroundStyle(.secondary)
@@ -171,6 +193,10 @@ private struct PartnerSimulatorView: View {
                 GridRow {
                     Text("Message sent").foregroundStyle(.secondary)
                     Text(state.messageStatus.label)
+                }
+                GridRow {
+                    Text("Photo sent").foregroundStyle(.secondary)
+                    Text(state.photoStatus.label)
                 }
                 GridRow {
                     Text("Last message").foregroundStyle(.secondary)

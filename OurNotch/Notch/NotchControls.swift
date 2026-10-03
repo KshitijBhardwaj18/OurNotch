@@ -1,13 +1,14 @@
 import SwiftUI
 
 enum NotchTab: CaseIterable {
-    case home, note, emoji, photo
+    case home, note, emoji, mood, photo
 
     var label: String {
         switch self {
         case .home: "Home"
         case .note: "Note"
         case .emoji: "Emoji"
+        case .mood: "Mood"
         case .photo: "Photo"
         }
     }
@@ -17,12 +18,13 @@ enum NotchTab: CaseIterable {
         case .home: "house"
         case .note: "bubble.left"
         case .emoji: "face.smiling"
+        case .mood: "cloud.sun"
         case .photo: "photo"
         }
     }
 }
 
-/// The native-looking segmented control at the bottom of the open notch (300 × 28).
+/// The native-looking segmented control at the bottom of the open notch (76 pt per tab × 28).
 struct NotchTabBar: View {
     @Binding var selection: NotchTab
     /// True while Settings covers the tabs, so no tab looks selected.
@@ -55,7 +57,7 @@ struct NotchTabBar: View {
             }
         }
         .padding(2)
-        .frame(width: 300, height: 28)
+        .frame(width: CGFloat(NotchTab.allCases.count) * 76, height: 28)
         .background(Color.segmentTrack, in: RoundedRectangle(cornerRadius: 8))
         .animation(.snappy(duration: 0.2), value: selection)
         .animation(.snappy(duration: 0.2), value: dimmed)
@@ -128,13 +130,14 @@ extension View {
     }
 }
 
-/// "now", "2m ago", "1h ago", "3d ago".
-func shortAgo(_ date: Date, now: Date = .now) -> String {
+/// "now", "2m ago", "1h ago", "3d ago" — or "2m", "1h", "3d" without the suffix.
+func shortAgo(_ date: Date, now: Date = .now, suffix: Bool = true) -> String {
     let seconds = max(0, Int(now.timeIntervalSince(date)))
+    let ago = suffix ? " ago" : ""
     switch seconds {
     case ..<60: return "now"
-    case ..<3600: return "\(seconds / 60)m ago"
-    case ..<86_400: return "\(seconds / 3600)h ago"
-    default: return "\(seconds / 86_400)d ago"
+    case ..<3600: return "\(seconds / 60)m\(ago)"
+    case ..<86_400: return "\(seconds / 3600)h\(ago)"
+    default: return "\(seconds / 86_400)d\(ago)"
     }
 }

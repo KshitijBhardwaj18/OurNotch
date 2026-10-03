@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The row beside the camera. Closed: days together and a heartbeat ♥. Open: the couple's names and the
+/// The row beside the camera. Closed: your love's little avatar and mood, and a heartbeat ♥. Open: the couple's names and the
 /// Settings gear. Both layouts sit in the same row and crossfade, so nothing reflows mid-animation.
 struct NotchHeaderView: View {
     let state: AppState
@@ -18,16 +18,15 @@ struct NotchHeaderView: View {
 
     private var closed: some View {
         HStack(spacing: 0) {
-            Group {
-                if let since = state.togetherSince {
-                    Text("\(Together.days(since: since))")
-                        .font(.system(size: 12, weight: .semibold).monospacedDigit())
-                        .foregroundStyle(.white)
-                } else {
-                    Text("♡").font(.system(size: 12)).foregroundStyle(Color.tertiaryLabel)
+            HStack(spacing: 4) {
+                PartnerAvatar(state: state, size: 20)
+                if let mood = state.partnerOutbox.mood {
+                    Text(mood).font(.system(size: 13)).transition(.scale.combined(with: .opacity))
                 }
             }
-            .frame(width: Config.Notch.closedSideWidth)
+            .animation(.spring(response: 0.35, dampingFraction: 0.6), value: state.partnerOutbox.mood)
+            .padding(.leading, Config.Notch.closedInset)
+            .frame(width: Config.Notch.closedSideWidth, alignment: .leading)
 
             // Nothing drawn behind the camera is visible, so leave at least its width empty.
             Spacer(minLength: notchSize.width)
@@ -36,22 +35,26 @@ struct NotchHeaderView: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Color.notchPink)
                 .heartbeat()
-                .frame(width: Config.Notch.closedSideWidth)
+                .padding(.trailing, Config.Notch.closedInset + 2)
+                .frame(width: Config.Notch.closedSideWidth, alignment: .trailing)
         }
     }
 
     private var open: some View {
         HStack(spacing: 0) {
             HStack(spacing: 4) {
-                Text(state.myName.lowercased()).fixedSize()
+                Text(state.myName.lowercased()).lineLimit(1)
                 Image(systemName: "heart.fill").font(.system(size: 11)).foregroundStyle(Color.notchPink)
                 Text(state.partnerName.lowercased()).lineLimit(1).truncationMode(.tail)
             }
             .font(.system(size: 13, weight: .semibold))
             .foregroundStyle(.white)
+            // At most 160 pt, so the names always end well before the camera.
             .frame(maxWidth: 160, alignment: .leading)
 
-            Spacer(minLength: notchSize.width)
+            // No minimum here: this row is laid out (invisibly) in the narrow closed notch too,
+            // and must never be wider than it, or it pushes the closed row off-center.
+            Spacer(minLength: 0)
 
             Button { showsSettings.toggle() } label: {
                 Image(systemName: showsSettings ? "gearshape.fill" : "gearshape")
@@ -64,5 +67,28 @@ struct NotchHeaderView: View {
             .help("Settings")
         }
         .padding(.horizontal, Config.Notch.margin) // the notch view already insets past the ears
+    }
+}
+
+/// Your love's photo in a small circle, or their initial on pink until they've sent one.
+struct PartnerAvatar: View {
+    let state: AppState
+    let size: CGFloat
+
+    var body: some View {
+        Group {
+            if let photo = state.partnerPhoto {
+                Image(nsImage: photo).resizable().scaledToFill()
+            } else {
+                Color.notchPink.overlay {
+                    Text(state.partnerName.prefix(1).lowercased())
+                        .font(.system(size: size * 0.55, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+            }
+        }
+        .frame(width: size, height: size)
+        .clipShape(Circle())
+        .overlay(Circle().strokeBorder(.white.opacity(0.15), lineWidth: 0.5))
     }
 }
