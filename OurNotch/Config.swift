@@ -27,10 +27,14 @@ enum Config {
     }
 
     enum Notch {
-        static let openSize = CGSize(width: 560, height: 296)
-        /// The tab content area inside the open notch, with an even `margin` around it.
-        static let contentSize = CGSize(width: 520, height: 200)
+        /// The tab content area inside the open notch.
+        static let contentSize = CGSize(width: 500, height: 200)
+        /// Space between the notch's black edge and its content, on every side.
         static let margin: CGFloat = 20
+        /// The curved "ears" at the top corners of the open notch. They sit inside the frame,
+        /// so the black body is this much narrower on each side.
+        static let openEarRadius: CGFloat = 14
+        static let openSize = CGSize(width: contentSize.width + (margin + openEarRadius) * 2, height: 296)
         /// Width of the slots on each side of the camera in the closed notch, for the days count and ♥.
         static let closedSideWidth: CGFloat = 52
         /// How far the closed shape reaches below the menu bar, so it fully covers the camera housing.

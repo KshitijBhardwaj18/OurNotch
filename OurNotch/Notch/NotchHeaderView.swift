@@ -63,6 +63,6 @@ struct NotchHeaderView: View {
             .buttonStyle(.plain)
             .help("Settings")
         }
-        .padding(.horizontal, Config.Notch.margin - 14) // + the shape's 14 pt ear inset = the 20 pt margin
+        .padding(.horizontal, Config.Notch.margin) // the notch view already insets past the ears
     }
 }

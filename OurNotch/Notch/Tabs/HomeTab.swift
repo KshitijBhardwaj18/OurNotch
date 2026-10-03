@@ -4,6 +4,8 @@ import SwiftUI
 struct HomeTab: View {
     let state: AppState
 
+    static let photoWidth: CGFloat = 180
+
     var body: some View {
         // Ticks every second, only while the notch is open on Home.
         TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -19,7 +21,7 @@ struct HomeTab: View {
 
     // MARK: Photo
 
-    /// A square as tall as the content area. Empty until photos arrive in slice 6.
+    /// A portrait tile as tall as the content area; people photos look best tall. Empty until photos arrive in slice 6.
     private var photoTile: some View {
         VStack(spacing: 8) {
             Image(systemName: "photo").font(.system(size: 30)).foregroundStyle(Color.tertiaryLabel)
@@ -29,7 +31,7 @@ struct HomeTab: View {
                 .multilineTextAlignment(.center)
         }
         .padding(12)
-        .frame(width: Config.Notch.contentSize.height, height: Config.Notch.contentSize.height)
+        .frame(width: Self.photoWidth, height: Config.Notch.contentSize.height)
         .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 14))
     }
 
@@ -64,13 +66,13 @@ struct HomeTab: View {
 
     // MARK: Stats
 
-    /// Hours · Weekends · Seconds at a width ratio of 1 : 1 : 2.1.
+    /// Hours · Weekends · Seconds at a width ratio of 1 : 1 : 1.8, so every label and number fits at full size.
     private func stats(now: Date) -> some View {
         let since = state.togetherSince
         func value(_ compute: (Date) -> Int) -> String { since.map { compute($0).formatted() } ?? "—" }
 
         return GeometryReader { row in
-            let unit = (row.size.width - 20) / 4.1
+            let unit = (row.size.width - 20) / 3.8
             HStack(spacing: 10) {
                 statTile("Hours", value { Together.hours(since: $0, now: now) })
                     .frame(width: unit)
@@ -78,7 +80,7 @@ struct HomeTab: View {
                     .frame(width: unit)
                 statTile("Seconds", value { Together.seconds(since: $0, now: now) },
                          highlighted: since != nil, withHeart: true)
-                    .frame(width: unit * 2.1)
+                    .frame(width: unit * 1.8)
             }
         }
     }
@@ -94,7 +96,6 @@ struct HomeTab: View {
             .font(.system(size: 11, weight: .medium))
             .foregroundStyle(Color.secondaryLabel)
             .lineLimit(1)
-            .minimumScaleFactor(0.8)
             Spacer(minLength: 0)
             Text(value)
                 .font(.system(size: 16, weight: .semibold).monospacedDigit())
@@ -104,7 +105,7 @@ struct HomeTab: View {
                 .foregroundStyle(highlighted ? Color.notchPink : .white)
         }
         .padding(.vertical, 12)
-        .padding(.horizontal, 11)
+        .padding(.horizontal, 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 12))
     }

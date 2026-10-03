@@ -124,3 +124,4 @@ Activity mode:
 - Numbers use the Mac's own grouping (e.g. 11,47,03,695 in Indian format) rather than the design's US grouping — native macOS behavior; learner to confirm.
 - Photo tab shows its empty state with a disabled *Choose Photo…* until slice 6.
 - Learner feedback on slice 5: open notch enlarged to 560 × 296 with an even 20 pt margin (content 520 × 200, photo square 200, 10 pt gaps) because the bento felt cramped; closed side slots widened 45 → 52 pt because the days count hugged the left edge; Settings moved inside the notch (the gear swaps the content area for a Settings card) because a separate window felt out of place.
+- Second padding pass: margins now measured from the notch's black body, not its frame (the 14 pt ears sit inside the frame, so cards were only ~6 pt from the edge); open notch 568 × 296 around a 500 × 200 bento; photo tile made portrait (180 × 200) and stats split 1 : 1 : 1.8 so "Weekends" and the seconds fit at full size.
