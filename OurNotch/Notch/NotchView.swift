@@ -19,7 +19,7 @@ struct NotchView: View {
     @State private var hoverTask: Task<Void, Never>?
 
     private typealias Radii = (top: CGFloat, bottom: CGFloat)
-    private static let openRadii: Radii = (14, 24)
+    private static let openRadii: Radii = (Config.Notch.openEarRadius, 24)
     private static let closedRadii: Radii = (6, 12)
     private static let bannerRadii: Radii = (6, 16)
 
