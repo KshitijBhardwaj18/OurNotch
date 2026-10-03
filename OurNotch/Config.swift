@@ -27,9 +27,12 @@ enum Config {
     }
 
     enum Notch {
-        static let openSize = CGSize(width: 520, height: 272)
+        static let openSize = CGSize(width: 560, height: 296)
+        /// The tab content area inside the open notch, with an even `margin` around it.
+        static let contentSize = CGSize(width: 520, height: 200)
+        static let margin: CGFloat = 20
         /// Width of the slots on each side of the camera in the closed notch, for the days count and ♥.
-        static let closedSideWidth: CGFloat = 45
+        static let closedSideWidth: CGFloat = 52
         /// How far the closed shape reaches below the menu bar, so it fully covers the camera housing.
         static let closedExtraHeight: CGFloat = 2
         /// Used on Macs without a notch.

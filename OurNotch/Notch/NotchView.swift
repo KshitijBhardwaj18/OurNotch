@@ -9,10 +9,10 @@ struct NotchView: View {
     let state: AppState
     let effects: EmojiEffect
     let geometry: NotchGeometry
-    let onOpenSettings: () -> Void
 
     @State private var isOpen = false
     @State private var tab: NotchTab = .home
+    @State private var showsSettings = false
     @State private var isHovering = false
     /// True while the note field has focus; the notch stays open so typing isn't cut off.
     @State private var isEditing = false
@@ -37,11 +37,11 @@ struct NotchView: View {
 
     private var notch: some View {
         VStack(spacing: 0) {
-            NotchHeaderView(state: state, notchSize: geometry.notchSize, isOpen: isOpen, onOpenSettings: onOpenSettings)
+            NotchHeaderView(state: state, notchSize: geometry.notchSize, isOpen: isOpen, showsSettings: $showsSettings)
                 .frame(height: closedHeight)
 
             if isOpen {
-                OpenNotchView(state: state, tab: $tab, isEditing: $isEditing)
+                OpenNotchView(state: state, tab: $tab, showsSettings: $showsSettings, isEditing: $isEditing)
                     .transition(.asymmetric(
                         insertion: .scale(scale: 0.94, anchor: .top)
                             .combined(with: .opacity)
@@ -66,7 +66,7 @@ struct NotchView: View {
         .onHover(perform: hoverChanged)
         .sensoryFeedback(.alignment, trigger: isOpen)
         .onChange(of: isOpen) { _, open in
-            if open { state.notchOpened() }
+            if open { state.notchOpened() } else { showsSettings = false }
         }
         .onChange(of: isEditing) { _, editing in
             if !editing && !isHovering { isOpen = false }

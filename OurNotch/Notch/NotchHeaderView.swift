@@ -6,7 +6,7 @@ struct NotchHeaderView: View {
     let state: AppState
     let notchSize: CGSize
     let isOpen: Bool
-    let onOpenSettings: () -> Void
+    @Binding var showsSettings: Bool
 
     var body: some View {
         ZStack {
@@ -49,20 +49,20 @@ struct NotchHeaderView: View {
             }
             .font(.system(size: 13, weight: .semibold))
             .foregroundStyle(.white)
-            .frame(maxWidth: 148, alignment: .leading)
+            .frame(maxWidth: 160, alignment: .leading)
 
             Spacer(minLength: notchSize.width)
 
-            Button(action: onOpenSettings) {
-                Image(systemName: "gearshape")
+            Button { showsSettings.toggle() } label: {
+                Image(systemName: showsSettings ? "gearshape.fill" : "gearshape")
                     .font(.system(size: 16))
-                    .foregroundStyle(Color.secondaryLabel)
+                    .foregroundStyle(showsSettings ? Color.notchPink : .secondaryLabel)
                     .frame(width: 28, height: 28)
                     .contentShape(Rectangle()) // the gear's center is a hole; make the whole square clickable
             }
             .buttonStyle(.plain)
             .help("Settings")
         }
-        .padding(.horizontal, 8) // + the shape's 14 pt ear inset = 22 pt from the edges
+        .padding(.horizontal, Config.Notch.margin - 14) // + the shape's 14 pt ear inset = the 20 pt margin
     }
 }

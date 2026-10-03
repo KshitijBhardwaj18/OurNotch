@@ -25,11 +25,13 @@ enum NotchTab: CaseIterable {
 /// The native-looking segmented control at the bottom of the open notch (300 × 28).
 struct NotchTabBar: View {
     @Binding var selection: NotchTab
+    /// True while Settings covers the tabs, so no tab looks selected.
+    var dimmed = false
 
     var body: some View {
         HStack(spacing: 0) {
             ForEach(NotchTab.allCases, id: \.self) { tab in
-                let selected = tab == selection
+                let selected = tab == selection && !dimmed
                 Button { selection = tab } label: {
                     HStack(spacing: 5) {
                         Image(systemName: selected ? "\(tab.symbol).fill" : tab.symbol)
@@ -56,6 +58,7 @@ struct NotchTabBar: View {
         .frame(width: 300, height: 28)
         .background(Color.segmentTrack, in: RoundedRectangle(cornerRadius: 8))
         .animation(.snappy(duration: 0.2), value: selection)
+        .animation(.snappy(duration: 0.2), value: dimmed)
     }
 }
 
