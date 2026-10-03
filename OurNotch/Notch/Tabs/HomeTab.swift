@@ -7,9 +7,9 @@ struct HomeTab: View {
     var body: some View {
         // Ticks every second, only while the notch is open on Home.
         TimelineView(.periodic(from: .now, by: 1)) { context in
-            HStack(spacing: 8) {
+            HStack(spacing: 10) {
                 photoTile
-                VStack(spacing: 8) {
+                VStack(spacing: 10) {
                     noteTile(now: context.date)
                     stats(now: context.date)
                 }
@@ -19,7 +19,7 @@ struct HomeTab: View {
 
     // MARK: Photo
 
-    /// Empty until photos arrive in slice 6.
+    /// A square as tall as the content area. Empty until photos arrive in slice 6.
     private var photoTile: some View {
         VStack(spacing: 8) {
             Image(systemName: "photo").font(.system(size: 30)).foregroundStyle(Color.tertiaryLabel)
@@ -29,7 +29,7 @@ struct HomeTab: View {
                 .multilineTextAlignment(.center)
         }
         .padding(12)
-        .frame(width: 184, height: 184)
+        .frame(width: Config.Notch.contentSize.height, height: Config.Notch.contentSize.height)
         .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 14))
     }
 
@@ -70,8 +70,8 @@ struct HomeTab: View {
         func value(_ compute: (Date) -> Int) -> String { since.map { compute($0).formatted() } ?? "—" }
 
         return GeometryReader { row in
-            let unit = (row.size.width - 16) / 4.1
-            HStack(spacing: 8) {
+            let unit = (row.size.width - 20) / 4.1
+            HStack(spacing: 10) {
                 statTile("Hours", value { Together.hours(since: $0, now: now) })
                     .frame(width: unit)
                 statTile("Weekends", value { Together.weekends(since: $0, now: now) })
