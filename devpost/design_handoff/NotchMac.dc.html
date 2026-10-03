@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,200..700,0..1,0&display=block">
+<style>
+@keyframes nm-marquee{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+@keyframes nm-pulse{0%,55%,100%{transform:scale(1)}8%{transform:scale(1.18)}16%{transform:scale(1)}24%{transform:scale(1.1)}32%{transform:scale(1)}}
+@keyframes nm-up{0%{opacity:0;transform:translate(0,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(var(--dx),-40px) scale(1)}}
+@keyframes nm-pour{0%{opacity:0;transform:translate(0,0) scale(.6)}15%{opacity:1}40%{transform:translate(calc(var(--dx) * -1),40px) scale(1) rotate(-8deg)}70%{opacity:.85;transform:translate(var(--dx),80px) rotate(8deg)}100%{opacity:0;transform:translate(0,116px)}}
+@keyframes nm-rise{0%{opacity:0;transform:translate(0,0) scale(.7)}15%{opacity:1}50%{transform:translate(var(--dx),-170px) scale(1) rotate(8deg)}100%{opacity:0;transform:translate(0,-360px) scale(1.05) rotate(-6deg)}}
+</style>
+</helmet>
+<div style="zoom:2;width:{{ fw }}px;height:{{ fh }}px;position:relative;overflow:hidden;border-radius:12px;background:linear-gradient(160deg,#8FA8D6 0%,#B9B2DE 48%,#E8C3D3 100%);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;color:#FFFFFF;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums">
+  <div style="position:absolute;top:0;left:0;right:0;height:34px;background:rgba(255,255,255,.28);display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:13px;color:#1D1D1F">
+    <div style="display:flex;gap:18px"><b>Finder</b><span>File</span><span>Edit</span><span>View</span></div>
+    <div style="display:flex;gap:14px"><span>Sat Oct 3</span><span>9:41 AM</span></div>
+  </div>
+  <div style="position:absolute;inset:0;pointer-events:none">{{ splash }}</div>
+  <div style="position:absolute;top:30px;left:50%;width:0;height:0;pointer-events:none">{{ pour }}</div>
+
+  <div onMouseEnter="{{ enter }}" onMouseLeave="{{ leave }}" style="position:absolute;top:0;left:50%;margin-left:-{{ half }}px;width:{{ w }}px;height:{{ h }}px;transition:all .5s cubic-bezier(.3,1.3,.5,1)">
+    <div style="position:absolute;top:0;left:-{{ ear }}px;width:{{ ear }}px;height:{{ ear }}px;background:{{ earL }}"></div>
+    <div style="position:absolute;top:0;right:-{{ ear }}px;width:{{ ear }}px;height:{{ ear }}px;background:{{ earR }}"></div>
+    <div style="position:absolute;inset:0;background:#000000;border-radius:0 0 {{ r }}px {{ r }}px;overflow:hidden;transition:border-radius .5s cubic-bezier(.3,1.3,.5,1)">
+
+      <div style="position:absolute;top:0;left:50%;margin-left:-135px;width:270px;height:34px;display:flex;justify-content:space-between;align-items:center;opacity:{{ closedOpacity }};transition:opacity .18s">
+        <div style="width:45px;text-align:center;font-size:12px;font-weight:600;color:{{ daysColor }}">{{ daysShort }}</div>
+        <div style="width:45px;display:flex;justify-content:center">
+          <span style="font-family:'Material Symbols Rounded';font-variation-settings:'FILL' 1;font-size:14px;line-height:1;color:#FF375F;animation:nm-pulse 2.6s ease-in-out infinite">favorite</span>
+        </div>
+      </div>
+
+      <div style="position:absolute;top:34px;left:50%;margin-left:-135px;width:270px;height:20px;padding:0 18px;box-sizing:border-box;overflow:hidden;white-space:nowrap;opacity:{{ stripOpacity }};transition:opacity .25s;-webkit-mask-image:linear-gradient(90deg,transparent 12px,#000 30px,#000 240px,transparent 258px);mask-image:linear-gradient(90deg,transparent 12px,#000 30px,#000 240px,transparent 258px)">
+        <div style="display:inline-block;padding-left:100%;animation:nm-marquee 8s linear infinite;font-size:12px;font-weight:500;line-height:18px;color:#FFFFFF"><span style="color:#FF375F;font-weight:600">{{ name }}</span>  {{ incomingText }}</div>
+      </div>
+
+      <div style="position:absolute;top:0;left:50%;margin-left:-260px;width:520px;height:272px;opacity:{{ openOpacity }};transform:scale({{ openScale }});transform-origin:top center;pointer-events:{{ openPE }};transition:opacity .22s ease .08s,transform .5s cubic-bezier(.3,1.3,.5,1)">
+        <div style="position:absolute;top:0;left:22px;right:22px;height:34px;display:flex;justify-content:space-between;align-items:center">
+          <div style="display:flex;align-items:center;gap:7px;max-width:148px;min-width:0">
+            <div style="display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;min-width:0"><span>{{ myName }}</span><span style="color:#FF375F;font-size:11px">♥</span><span style="overflow:hidden;text-overflow:ellipsis">{{ name }}</span></div>
+          </div>
+          <span style="font-family:'Material Symbols Rounded';font-variation-settings:'wght' 400;font-size:16px;line-height:1;color:rgba(235,235,245,.6);cursor:pointer">settings</span>
+        </div>
+
+        <div style="position:absolute;top:40px;left:16px;width:488px;height:184px;background:{{ cardBg }};border-radius:12px;padding:{{ cardPad }}px;box-sizing:border-box">
+
+          <sc-if value="{{ isUs }}">
+            <div style="display:grid;grid-template-columns:1.25fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;height:100%">
+              <div style="grid-row:span 2;background:#1C1C1E;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;justify-content:space-between">
+                <span style="font-family:'Material Symbols Rounded';font-variation-settings:'FILL' 1;font-size:16px;line-height:1;color:#FF375F">favorite</span>
+                <sc-if value="{{ hasDate }}" hint-placeholder-val="{{ true }}">
+                  <div>
+                    <div style="font-size:30px;font-weight:600;letter-spacing:-.6px;line-height:1.05">{{ days }}</div>
+                    <div style="font-size:12px;font-weight:500;margin-top:2px">days together</div>
+                    <div style="font-size:11px;color:rgba(235,235,245,.3);margin-top:2px">since {{ sinceDate }}</div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ noDate }}">
+                  <div>
+                    <div style="font-size:14px;font-weight:600;line-height:1.25">When did it all start?</div>
+                    <div style="margin-top:8px;display:inline-flex;height:22px;padding:0 10px;border-radius:6px;background:rgba(255,255,255,.14);font-size:12px;font-weight:500;align-items:center;cursor:pointer">Set Date…</div>
+                  </div>
+                </sc-if>
+              </div>
+              <sc-for list="{{ bento }}" as="b" hint-placeholder-count="4">
+                <div style="background:#1C1C1E;border-radius:12px;padding:9px 12px;display:flex;flex-direction:column;justify-content:space-between;min-width:0">
+                  <span style="font-family:'Material Symbols Rounded';font-variation-settings:'wght' 400;font-size:14px;line-height:1;color:rgba(235,235,245,.6)">{{ b.icon }}</span>
+                  <div style="min-width:0">
+                    <div style="font-size:16px;font-weight:600;letter-spacing:-.2px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:{{ b.color }}">{{ b.value }}</div>
+                    <div style="font-size:11px;color:rgba(235,235,245,.6)">{{ b.label }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:8px;height:100%">
+              <sc-if value="{{ hasPhoto }}" hint-placeholder-val="{{ true }}">
+                <div style="position:relative;width:184px;flex:none;border-radius:14px;overflow:hidden;background:#2C2C2E">
+                  <div style="position:absolute;inset:0;background:url(https://picsum.photos/id/1027/736/736) center/cover;filter:{{ photoFilter }}"></div>
+                  <div style="position:absolute;inset:0;background:#FF375F;mix-blend-mode:soft-light;opacity:{{ tintOpacity }}"></div>
+                  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,rgba(0,0,0,.55) 100%)"></div>
+                  <div style="position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.08)"></div>
+                  <div style="position:absolute;left:12px;bottom:10px;font-size:11.5px;font-weight:500;color:rgba(255,255,255,.9)">from {{ name }} · 1h</div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ noPhoto }}">
+                <div style="width:184px;flex:none;background:#1C1C1E;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0 12px;box-sizing:border-box;text-align:center">
+                  <span style="font-family:'Material Symbols Rounded';font-variation-settings:'wght' 300;font-size:30px;line-height:1;color:rgba(235,235,245,.3)">photo</span>
+                  <div style="font-size:12px;color:rgba(235,235,245,.6);line-height:1.3">No photo from {{ name }} yet</div>
+                </div>
+              </sc-if>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                <div style="flex:1;min-height:0;background:#1C1C1E;border-radius:12px;padding:12px 14px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:4px">
+                  <sc-if value="{{ hasMessage }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:rgba(235,235,245,.6)"><span style="font-family:'Material Symbols Rounded';font-variation-settings:'FILL' 1;font-size:12px;line-height:1;color:#FF375F">chat_bubble</span>{{ name }} · 2m ago</div>
+                    <div style="font-size:15px;font-weight:500;line-height:1.3;letter-spacing:-.1px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">hi babe how are you? love you</div>
+                  </sc-if>
+                  <sc-if value="{{ noMessage }}">
+                    <div style="font-size:13px;color:rgba(235,235,245,.6)">No notes from {{ name }} yet ♡</div>
+                  </sc-if>
+                </div>
+                <div style="flex:1;min-height:0;display:flex;gap:8px">
+                  <div style="flex:1;min-width:0;background:#1C1C1E;border-radius:12px;padding:12px 11px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between">
+                    <div style="font-size:11px;font-weight:500;color:rgba(235,235,245,.6)">Hours</div>
+                    <div style="font-size:16px;font-weight:600;letter-spacing:-.3px;white-space:nowrap">{{ hoursVal }}</div>
+                  </div>
+                  <div style="flex:1;min-width:0;background:#1C1C1E;border-radius:12px;padding:12px 11px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between">
+                    <div style="font-size:11px;font-weight:500;color:rgba(235,235,245,.6)">Weekends</div>
+                    <div style="font-size:16px;font-weight:600;letter-spacing:-.3px;white-space:nowrap">{{ weekendsVal }}</div>
+                  </div>
+                  <div style="flex:2.1;min-width:0;background:#1C1C1E;border-radius:12px;padding:12px 11px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between">
+                    <div style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:500;color:rgba(235,235,245,.6)">Seconds<span style="font-family:'Material Symbols Rounded';font-variation-settings:'FILL' 1;font-size:10px;line-height:1;color:#FF375F;animation:nm-pulse 2.6s ease-in-out infinite">favorite</span></div>
+                    <div style="font-size:16px;font-weight:600;letter-spacing:-.3px;white-space:nowrap;color:{{ secondsColor }}">{{ secondsVal }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isMessage }}">
+            <div style="display:flex;flex-direction:column;height:100%;justify-content:space-between">
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <div style="font-size:11px;font-weight:500;color:rgba(235,235,245,.6)">From {{ name }} · 2m ago</div>
+                <div style="font-size:16px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">hi babe how are you? love you</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid rgba(255,255,255,.08)">
+                <div style="flex:1;min-width:0;height:34px;border-radius:9px;background:#2C2C2E;border:1px solid {{ fieldBorder }};box-shadow:{{ fieldRing }};box-sizing:border-box;display:flex;align-items:center;padding:0 10px;transition:all .15s">
+                  <input value="{{ text }}" onChange="{{ onInput }}" onKeyDown="{{ onKey }}" onFocus="{{ onFocus }}" onBlur="{{ onBlur }}" readOnly="{{ inputLocked }}" placeholder="Say something sweet…" style="flex:1;min-width:0;background:transparent;border:0;outline:none;color:{{ inputColor }};font-family:inherit;font-size:13px;padding:0">
+                </div>
+                <div onClick="{{ sendMsg }}" style="width:32px;height:32px;flex:none;border-radius:50%;background:{{ sendBg }};display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s">
+                  <span style="font-family:'Material Symbols Rounded';font-size:17px;line-height:1;font-variation-settings:'wght' 600;color:{{ sendColor }}">arrow_upward</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font-size:12px;color:rgba(235,235,245,.6)">Scroll</span>
+                  <div style="display:flex;padding:2px;border-radius:7px;background:rgba(118,118,128,.24)">
+                    <sc-for list="{{ modes }}" as="m" hint-placeholder-count="2">
+                      <div onClick="{{ m.onClick }}" style="height:20px;padding:0 10px;border-radius:5px;display:flex;align-items:center;font-size:11.5px;font-weight:500;white-space:nowrap;background:{{ m.bg }};color:{{ m.color }};box-shadow:{{ m.shadow }};cursor:pointer;transition:all .15s">{{ m.label }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:500;color:{{ statusColor }};white-space:nowrap">{{ statusText }}</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isEmoji }}">
+            <div style="display:flex;flex-direction:column;justify-content:space-between;height:100%">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                  <div style="font-size:15px;font-weight:600">Send an emoji</div>
+                  <div style="font-size:11.5px;color:rgba(235,235,245,.6)">Tap one — it pops up on {{ name }}'s screen ♡</div>
+                </div>
+                <div style="font-size:11.5px;font-weight:500;white-space:nowrap;color:{{ emojiStatusColor }}">{{ emojiStatusText }}</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <sc-for list="{{ emojis }}" as="e" hint-placeholder-count="6">
+                  <div onClick="{{ e.onClick }}" style="position:relative;flex:1;height:54px;border-radius:12px;background:{{ e.bg }};box-shadow:{{ e.ring }};transform:{{ e.transform }};display:flex;align-items:center;justify-content:center;font-size:27px;line-height:1;cursor:pointer;transition:transform .18s cubic-bezier(.3,1.6,.5,1),background .15s">{{ e.char }}<div style="position:absolute;top:6px;left:50%;width:0;height:0">{{ e.burst }}</div></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:rgba(235,235,245,.6)">Appears</span>
+                <div style="display:flex;padding:2px;border-radius:7px;background:rgba(118,118,128,.24)">
+                  <sc-for list="{{ emojiModes }}" as="m" hint-placeholder-count="2">
+                    <div onClick="{{ m.onClick }}" style="height:20px;padding:0 10px;border-radius:5px;display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:500;white-space:nowrap;background:{{ m.bg }};color:{{ m.color }};box-shadow:{{ m.shadow }};cursor:pointer;transition:all .15s"><span style="font-family:'Material Symbols Rounded';font-size:13px;line-height:1">{{ m.icon }}</span>{{ m.label }}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isPhoto }}">
+            <div style="display:flex;gap:16px;height:100%;align-items:center">
+              <sc-if value="{{ myPhoto }}" hint-placeholder-val="{{ true }}">
+                <div style="position:relative;width:150px;height:150px;flex:none;border-radius:12px;overflow:hidden;background:#2C2C2E">
+                  <div style="position:absolute;inset:0;background:url(https://picsum.photos/id/823/600/600) center/cover;filter:{{ photoFilter }}"></div>
+                  <div style="position:absolute;inset:0;background:#FF375F;mix-blend-mode:soft-light;opacity:{{ tintOpacity }}"></div>
+                  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,28,30,0) 55%,rgba(28,28,30,{{ fadeOpacity }}) 100%)"></div>
+                  <div style="position:absolute;inset:0;border-radius:12px;box-shadow:inset 0 0 0 .5px rgba(255,255,255,.08)"></div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ noMyPhoto }}">
+                <div style="width:150px;height:150px;flex:none;border-radius:12px;border:1px dashed rgba(235,235,245,.3);box-sizing:border-box;display:flex;align-items:center;justify-content:center">
+                  <span style="font-family:'Material Symbols Rounded';font-variation-settings:'wght' 300;font-size:26px;line-height:1;color:rgba(235,235,245,.3)">add_photo_alternate</span>
+                </div>
+              </sc-if>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px">
+                <div style="font-size:11px;font-weight:500;color:rgba(235,235,245,.6)">{{ photoEyebrow }}</div>
+                <div style="font-size:15px;font-weight:600;line-height:1.3">{{ photoTitle }}</div>
+                <div style="font-size:12px;color:rgba(235,235,245,.6);line-height:1.4;text-wrap:pretty">{{ photoSub }}</div>
+                <sc-if value="{{ myPhoto }}" hint-placeholder-val="{{ true }}">
+                  <div style="margin-top:10px;height:24px;padding:0 12px;border-radius:6px;background:rgba(255,255,255,.14);font-size:12px;font-weight:500;display:flex;align-items:center;cursor:pointer">Send New Photo…</div>
+                </sc-if>
+                <sc-if value="{{ noMyPhoto }}">
+                  <div style="margin-top:10px;height:24px;padding:0 12px;border-radius:6px;background:#FF375F;font-size:12px;font-weight:500;display:flex;align-items:center;cursor:pointer">Choose Photo…</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="position:absolute;bottom:10px;left:50%;margin-left:-150px;width:300px;height:28px;border-radius:8px;background:rgba(118,118,128,.24);padding:2px;box-sizing:border-box;display:flex">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+            <div onClick="{{ t.onClick }}" style="flex:1;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:5px;background:{{ t.bg }};box-shadow:{{ t.shadow }};cursor:pointer;transition:background .15s">
+              <span style="font-family:'Material Symbols Rounded';font-size:14px;line-height:1;font-variation-settings:{{ t.fv }};color:{{ t.iconColor }}">{{ t.icon }}</span>
+              <span style="font-size:12px;font-weight:500;color:{{ t.color }}">{{ t.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <sc-if value="{{ showDeadZone }}">
+      <div style="position:absolute;top:0;left:50%;margin-left:-90px;width:180px;height:32px;border:1px dashed rgba(255,255,255,.25);border-top:0;border-radius:0 0 10px 10px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:7px;letter-spacing:.5px;color:rgba(255,255,255,.3);pointer-events:none">CAMERA · 180×32</div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1120,&quot;height&quot;:560},&quot;open&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;hover&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;message&quot;,&quot;photo&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;hasPhoto&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;hasDate&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;myPhoto&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;pressed&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;heartStatus&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;&quot;,&quot;sent&quot;,&quot;delivered&quot;],&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;text&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;msgStatus&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;&quot;,&quot;sending&quot;,&quot;sent&quot;,&quot;delivered&quot;],&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;scrollMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;3x&quot;,&quot;open&quot;],&quot;default&quot;:&quot;3x&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;focused&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;incoming&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;partnerName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;nikki&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showDeadZone&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;frameW&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:560,&quot;tsType&quot;:&quot;number&quot;},&quot;frameH&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:280,&quot;tsType&quot;:&quot;number&quot;},&quot;pourLoop&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;splashLoop&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;pourKey&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;splashKey&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  state = {
+    hovering: false, tab: this.props.tab || 'home', pressed: !!this.props.pressed,
+    heartStatus: this.props.heartStatus || '', text: this.props.text || '',
+    msgStatus: this.props.msgStatus || '', scrollMode: this.props.scrollMode || '3x',
+    focused: !!this.props.focused, burst: 0, now: Date.now(),
+    emojiMode: this.props.emojiMode || 'notch', sentEmoji: this.props.sentEmoji || '', emojiStatus: this.props.emojiStatus || '', pressedEmoji: -1, emojiBurst: 0, burstIdx: -1
+  };
+  start = Date.now() - (((1326 * 24 + 16) * 3600) + 33 * 60 + 21) * 1000;
+  timers = [];
+  componentDidMount() { this.iv = setInterval(() => this.setState({ now: Date.now() }), 1000); }
+  componentWillUnmount() { clearInterval(this.iv); this.timers.forEach(clearTimeout); clearTimeout(this.leaveT); }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms)); }
+  sendHeart = () => {
+    this.setState(s => ({ pressed: true, heartStatus: 'sent', burst: s.burst + 1 }));
+    this.later(() => this.setState({ pressed: false }), 150);
+    this.later(() => this.setState({ heartStatus: 'delivered' }), 1300);
+    this.later(() => this.setState({ heartStatus: '' }), 4300);
+  };
+  sendEmoji = (i, ch) => {
+    this.setState(s => ({ pressedEmoji: i, sentEmoji: ch, emojiStatus: 'sent', emojiBurst: s.emojiBurst + 1, burstIdx: i }));
+    this.later(() => this.setState({ pressedEmoji: -1 }), 150);
+    this.later(() => this.setState(s => s.sentEmoji === ch ? { emojiStatus: 'delivered' } : null), 1200);
+    this.later(() => this.setState(s => s.sentEmoji === ch ? { emojiStatus: '', sentEmoji: '' } : null), 4200);
+  };
+  sendMsg = () => {
+    if (!this.canSend) return;
+    this.setState({ msgStatus: 'sending' });
+    this.later(() => this.setState({ msgStatus: 'sent' }), 800);
+    this.later(() => this.setState({ msgStatus: 'delivered' }), 2000);
+    this.later(() => this.setState({ msgStatus: '', text: '' }), 4200);
+  };
+  heart(key, st) {
+    const em = this.props.incomingEmoji;
+    if (em) return React.createElement('span', { key, style: Object.assign({}, st, { position: 'absolute', lineHeight: 1, opacity: 0, pointerEvents: 'none', color: undefined, fontSize: Math.round((st.fontSize || 14) * 1.25) }) }, em);
+    return React.createElement('span', { key, style: Object.assign({ position: 'absolute', fontFamily: 'Material Symbols Rounded', fontVariationSettings: "'FILL' 1", lineHeight: 1, opacity: 0, pointerEvents: 'none' }, st) }, 'favorite');
+  }
+  renderVals() {
+    const p = this.props, s = this.state;
+    const open = p.hover ? s.hovering : !!p.open;
+    const incoming = !open && !!p.incoming;
+    const w = open ? 520 : 270, h = open ? 272 : incoming ? 56 : 34, ear = open ? 14 : 6, r = open ? 24 : incoming ? 16 : 12;
+    const name = p.partnerName || 'nikki';
+    const el = Math.max(0, s.now - this.start);
+    const d = Math.floor(el / 864e5), rem = el % 864e5, pad = n => String(n).padStart(2, '0');
+    const hms = `${Math.floor(rem / 36e5)}h ${pad(Math.floor(rem % 36e5 / 6e4))}m ${pad(Math.floor(rem % 6e4 / 1e3))}s`;
+    const words = s.text.trim().split(/\s+/).filter(Boolean);
+    let hint = '';
+    if (s.text.length > 60) hint = 'A little shorter ♡';
+    else if (words.length > 10) hint = '10 words max ♡';
+    else if (words.some(x => x.length > 15)) hint = 'One word is too long ♡';
+    this.canSend = words.length > 0 && !hint && !s.msgStatus;
+    const hasPhoto = p.hasPhoto ?? true, hasDate = p.hasDate ?? true, myPhoto = p.myPhoto ?? true;
+    const sec = 'rgba(235,235,245,.6)', ter = 'rgba(235,235,245,.3)';
+    const ms = { sending: ['Sending…', sec], sent: ['Sent ♡', '#FFFFFF'], delivered: ['Delivered ♡', '#FF375F'] }[s.msgStatus];
+    const [statusText, statusColor] = ms || (hint ? [hint, '#FF375F'] : words.length ? [`${words.length} of 10 words`, ter] : ['Up to 10 words', ter]);
+    const hl = { sent: ['favorite', 'Sent ♡'], delivered: ['check', 'Delivered'] }[s.heartStatus] || ['favorite', 'Send a Heart'];
+    const sd = new Date(this.start), nowD = new Date(s.now);
+    let months = (nowD.getFullYear() - sd.getFullYear()) * 12 + nowD.getMonth() - sd.getMonth();
+    if (nowD.getDate() < sd.getDate()) months--;
+    const firstSat = (6 - sd.getDay() + 7) % 7;
+    const weekends = d >= firstSat ? Math.floor((d - firstSat) / 7) + 1 : 0;
+    const fmt = n => n.toLocaleString('en-US');
+    const bento = [
+      ['calendar_month', hasDate ? fmt(months) : '—', 'months'],
+      ['weekend', hasDate ? fmt(weekends) : '—', 'weekends'],
+      ['schedule', hasDate ? fmt(Math.floor(el / 36e5)) : '—', 'hours'],
+      ['favorite', hasDate ? fmt(Math.floor(el / 1000)) : '—', 'seconds']
+    ].map(([icon, value, label], i) => ({ icon, value, label, color: i === 3 && hasDate ? '#FF375F' : '#FFFFFF' }));
+    const tabs = [['home', 'home', 'Home'], ['message', 'chat_bubble', 'Note'], ['emoji', 'add_reaction', 'Emoji'], ['photo', 'image', 'Photo']].map(([k, icon, label]) => {
+      const on = s.tab === k;
+      return { icon, label, bg: on ? '#636366' : 'transparent', shadow: on ? '0 1px 2px rgba(0,0,0,.3)' : 'none',
+        color: on ? '#FFFFFF' : sec, iconColor: on ? '#FF375F' : sec,
+        fv: on ? "'FILL' 1, 'wght' 500" : "'FILL' 0, 'wght' 400", onClick: () => this.setState({ tab: k }) };
+    });
+    const modes = [['3x', '3 times'], ['open', 'Until opened']].map(([k, label]) => {
+      const on = s.scrollMode === k;
+      return { label, bg: on ? '#636366' : 'transparent', color: on ? '#FFFFFF' : sec, shadow: on ? '0 1px 2px rgba(0,0,0,.3)' : 'none', onClick: () => this.setState({ scrollMode: k }) };
+    });
+    const burst = s.burst ? [-12, 0, 12].map((dx, i) => this.heart(s.burst + '-' + i, { left: -6, top: 0, fontSize: 11 + (i === 1 ? 3 : 0), color: i === 1 ? '#FFFFFF' : '#FFB3C2', '--dx': dx + 'px', animation: `nm-up .9s ease-out ${i * 0.07}s forwards` })) : null;
+    const it = loop => loop ? 'infinite' : 'forwards';
+    const pour = (p.pourLoop || p.pourKey) ? [[-16, 18, '#FF375F', 0, 6], [6, 14, '#FFB3C2', .25, -6], [-4, 20, '#FF375F', .7, 8]].slice(0, p.pourLoop ? 3 : 2).map(([x, fs, c, dl, dx], i) =>
+      this.heart('p' + (p.pourKey || 0) + i, { left: x, top: 0, fontSize: fs, color: c, '--dx': dx + 'px', animation: `nm-pour 1.5s ease-out ${dl}s ${it(p.pourLoop)}` })) : null;
+    const splash = (p.splashLoop || p.splashKey) ? Array.from({ length: 18 }, (_, i) => this.heart('s' + (p.splashKey || 0) + '-' + i, {
+      left: `${(i * 37 + 7) % 96}%`, bottom: -24, fontSize: 14 + (i * 7) % 18,
+      color: i % 3 === 0 ? '#FFB3C2' : i % 3 === 1 ? '#FF375F' : '#FFFFFF', '--dx': ((i % 2 ? 1 : -1) * 14) + 'px',
+      animation: `nm-rise 3s ease-out ${(i * 0.08).toFixed(2)}s ${it(p.splashLoop)}`
+    })) : null;
+    return {
+      ...({ soft: { photoFilter: 'saturate(.75) brightness(.94) contrast(1.05)', tintOpacity: .22, fadeOpacity: .55 }, mono: { photoFilter: 'grayscale(1) contrast(1.08) brightness(.95)', tintOpacity: .35, fadeOpacity: .5 }, none: { photoFilter: 'none', tintOpacity: 0, fadeOpacity: 0 } }[p.photoStyle] || { photoFilter: 'saturate(.75) brightness(.94) contrast(1.05)', tintOpacity: .22, fadeOpacity: .55 }),
+      fw: p.frameW ?? 600, fh: p.frameH ?? (open ? 312 : 110),
+      w, h, half: w / 2, ear, r,
+      earL: `radial-gradient(circle at 0 100%, transparent ${ear - 0.5}px, #000 ${ear}px)`,
+      earR: `radial-gradient(circle at 100% 100%, transparent ${ear - 0.5}px, #000 ${ear}px)`,
+      closedOpacity: open ? 0 : 1, stripOpacity: incoming ? 1 : 0,
+      openOpacity: open ? 1 : 0, openScale: open ? 1 : 0.94, openPE: open ? 'auto' : 'none',
+      incomingText: p.incoming || '', daysShort: hasDate ? d.toLocaleString('en-US') : '♡', daysColor: hasDate ? '#FFFFFF' : ter,
+      enter: () => { if (!p.hover) return; clearTimeout(this.leaveT); this.setState({ hovering: true }); },
+      leave: () => { if (!p.hover) return; this.leaveT = setTimeout(() => this.setState({ hovering: false }), 350); },
+      isEmoji: s.tab === 'emoji',
+      emojiModes: [['notch', 'Out of the notch', 'expand_more'], ['full', 'Full screen', 'fullscreen']].map(([k, label, icon]) => {
+        const on = s.emojiMode === k;
+        return { label, icon, bg: on ? '#636366' : 'transparent', color: on ? '#FFFFFF' : sec, shadow: on ? '0 1px 2px rgba(0,0,0,.3)' : 'none', onClick: () => this.setState({ emojiMode: k }) };
+      }),
+      myName: p.myName || 'sam', hasMessage: p.hasMessage ?? true, noMessage: !(p.hasMessage ?? true),
+      emojis: ['❤️', '🥰', '😘', '🫶', '🤗', '🌹'].map((ch, i) => ({
+        char: ch,
+        bg: s.pressedEmoji === i ? '#3A3A3C' : s.sentEmoji === ch ? 'rgba(255,55,95,.16)' : '#2C2C2E',
+        ring: s.sentEmoji === ch ? 'inset 0 0 0 1px rgba(255,55,95,.6)' : 'none',
+        transform: s.pressedEmoji === i ? 'scale(.9)' : 'scale(1)',
+        onClick: () => this.sendEmoji(i, ch),
+        burst: s.emojiBurst && s.burstIdx === i ? [-10, 0, 10].map((dx, k) => React.createElement('span', { key: s.emojiBurst + '-' + k, style: { position: 'absolute', left: -7, top: 0, fontSize: 12 + (k === 1 ? 2 : 0), lineHeight: 1, opacity: 0, pointerEvents: 'none', '--dx': dx + 'px', animation: `nm-up .9s ease-out ${k * 0.07}s forwards` } }, ch)) : null
+      })),
+      emojiStatusText: s.emojiStatus === 'sent' ? `Sent ${s.sentEmoji}` : s.emojiStatus === 'delivered' ? `Delivered ${s.sentEmoji}` : 'Tap to send',
+      emojiStatusColor: s.emojiStatus === 'delivered' ? '#FF375F' : s.emojiStatus === 'sent' ? '#FFFFFF' : 'rgba(235,235,245,.3)',
+      name, isUs: s.tab === 'us', bento, sinceDate: sd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      cardBg: s.tab === 'us' || s.tab === 'home' ? 'transparent' : '#1C1C1E', cardPad: s.tab === 'us' || s.tab === 'home' ? 0 : 12,
+      hoursVal: hasDate ? fmt(Math.floor(el / 36e5)) : '—', weekendsVal: hasDate ? fmt(weekends) : '—', secondsVal: hasDate ? fmt(Math.floor(el / 1000)) : '—', secondsColor: hasDate ? '#FF375F' : '#FFFFFF',
+      isHome: s.tab === 'home', isMessage: s.tab === 'message', isPhoto: s.tab === 'photo',
+      hasPhoto, noPhoto: !hasPhoto, hasDate, noDate: !hasDate, myPhoto, noMyPhoto: !myPhoto,
+      days: d.toLocaleString('en-US'), hms,
+      heartBg: s.pressed ? '#D92D50' : '#FF375F', heartTransform: s.pressed ? 'scale(.97)' : 'scale(1)',
+      heartIcon: hl[0], heartLabel: hl[1], sendHeart: this.sendHeart, burst, pour, splash,
+      text: s.text, inputLocked: !!s.msgStatus, inputColor: s.msgStatus ? ter : '#FFFFFF',
+      onInput: e => this.setState({ text: e.target.value }),
+      onKey: e => { if (e.key === 'Enter') this.sendMsg(); },
+      onFocus: () => this.setState({ focused: true }), onBlur: () => this.setState({ focused: false }),
+      fieldBorder: hint || s.focused ? '#FF375F' : 'rgba(255,255,255,.08)',
+      fieldRing: hint || s.focused ? '0 0 0 3px rgba(255,55,95,.35)' : 'none',
+      sendBg: this.canSend ? '#FF375F' : 'rgba(255,255,255,.1)', sendColor: this.canSend ? '#FFFFFF' : ter,
+      sendMsg: this.sendMsg, modes, statusText, statusColor,
+      photoEyebrow: myPhoto ? 'Yesterday · Delivered ♡' : 'Photo', photoTitle: myPhoto ? `Last sent to ${name}` : `Send ${name} a photo`,
+      photoSub: myPhoto ? 'Shows on their Home until you send a new one ♡' : 'It shows up on their Home the next time they open their notch ♡',
+      tabs, showDeadZone: !!p.showDeadZone
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,21 +1,23 @@
-import ServiceManagement
 import SwiftUI
 
-/// Drives the first-launch steps: welcome → name → invite or join → together since (inviter) → open at login.
+/// Drives the first-launch steps.
+/// Inviter: welcome → name → invite → date → login → done. Joiner: welcome → name → join → login → done.
 @MainActor
 @Observable
 final class OnboardingModel {
-    enum Step { case welcome, name, choosePath, invite, join, paired, togetherSince, openAtLogin }
+    enum Step { case welcome, name, invite, join, date, login, done }
 
     var step: Step = .welcome
     var name = ""
     var typedCode = ""
     var togetherSince = Calendar.current.startOfDay(for: .now)
     private(set) var inviteCode: String?
+    /// The invite found from a typed code, shown as "nikki ♥ invited you" before joining.
+    private(set) var foundInvite: Invite?
     private(set) var pairing: Pairing?
     private(set) var error: String?
     private(set) var isWorking = false
-    private(set) var opensAtLogin = SMAppService.mainApp.status == .enabled
+    private(set) var opensAtLogin = LoginItem.isEnabled
 
     @ObservationIgnored private let store: LocalStore
     @ObservationIgnored private let service: PairingService
@@ -30,53 +32,49 @@ final class OnboardingModel {
     }
 
     var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
+    var partnerName: String { (pairing?.partnerName ?? foundInvite?.inviterName ?? "your love").lowercased() }
+
+    /// The steps on the current path, for the page dots.
+    var path: [Step] {
+        step == .join || pairing?.role == .joiner
+            ? [.welcome, .name, .join, .login, .done]
+            : [.welcome, .name, .invite, .date, .login, .done]
+    }
 
     func go(to step: Step) {
         error = nil
-        if step == .choosePath { waitTask?.cancel() }
+        if step != .invite { waitTask?.cancel() }
         self.step = step
+        if step == .invite { startInvite() }
     }
 
-    // MARK: Pairing
+    // MARK: Invite
 
-    /// Posts the invite, then waits in the background for my love to join.
-    func startInvite() {
-        go(to: .invite)
-        guard inviteCode == nil else { return waitForJoin() }
+    /// Posts the invite (once), then waits in the background for my love to join.
+    private func startInvite() {
         Task {
-            do {
-                inviteCode = try await service.createInvite(name: trimmedName)
-                waitForJoin()
-            } catch {
-                self.error = "couldn't create an invite ♡ try again"
+            if inviteCode == nil {
+                do {
+                    inviteCode = try await service.createInvite(name: trimmedName)
+                } catch {
+                    self.error = "Couldn't create an invite. Try again."
+                    return
+                }
+            }
+            guard let inviteCode else { return }
+            waitTask?.cancel()
+            waitTask = Task {
+                guard let pairing = try? await service.waitForJoin(code: inviteCode) else { return }
+                self.pairing = pairing
+                go(to: .date)
             }
         }
     }
 
-    private func waitForJoin() {
+    func copyCode() {
         guard let inviteCode else { return }
-        waitTask?.cancel()
-        waitTask = Task {
-            guard let pairing = try? await service.waitForJoin(code: inviteCode) else { return }
-            self.pairing = pairing
-            go(to: .paired)
-        }
-    }
-
-    func join() {
-        isWorking = true
-        error = nil
-        Task {
-            defer { isWorking = false }
-            do {
-                pairing = try await service.join(code: typedCode, name: trimmedName)
-                go(to: .paired)
-            } catch let pairingError as PairingError {
-                error = pairingError.errorDescription
-            } catch {
-                self.error = "something went wrong ♡ try again"
-            }
-        }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(inviteCode, forType: .string)
     }
 
     /// Opens the user's own Mail app with a pre-written invite. No email server needed.
@@ -86,7 +84,7 @@ final class OnboardingModel {
         I'd love for us to share a little space in our notches ♡
 
         1. Download OurNotch: \(Config.Pairing.downloadURL)
-        2. Choose "I have a code" and type: \(inviteCode)
+        2. Choose "I Have a Code" and type: \(inviteCode)
 
         love, \(trimmedName)
         """
@@ -97,26 +95,56 @@ final class OnboardingModel {
         if let url = mail.url { NSWorkspace.shared.open(url) }
     }
 
-    // MARK: After pairing
+    // MARK: Join
 
-    /// Only the inviter is asked "together since"; the joiner receives it.
-    func continueAfterPairing() {
-        go(to: pairing?.role == .inviter ? .togetherSince : .openAtLogin)
+    func lookUpCode() {
+        run {
+            self.foundInvite = try await self.service.lookUpInvite(code: self.typedCode)
+        }
     }
+
+    func join() {
+        run {
+            self.pairing = try await self.service.join(code: self.typedCode, name: self.trimmedName)
+            self.go(to: .login)
+        }
+    }
+
+    func editCode() {
+        foundInvite = nil
+        error = nil
+    }
+
+    private func run(_ work: @escaping () async throws -> Void) {
+        isWorking = true
+        error = nil
+        Task {
+            defer { isWorking = false }
+            do {
+                try await work()
+            } catch let pairingError as PairingError {
+                error = pairingError.errorDescription
+            } catch {
+                self.error = "Something went wrong. Try again."
+            }
+        }
+    }
+
+    // MARK: After pairing
 
     func saveTogetherSince() {
         store.togetherSince = togetherSince
-        go(to: .openAtLogin)
+        go(to: .login)
     }
 
-    func setOpensAtLogin(_ on: Bool) {
+    func setOpensAtLogin(_ enabled: Bool) {
         do {
-            if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+            try LoginItem.set(enabled)
             error = nil
         } catch {
-            self.error = "couldn't change that ♡ you can try again later"
+            self.error = "Couldn't change this right now. You can turn it on later in Settings."
         }
-        opensAtLogin = SMAppService.mainApp.status == .enabled
+        opensAtLogin = LoginItem.isEnabled
     }
 
     func finish() { onFinished() }
@@ -124,178 +152,259 @@ final class OnboardingModel {
 
 // MARK: - Views
 
+/// Setup-Assistant style: centered content, and a footer with page dots and Back / Continue.
+/// Follows the system's light or dark appearance.
 struct OnboardingView: View {
-    let model: OnboardingModel
+    @Bindable var model: OnboardingModel
 
     var body: some View {
-        Group {
-            switch model.step {
-            case .welcome: welcome
-            case .name: nameStep
-            case .choosePath: choosePath
-            case .invite: invite
-            case .join: join
-            case .paired: paired
-            case .togetherSince: togetherSince
-            case .openAtLogin: openAtLogin
+        VStack(spacing: 0) {
+            content
+                .padding(.horizontal, 36)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            if let error = model.error {
+                Text(error).font(.system(size: 12)).foregroundStyle(Color.accentPink).padding(.bottom, 8)
             }
+            Divider()
+            footer
         }
         .frame(width: 420, height: 440)
-        .animation(.smooth, value: model.step)
-        .environment(model)
+        .animation(.smooth(duration: 0.25), value: model.step)
     }
 
-    private var welcome: some View {
-        StepLayout(title: "OurNotch",
-                   subtitle: "a little shared space for the two of you, living in your notch. send hearts and sweet notes that float by while you work.") {
-            Button("get started") { model.go(to: .name) }.buttonStyle(RoseButtonStyle())
-        }
-    }
+    // MARK: Screens
 
-    private var nameStep: some View {
-        @Bindable var model = model
-        return StepLayout(title: "what should your love call you?", subtitle: "they'll see this when you invite them.") {
-            TextField("your name", text: $model.name)
-                .textFieldStyle(.roundedBorder)
-                .frame(width: 220)
-                .onSubmit { if !model.trimmedName.isEmpty { model.go(to: .choosePath) } }
-            Button("continue") { model.go(to: .choosePath) }
-                .buttonStyle(RoseButtonStyle())
-                .disabled(model.trimmedName.isEmpty)
-        }
-    }
-
-    private var choosePath: some View {
-        StepLayout(title: "pair with your love", subtitle: "one of you invites, the other types the code.") {
-            Button("invite your love") { model.startInvite() }.buttonStyle(RoseButtonStyle())
-            Button("I have a code") { model.go(to: .join) }.buttonStyle(.link)
-        }
-    }
-
-    private var invite: some View {
-        StepLayout(title: "your invite code", subtitle: "send it to your love. they choose \"I have a code\" and type it in.") {
-            if let code = model.inviteCode {
-                Text(code)
-                    .font(.system(size: 34, weight: .bold, design: .rounded).monospaced())
-                    .tracking(6)
-                    .textSelection(.enabled)
-                Button("send email") { model.sendInviteEmail() }.buttonStyle(RoseButtonStyle())
-                HStack(spacing: 6) {
-                    ProgressView().controlSize(.small)
-                    Text("waiting for your love to join…").foregroundStyle(.secondary)
-                }
-            } else if model.error == nil {
-                ProgressView()
+    @ViewBuilder private var content: some View {
+        switch model.step {
+        case .welcome:
+            Screen(icon: AnyView(AppIcon()), title: "Welcome to OurNotch",
+                   message: "A little love note that lives in the top of your screen.") {}
+        case .name:
+            Screen(symbol: "person", title: "What should your love call you?",
+                   message: "Shown next to your hearts and notes.") {
+                TextField("Your name", text: $model.name)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 240)
+                    .onSubmit(continueAction)
             }
-            backButton
+        case .invite:
+            Screen(symbol: "envelope", title: "Invite your love",
+                   message: "Share this code — it's just for the two of you.") { inviteCode }
+        case .join:
+            joinScreen
+        case .date:
+            Screen(symbol: "calendar", title: "When did you get together?", message: "") {
+                DatePicker("Together since", selection: $model.togetherSince, in: ...Date.now, displayedComponents: .date)
+                    .datePickerStyle(.stepperField)
+                    .labelsHidden()
+                Text("That's \(Together.days(since: model.togetherSince).formatted()) days ♡")
+                    .font(.system(size: 13, weight: .medium).monospacedDigit())
+                    .foregroundStyle(Color.accentPink)
+            }
+        case .login:
+            Screen(symbol: "laptopcomputer", title: "Keep your love close",
+                   message: "Your notch will be there every time you open your Mac.") {
+                HStack {
+                    Text("Open at Login")
+                    Spacer()
+                    Toggle("Open at Login", isOn: Binding(get: { model.opensAtLogin }, set: model.setOpensAtLogin))
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                }
+                .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .frame(width: 280)
+                    .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
+            }
+        case .done:
+            Screen(symbol: "heart.fill", title: "You're all set ♡",
+                   message: "Hover the notch anytime to send \(model.partnerName) a little love.") {}
         }
     }
 
-    private var join: some View {
-        @Bindable var model = model
-        return StepLayout(title: "enter your code", subtitle: "the 6 letters from your love's invite.") {
-            TextField("ABC234", text: $model.typedCode)
-                .textFieldStyle(.roundedBorder)
-                .font(.system(size: 18, weight: .semibold, design: .rounded).monospaced())
-                .multilineTextAlignment(.center)
-                .frame(width: 180)
-                .onSubmit(model.join)
-            Button("join") { model.join() }
-                .buttonStyle(RoseButtonStyle())
-                .disabled(model.typedCode.isEmpty || model.isWorking)
-            backButton
+    @ViewBuilder private var inviteCode: some View {
+        if let code = model.inviteCode {
+            Text(code)
+                .font(.system(size: 26, weight: .semibold, design: .monospaced))
+                .tracking(6)
+                .textSelection(.enabled)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 8)
+                .background(.background, in: RoundedRectangle(cornerRadius: 8))
+                .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.separator))
+            HStack {
+                Button("Copy Code", action: model.copyCode)
+                Button("Send Email…", action: model.sendInviteEmail)
+            }
+            HStack(spacing: 6) {
+                ProgressView().controlSize(.small)
+                Text("Waiting for your love to join…").font(.system(size: 12)).foregroundStyle(.secondary)
+            }
+            .padding(.top, 4)
+        } else if model.error == nil {
+            ProgressView()
         }
     }
 
-    private var paired: some View {
-        let partner = model.pairing?.partnerName.lowercased() ?? "your love"
-        let title = model.pairing?.role == .joiner ? "\(partner) ❤ invited you" : "\(partner) ❤ joined"
-        return StepLayout(title: title, subtitle: "you're paired. hearts and notes now travel between your notches, locked so only you two can read them.") {
-            Button("continue") { model.continueAfterPairing() }.buttonStyle(RoseButtonStyle())
+    @ViewBuilder private var joinScreen: some View {
+        if let invite = model.foundInvite {
+            Screen(symbol: "heart.fill", title: "\(invite.inviterName.lowercased()) ♥ invited you",
+                   message: "Code \(PairingService.normalize(model.typedCode))") {}
+        } else {
+            Screen(symbol: "heart.fill", title: "Enter your code",
+                   message: "The 6 letters from your love's invite.") {
+                TextField("K7QM3X", text: $model.typedCode)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                    .multilineTextAlignment(.center)
+                    .frame(width: 180)
+                    .onSubmit(continueAction)
+            }
         }
     }
 
-    private var togetherSince: some View {
-        @Bindable var model = model
-        return StepLayout(title: "how long have you been together?", subtitle: "the day you got together. your notch counts from here.") {
-            DatePicker("together since", selection: $model.togetherSince, in: ...Date.now, displayedComponents: .date)
-                .datePickerStyle(.field)
-                .labelsHidden()
-            Button("continue") { model.saveTogetherSince() }.buttonStyle(RoseButtonStyle())
+    // MARK: Footer
+
+    private var footer: some View {
+        HStack(spacing: 8) {
+            footerLeading
+            Spacer()
+            if let back = backAction {
+                Button("Back", action: back).controlSize(.large)
+            }
+            if let title = continueTitle {
+                Button(title, action: continueAction)
+                    .buttonStyle(PinkProminentButtonStyle())
+                    .disabled(!canContinue)
+                    .keyboardShortcut(.defaultAction)
+            }
+        }
+        .padding(.horizontal, 20)
+        .frame(height: 56)
+    }
+
+    @ViewBuilder private var footerLeading: some View {
+        switch model.step {
+        case .invite:
+            Button("I Have a Code") { model.go(to: .join) }.buttonStyle(.link)
+        case .date:
+            Button("Skip for Now") { model.go(to: .login) }.buttonStyle(.link)
+        default:
+            HStack(spacing: 6) {
+                ForEach(model.path, id: \.self) { step in
+                    Circle()
+                        .fill(step == model.step ? Color.primary : Color.secondary.opacity(0.35))
+                        .frame(width: 6, height: 6)
+                }
+            }
         }
     }
 
-    private var openAtLogin: some View {
-        StepLayout(title: "keep your love close", subtitle: "open OurNotch when you log in, so their hearts always find you. no other permissions needed.") {
-            Toggle("open at login", isOn: Binding(get: { model.opensAtLogin }, set: model.setOpensAtLogin))
-                .toggleStyle(.switch)
-            Button("done") { model.finish() }.buttonStyle(RoseButtonStyle())
+    private var continueTitle: String? {
+        switch model.step {
+        case .welcome: "Get Started"
+        case .invite: nil // advances by itself when your love joins
+        case .join: model.foundInvite.map { "Join \($0.inviterName.lowercased())" } ?? "Continue"
+        case .done: "Done"
+        default: "Continue"
         }
     }
 
-    private var backButton: some View {
-        Button("back") { model.go(to: .choosePath) }.buttonStyle(.link)
+    private var canContinue: Bool {
+        switch model.step {
+        case .name: !model.trimmedName.isEmpty
+        case .join: !model.typedCode.isEmpty && !model.isWorking
+        default: true
+        }
+    }
+
+    private func continueAction() {
+        guard canContinue else { return }
+        switch model.step {
+        case .welcome: model.go(to: .name)
+        case .name: model.go(to: .invite)
+        case .invite: break
+        case .join: model.foundInvite == nil ? model.lookUpCode() : model.join()
+        case .date: model.saveTogetherSince()
+        case .login: model.go(to: .done)
+        case .done: model.finish()
+        }
+    }
+
+    private var backAction: (() -> Void)? {
+        switch model.step {
+        case .name: { model.go(to: .welcome) }
+        case .invite: { model.go(to: .name) }
+        case .join: model.foundInvite == nil ? { model.go(to: .invite) } : model.editCode
+        case .done: { model.go(to: .login) }
+        default: nil // the welcome screen, and steps after pairing that can't be undone
+        }
     }
 }
 
-/// One step: a heart, a title, a short line, then the step's controls. One thing per screen.
-private struct StepLayout<Content: View>: View {
+/// One screen: an icon, a title, a short line, then the screen's controls.
+private struct Screen<Content: View>: View {
+    var icon: AnyView? = nil
+    var symbol: String? = nil
     let title: String
-    let subtitle: String
+    let message: String
     @ViewBuilder let content: Content
 
     var body: some View {
-        VStack(spacing: 18) {
-            Image(systemName: "heart.fill")
-                .font(.system(size: 40))
-                .foregroundStyle(Color.rose)
+        VStack(spacing: 14) {
+            if let icon {
+                icon
+            } else if let symbol {
+                Image(systemName: symbol).font(.system(size: 44)).foregroundStyle(Color.accentPink)
+            }
             Text(title)
-                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .font(.system(size: 22, weight: .bold))
+                .tracking(-0.3)
                 .multilineTextAlignment(.center)
-            Text(subtitle)
-                .font(.system(size: 13, design: .rounded))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-                .frame(maxWidth: 320)
-            content
+            if !message.isEmpty {
+                Text(message)
+                    .font(.system(size: 13))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            content.padding(.top, 4)
         }
-        .padding(32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .overlay(alignment: .bottom) { ErrorLine() }
     }
 }
 
-/// Shows the current model error, if any, at the bottom of the step.
-private struct ErrorLine: View {
-    @Environment(OnboardingModel.self) private var model
-
+/// The OurNotch icon: a white heart on a pink gradient tile.
+private struct AppIcon: View {
     var body: some View {
-        if let error = model.error {
-            Text(error)
-                .font(.system(size: 12, design: .rounded))
-                .foregroundStyle(Color.rose)
-                .padding(.bottom, 24)
-        }
+        RoundedRectangle(cornerRadius: 17)
+            .fill(LinearGradient(colors: [Color(hex: 0xFF5C7A), Color(hex: 0xFF2D55)], startPoint: .top, endPoint: .bottom))
+            .frame(width: 72, height: 72)
+            .overlay(Image(systemName: "heart.fill").font(.system(size: 38)).foregroundStyle(.white))
     }
 }
 
-struct RoseButtonStyle: ButtonStyle {
+/// Prominent pink button, 28 pt tall, radius 6.
+struct PinkProminentButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
-        RoseButton(configuration: configuration)
+        StyledButton(configuration: configuration)
     }
 
-    private struct RoseButton: View {
+    private struct StyledButton: View {
         let configuration: Configuration
         @Environment(\.isEnabled) private var isEnabled
 
         var body: some View {
             configuration.label
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.white)
-                .padding(.horizontal, 22)
-                .padding(.vertical, 9)
-                .background(Color.rose.opacity(configuration.isPressed ? 0.8 : 1), in: Capsule())
+                .padding(.horizontal, 14)
+                .frame(height: 28)
+                .background(Color.accentPink.opacity(configuration.isPressed ? 0.8 : 1), in: RoundedRectangle(cornerRadius: 6))
                 .opacity(isEnabled ? 1 : 0.4)
         }
     }
+}
+
+extension Color {
+    /// systemPink: `#FF2D55` in light mode, `#FF375F` in dark — follows the window's appearance.
+    static let accentPink = Color(nsColor: .systemPink)
 }

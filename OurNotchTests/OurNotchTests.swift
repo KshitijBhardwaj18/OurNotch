@@ -19,32 +19,43 @@ struct TogetherTests {
         #expect(Together.days(since: date(2030, 1, 1), now: date(2026, 1, 1), calendar: calendar) == 0)
     }
 
-    @Test func liveCounterCountsFromStartOfDay() {
-        let c = Together.elapsed(since: date(2023, 2, 14, 18), now: date(2023, 2, 16, 3, 4, 5), calendar: calendar)
-        #expect([c.day, c.hour, c.minute, c.second] == [2, 3, 4, 5])
+    @Test func hoursAndSecondsCountFromStartOfDay() {
+        let since = date(2023, 2, 14, 18), now = date(2023, 2, 16, 3, 4, 5)
+        #expect(Together.seconds(since: since, now: now, calendar: calendar) == ((2 * 24 + 3) * 60 + 4) * 60 + 5)
+        #expect(Together.hours(since: since, now: now, calendar: calendar) == 51)
+    }
+
+    @Test func weekendsCountSaturdays() {
+        // 2023-02-14 was a Tuesday; the first Saturday is the 18th.
+        #expect(Together.weekends(since: date(2023, 2, 14), now: date(2023, 2, 17), calendar: calendar) == 0)
+        #expect(Together.weekends(since: date(2023, 2, 14), now: date(2023, 2, 18), calendar: calendar) == 1)
+        #expect(Together.weekends(since: date(2023, 2, 14), now: date(2023, 2, 25), calendar: calendar) == 2)
+        // Starting on a Saturday counts that day.
+        #expect(Together.weekends(since: date(2023, 2, 18), now: date(2023, 2, 18), calendar: calendar) == 1)
     }
 }
 
-struct HeartsTests {
-    @Test func missedHeartsAreTheDifference() {
-        #expect(Hearts.newCount(partnerSent: 12, lastShown: 9) == 3)
-        #expect(Hearts.newCount(partnerSent: 9, lastShown: 9) == 0)
-        #expect(Hearts.newCount(partnerSent: 2, lastShown: 9) == 0) // partner reinstalled; never negative
+struct ArrivalTests {
+    @Test func missedEmojisAreTheDifference() {
+        #expect(Arrival.newCount(partnerSent: 12, lastShown: 9) == 3)
+        #expect(Arrival.newCount(partnerSent: 9, lastShown: 9) == 0)
+        #expect(Arrival.newCount(partnerSent: 2, lastShown: 9) == 0) // partner reinstalled; never negative
     }
 
-    @Test func threeOrMoreSplashFewerPour() {
-        #expect(Hearts.effect(forNew: 0) == nil)
-        #expect(Hearts.effect(forNew: 1) == .pour)
-        #expect(Hearts.effect(forNew: 2) == .pour)
-        #expect(Hearts.effect(forNew: 3) == .splash)
-        #expect(Hearts.effect(forNew: 12) == .splash)
+    @Test func senderChoosesUnlessThreeOrMoreArrive() {
+        #expect(Arrival.effect(forNew: 0, mode: .notch) == nil)
+        #expect(Arrival.effect(forNew: 1, mode: .notch) == .pour)
+        #expect(Arrival.effect(forNew: 2, mode: .notch) == .pour)
+        #expect(Arrival.effect(forNew: 1, mode: .fullScreen) == .splash)
+        #expect(Arrival.effect(forNew: 3, mode: .notch) == .splash) // missed while away
+        #expect(Arrival.effect(forNew: 12, mode: .notch) == .splash)
     }
 
-    @Test func heartsSentThenDelivered() {
-        #expect(DeliveryStatus.hearts(sent: 0, saved: 0, partnerSeen: 0) == .none)
-        #expect(DeliveryStatus.hearts(sent: 5, saved: 4, partnerSeen: 4) == .sending)
-        #expect(DeliveryStatus.hearts(sent: 5, saved: 5, partnerSeen: 4) == .sent)
-        #expect(DeliveryStatus.hearts(sent: 5, saved: 5, partnerSeen: 5) == .delivered)
+    @Test func emojisSentThenDelivered() {
+        #expect(DeliveryStatus.counted(sent: 0, saved: 0, partnerSeen: 0) == .none)
+        #expect(DeliveryStatus.counted(sent: 5, saved: 4, partnerSeen: 4) == .sending)
+        #expect(DeliveryStatus.counted(sent: 5, saved: 5, partnerSeen: 4) == .sent)
+        #expect(DeliveryStatus.counted(sent: 5, saved: 5, partnerSeen: 5) == .delivered)
     }
 
     @Test func messageSentThenDelivered() {
@@ -69,10 +80,11 @@ struct MessageRulesTests {
     @Test func rejectsOverTheLimits() {
         let elevenWords = Array(repeating: "hi", count: 11).joined(separator: " ")
         #expect(MessageRules.check(elevenWords) == .invalid(hint: "10 words max ♡"))
+        #expect(MessageRules.wordCount("hi babe  how ") == 3)
         let sixtyOneChars = "aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaaaaaa aaaaaa"
         #expect(sixtyOneChars.count == 61)
-        #expect(MessageRules.check(sixtyOneChars) == .invalid(hint: "a little shorter ♡"))
-        #expect(MessageRules.check("sooooooooooooooo cute") == .invalid(hint: "one word is too long ♡"))
+        #expect(MessageRules.check(sixtyOneChars) == .invalid(hint: "A little shorter ♡"))
+        #expect(MessageRules.check("sooooooooooooooo cute") == .invalid(hint: "One word is too long ♡"))
         #expect(MessageRules.check("soooooooooooooo cute") == .valid("soooooooooooooo cute")) // 15 letters is fine
     }
 }
@@ -189,18 +201,22 @@ struct PartnersTests {
         #expect(partner.banner == nil)
     }
 
-    @Test func heartsArriveAndAreDelivered() async throws {
+    @Test func emojisArriveAndAreDelivered() async throws {
         let (you, partner) = try await TwoPartners().paired()
         var arrived = 0
-        partner.onHeartsArrived = { arrived += $0 }
-        (0..<3).forEach { _ in you.sendHeart() }
-        #expect(you.heartStatus == .sending) // bundled, not saved yet
-        try await Task.sleep(for: Config.heartBundleDelay + .milliseconds(200))
+        var latest: SentEmoji?
+        partner.onEmojisArrived = { arrived += $0; latest = $1 }
+        you.sendEmoji("❤️", mode: .notch)
+        you.sendEmoji("😘", mode: .fullScreen)
+        you.sendEmoji("🌹", mode: .notch)
+        #expect(you.emojiStatus == .sending) // bundled, not saved yet
+        try await Task.sleep(for: Config.emojiBundleDelay + .milliseconds(200))
 
         await partner.sync()
         #expect(arrived == 3)
         await you.sync()
-        #expect(you.heartStatus == .delivered)
+        #expect(latest == SentEmoji(char: "🌹", mode: .notch))
+        #expect(you.emojiStatus == .delivered)
     }
 
     @Test func invalidMessageIsNotSent() async throws {

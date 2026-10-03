@@ -90,11 +90,18 @@ struct PairingService {
         }
     }
 
-    /// Joins with a typed code. Saves and returns the pairing, whose `partnerName` is who invited me.
-    func join(code typed: String, name: String) async throws -> Pairing {
+    /// Finds the invite behind a typed code, so the joiner can see who invited them before joining.
+    func lookUpInvite(code typed: String) async throws -> Invite {
         let code = Self.normalize(typed)
         guard code.count == Config.Pairing.codeLength,
               let invite = try await mailbox.fetchInvite(code: code) else { throw PairingError.invalidCode }
+        return invite
+    }
+
+    /// Joins with a typed code. Saves and returns the pairing, whose `partnerName` is who invited me.
+    func join(code typed: String, name: String) async throws -> Pairing {
+        let code = Self.normalize(typed)
+        let invite = try await lookUpInvite(code: code)
 
         let join = Join(joinerId: store.myId, joinerName: name,
                         joinerKey: store.privateKey.publicKey.rawRepresentation)

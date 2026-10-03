@@ -20,8 +20,7 @@ final class PartnerSimulator {
             window.center()
             self.window = window
         }
-        NSApp.activate()
-        window?.makeKeyAndOrderFront(nil)
+        window?.showInFront()
     }
 }
 
@@ -78,6 +77,8 @@ private struct PartnerSimulatorView: View {
 
     @State private var draft = "hi babe how are you? love you"
     @State private var mode: BannerMode = .three
+    @State private var emoji = "😘"
+    @State private var emojiMode: EmojiMode = .notch
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -128,8 +129,20 @@ private struct PartnerSimulatorView: View {
             Text("Paired with \(state.pairing.partnerName) (\(state.pairing.role.rawValue))")
 
             HStack {
-                Button("Send ❤") { state.sendHeart() }
-                Button("Send ❤ ×3") { (0..<3).forEach { _ in state.sendHeart() } }
+                Picker("Emoji", selection: $emoji) {
+                    ForEach(Config.emojis, id: \.self) { Text($0).tag($0) }
+                }
+                .labelsHidden()
+                .fixedSize()
+                Picker("Appears", selection: $emojiMode) {
+                    ForEach(EmojiMode.allCases, id: \.self) { Text($0.label).tag($0) }
+                }
+                .labelsHidden()
+                .fixedSize()
+            }
+            HStack {
+                Button("Send \(emoji)") { state.sendEmoji(emoji, mode: emojiMode) }
+                Button("Send \(emoji) ×3") { (0..<3).forEach { _ in state.sendEmoji(emoji, mode: emojiMode) } }
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -148,12 +161,12 @@ private struct PartnerSimulatorView: View {
 
             Grid(alignment: .leading, verticalSpacing: 6) {
                 GridRow {
-                    Text("Hearts sent").foregroundStyle(.secondary)
-                    Text("\(state.myOutbox.heartsSent)  \(state.heartStatus.label)")
+                    Text("Emojis sent").foregroundStyle(.secondary)
+                    Text("\(state.myOutbox.emojisSent)  \(state.emojiStatus.label)")
                 }
                 GridRow {
-                    Text("Hearts received").foregroundStyle(.secondary)
-                    Text("\(state.heartsReceived)")
+                    Text("Emojis received").foregroundStyle(.secondary)
+                    Text("\(state.emojisReceived)")
                 }
                 GridRow {
                     Text("Message sent").foregroundStyle(.secondary)

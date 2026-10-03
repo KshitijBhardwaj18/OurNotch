@@ -18,18 +18,20 @@ final class AppState {
     /// The last outbox the mailbox accepted. Differs from `myOutbox` while a save is pending or failed.
     private var savedOutbox: Outbox
 
-    var heartsReceived: Int { myOutbox.seenHearts }
+    var myName: String { store.myName ?? "" }
+    var partnerName: String { pairing.partnerName }
+    var emojisReceived: Int { myOutbox.seenEmojis }
 
-    var heartStatus: DeliveryStatus {
-        .hearts(sent: myOutbox.heartsSent, saved: savedOutbox.heartsSent, partnerSeen: partnerOutbox.seenHearts)
+    var emojiStatus: DeliveryStatus {
+        .counted(sent: myOutbox.emojisSent, saved: savedOutbox.emojisSent, partnerSeen: partnerOutbox.seenEmojis)
     }
 
     var messageStatus: DeliveryStatus {
         .message(id: myOutbox.message?.id, savedId: savedOutbox.message?.id, partnerSeenId: partnerOutbox.seenMessageId)
     }
 
-    /// Called with the number of new hearts each time some arrive.
-    @ObservationIgnored var onHeartsArrived: ((Int) -> Void)?
+    /// Called when emojis arrive: how many are new, and the latest one (which decides how they appear).
+    @ObservationIgnored var onEmojisArrived: ((Int, SentEmoji) -> Void)?
 
     @ObservationIgnored private let key: SymmetricKey
     @ObservationIgnored private let mailbox: Mailbox
@@ -70,13 +72,14 @@ final class AppState {
 
     // MARK: Sending
 
-    /// Counts the heart locally right away; rapid taps are bundled into one save.
-    func sendHeart() {
-        myOutbox.heartsSent += 1
+    /// Counts the emoji locally right away; rapid taps are bundled into one save.
+    func sendEmoji(_ char: String, mode: EmojiMode) {
+        myOutbox.emojisSent += 1
+        myOutbox.lastEmoji = SentEmoji(char: char, mode: mode)
         store.myOutbox = myOutbox
         saveTask?.cancel()
         saveTask = Task { [weak self] in
-            try? await Task.sleep(for: Config.heartBundleDelay)
+            try? await Task.sleep(for: Config.emojiBundleDelay)
             guard !Task.isCancelled, let self else { return }
             await self.save()
             self.saveTask = nil
@@ -131,11 +134,11 @@ final class AppState {
         }
 
         var shownSomething = false
-        let newHearts = Hearts.newCount(partnerSent: partner.heartsSent, lastShown: myOutbox.seenHearts)
-        if newHearts > 0 {
-            log.notice("\(newHearts) new heart(s) from partner")
-            myOutbox.seenHearts = partner.heartsSent
-            onHeartsArrived?(newHearts)
+        let newEmojis = Arrival.newCount(partnerSent: partner.emojisSent, lastShown: myOutbox.seenEmojis)
+        if newEmojis > 0, let emoji = partner.lastEmoji {
+            log.notice("\(newEmojis) new emoji(s) from partner")
+            myOutbox.seenEmojis = partner.emojisSent
+            onEmojisArrived?(newEmojis, emoji)
             shownSomething = true
         }
         if let message = partner.message, message.id != myOutbox.seenMessageId {
@@ -171,8 +174,19 @@ enum Together {
         return max(0, calendar.dateComponents([.day], from: from, to: to).day ?? 0)
     }
 
-    /// Days, hours, minutes and seconds since the start of the together-since day.
-    static func elapsed(since start: Date, now: Date = .now, calendar: Calendar = .current) -> DateComponents {
-        calendar.dateComponents([.day, .hour, .minute, .second], from: calendar.startOfDay(for: start), to: now)
+    /// Seconds since the start of the together-since day.
+    static func seconds(since start: Date, now: Date = .now, calendar: Calendar = .current) -> Int {
+        max(0, Int(now.timeIntervalSince(calendar.startOfDay(for: start))))
+    }
+
+    static func hours(since start: Date, now: Date = .now, calendar: Calendar = .current) -> Int {
+        seconds(since: start, now: now, calendar: calendar) / 3600
+    }
+
+    /// Saturdays from the together-since day through today, counting both ends.
+    static func weekends(since start: Date, now: Date = .now, calendar: Calendar = .current) -> Int {
+        let days = days(since: start, now: now, calendar: calendar)
+        let toFirstSaturday = (14 - calendar.component(.weekday, from: start)) % 7 // weekday: Sunday 1 … Saturday 7
+        return days >= toFirstSaturday ? (days - toFirstSaturday) / 7 + 1 : 0
     }
 }
