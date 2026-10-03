@@ -21,9 +21,9 @@ enum Config {
         #if DEBUG
         static let pollInterval: Duration = .seconds(3)
         #else
-        // ponytail: 10 s while pings are unverified on two Macs. ~0.1 requests/s per user, so 1,000 users
-        // would exceed CloudKit's free allowance; return to 300 s once pings are confirmed.
-        static let pollInterval: Duration = .seconds(10)
+        // Pings deliver within seconds; this only catches a lost one. One request per check, so
+        // 1,000 users ≈ 17 requests/s — under half of CloudKit's ~40/s free starting allowance.
+        static let pollInterval: Duration = .seconds(60)
         #endif
     }
 
