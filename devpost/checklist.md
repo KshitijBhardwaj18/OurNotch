@@ -11,7 +11,7 @@ Workflow (learner decision, `spec.md > Decisions and Open Issues`): each slice i
 
 ## Slices
 
-- [ ] **1. A cute notch lives on your screen**
+- [x] **1. A cute notch lives on your screen**
   Becomes usable: Launch OurNotch and a black shape grows out of your real notch showing a days-together number and a ♡. Hover and it springs open to show the live counter (days down to seconds); move away and it closes. A ♡ in the menu bar has *Quit*. No Dock icon. The together-since date is a placeholder for now.
   Why now: The notch window is the first hard unknown and everything visible lands inside it. Building it first proves the overlay, positioning, hover, and look-and-feel before any data exists. Project scaffolding is folded in here.
   PRD ref: `prd.md > Screens and Layout`, `prd.md > Look and Feel`, `prd.md > Days Together`
@@ -83,3 +83,6 @@ Reflection:
 Activity mode: 
 
 ## Revisions
+
+- `Info.plist` replaced by build settings (`GENERATE_INFOPLIST_FILE`, `INFOPLIST_KEY_LSUIElement`); `Assets.xcassets` and `OurNotch.entitlements` deferred until something needs them (app icon, slice 5 CloudKit) — Xcode's folder-synced project generates the plist, and an empty asset catalog or entitlements file adds nothing yet.
+- Slice 1 screenshot check replaced by a window-server check (layer 27 = menu bar + 3, 480×170 at top-center over a 179×32 notch) — this terminal lacks Screen Recording permission; the visual check moves to the slice 2 hands-on checkpoint.
