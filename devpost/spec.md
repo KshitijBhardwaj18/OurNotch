@@ -70,7 +70,7 @@ Implements `prd.md > Look and Feel` (cute, minimal, modern). **Proposed. Learner
 - **Copy tone:** short, soft, lowercase-cute: "sent ♡", "delivered ♡", "waiting for your love…", "nikki ❤ invited you".
 - **Onboarding window:** small, centered, one thing per screen, adapts to light/dark mode.
 - **Avoid:** generic glassy dashboard styling, gradients everywhere, emoji overload.
-- **Open notch layout** (about 420×150 pt): left = days together + live counter; right = big ❤ button; bottom = message field + scroll-mode toggle + send; a small line under it shows the last message received and sent/delivered.
+- **Open notch layout:** tabbed, NotchBuddy-style (one job per tab, tab bar at the bottom). **Redesign in progress:** the learner is getting a visual design from a design agent using `devpost/design-brief.md`; that design replaces this line once approved.
 
 ## Components
 
@@ -94,6 +94,10 @@ PRD ref: `prd.md > Days Together`, `prd.md > Sending Messages`.
 ### Open Notch View
 Opens on hover. Live counter (days → seconds, ticks every second only while open), heart button, message field, scroll-mode toggle, send, last message, sent/delivered status. Keeps a notch-wide gap in its top row (behind the camera).
 PRD ref: `prd.md > Days Together`, `prd.md > Sending Hearts`, `prd.md > Sending Messages`.
+
+### Partner Photo
+One image per partner, chosen from the Mac (`NSOpenPanel`, images only), resized to at most 512 px on the long side and saved as JPEG (~100 KB), then **encrypted with the shared key** and stored as its own mailbox record (`Photo`, owner-only write). The outbox carries `photoId`; when the partner's `photoId` changes, the app fetches, decrypts, and caches the image locally. Shown on the Home tab.
+PRD ref: `prd.md > Your Love's Photo`.
 
 ### Hearts Effect
 Two effects: **pour** (hearts float out of the notch, inside the notch window area) and **splash** (a separate full-screen, click-through, transparent window with hearts across the whole screen, ~3 s, then closes). Chosen by new-heart count: `< 3` pour, `≥ 3` splash.
@@ -144,9 +148,11 @@ Default security: anyone signed in to the app can read; only the record's creato
 |---|---|---|---|
 | `Invite` | `invite-<CODE>` | `inviterId` (String), `inviterName` (String), `inviterKey` (Bytes, public key) | inviter, once |
 | `Join` | `join-<CODE>` | `joinerId`, `joinerName`, `joinerKey` | joiner, once (an existing record = "used code") |
-| `Outbox` | `outbox-<userId>` | `pairId` (String, queryable), `ownerId` (String, queryable), `payload` (Bytes, encrypted) | its owner only |
+| `Outbox` | `outbox-<userId>` | `ownerId` (String, **Queryable index**, needed for pings), `payload` (Bytes, encrypted) | its owner only |
 
 `pairId` = `<CODE>`. `userId` = a random UUID per install (not the iCloud account), so two identities can share one iCloud account for testing.
+
+| `Photo` | `photo-<userId>` | `ownerId`, `image` (Asset, encrypted JPEG) | its owner only |
 
 **Encrypted `payload` (JSON before locking):**
 ```json
@@ -154,19 +160,20 @@ Default security: anyone signed in to the app can read; only the record's creato
   "heartsSent": 12,
   "message": { "id": "uuid", "text": "hi babe how are you? love you", "mode": "three|untilOpened", "sentAt": "…" },
   "seenHearts": 4,          // partner's heartsSent I've shown
-  "seenMessageId": "uuid" } // partner's message I've shown
+  "seenMessageId": "uuid",   // partner's message I've shown
+  "photoId": "uuid" }       // changes when I pick a new photo
 ```
 
-**Subscription:** a `CKQuerySubscription` on `Outbox` where `pairId == CODE AND ownerId == partnerId`, firing on create and update, sent as a silent ping (`shouldSendContentAvailable`).
+**Subscription:** a `CKQuerySubscription` on `Outbox` where `ownerId == partnerId`, firing on create and update, sent as a silent ping (`shouldSendContentAvailable`). CloudKit doesn't ping the Mac that made the change, so on one Mac (notch + Partner Simulator) Debug builds check every 3 s; Release builds check every 5 min plus pings and wake.
 
 ### On this Mac
-- **Keychain:** private key.
+- **Keychain** (data-protection Keychain, service `OurNotch`; the simulator uses `OurNotch.PartnerSimulator`): private key. Tests keep keys in a throwaway `UserDefaults` suite instead.
 - **UserDefaults:** `userId`, my name, role (inviter/joiner), `pairId`, partner id + public key + name, together-since, my outbox payload (so counts survive restarts), last-shown partner heart count, pending `untilOpened` banner, open-at-login setting.
 - **Leave and come back:** everything above persists. On launch the app fetches the partner's outbox, so anything missed while it was closed shows then (pour/splash, banner).
 - **Partner Simulator** uses a separate `UserDefaults` suite and Keychain entry.
 
 ### Free-tier estimate (1,000 users = 500 couples)
-About 2,000 small records (~1 KB) ≈ **2 MB** stored. Requests: 5-minute checks ≈ 288k/day ≈ 3.3/s, plus about 20 hearts/messages per user per day ≈ 60k/day ≈ 0.7/s. Total ≈ **4 requests/s on average**, well below the published starting allowance (~40/s). These numbers are old; confirm in CloudKit Console → Telemetry once live.
+About 2,000 small records (~1 KB) ≈ **2 MB** stored, plus one ~100 KB photo per user ≈ **100 MB** of assets (re-check the current public-database asset allowance in slice 6). Requests: 5-minute checks ≈ 288k/day ≈ 3.3/s, plus about 20 hearts/messages per user per day ≈ 60k/day ≈ 0.7/s. Total ≈ **4 requests/s on average**, well below the published starting allowance (~40/s). These numbers are old; confirm in CloudKit Console → Telemetry once live.
 
 ## File Structure
 ```

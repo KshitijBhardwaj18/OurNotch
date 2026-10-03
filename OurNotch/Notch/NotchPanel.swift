@@ -13,6 +13,8 @@ final class NotchPanel: NSPanel {
         backgroundColor = .clear
         hasShadow = false
         isMovable = false
+        // Panels hide when their app stops being active by default; the notch must always stay.
+        hidesOnDeactivate = false
         level = NSWindow.Level(rawValue: NSWindow.Level.mainMenu.rawValue + 3)
         collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary, .ignoresCycle]
         appearance = NSAppearance(named: .darkAqua)
@@ -22,4 +24,10 @@ final class NotchPanel: NSPanel {
     // so the user's current app stays in front.
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
+
+    /// Clicking elsewhere ends editing, which lets the notch close again.
+    override func resignKey() {
+        super.resignKey()
+        makeFirstResponder(nil)
+    }
 }
