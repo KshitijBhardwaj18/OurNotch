@@ -148,7 +148,7 @@ Default security: anyone signed in to the app can read; only the record's creato
 |---|---|---|---|
 | `Invite` | `invite-<CODE>` | `inviterId` (String), `inviterName` (String), `inviterKey` (Bytes, public key) | inviter, once |
 | `Join` | `join-<CODE>` | `joinerId`, `joinerName`, `joinerKey` | joiner, once (an existing record = "used code") |
-| `Outbox` | `outbox-<userId>` | `pairId` (String, queryable), `ownerId` (String, queryable), `payload` (Bytes, encrypted) | its owner only |
+| `Outbox` | `outbox-<userId>` | `ownerId` (String, **Queryable index**, needed for pings), `payload` (Bytes, encrypted) | its owner only |
 
 `pairId` = `<CODE>`. `userId` = a random UUID per install (not the iCloud account), so two identities can share one iCloud account for testing.
 
@@ -164,10 +164,10 @@ Default security: anyone signed in to the app can read; only the record's creato
   "photoId": "uuid" }       // changes when I pick a new photo
 ```
 
-**Subscription:** a `CKQuerySubscription` on `Outbox` where `pairId == CODE AND ownerId == partnerId`, firing on create and update, sent as a silent ping (`shouldSendContentAvailable`).
+**Subscription:** a `CKQuerySubscription` on `Outbox` where `ownerId == partnerId`, firing on create and update, sent as a silent ping (`shouldSendContentAvailable`). CloudKit doesn't ping the Mac that made the change, so on one Mac (notch + Partner Simulator) Debug builds check every 3 s; Release builds check every 5 min plus pings and wake.
 
 ### On this Mac
-- **Keychain:** private key.
+- **Keychain** (data-protection Keychain, service `OurNotch`; the simulator uses `OurNotch.PartnerSimulator`): private key. Tests keep keys in a throwaway `UserDefaults` suite instead.
 - **UserDefaults:** `userId`, my name, role (inviter/joiner), `pairId`, partner id + public key + name, together-since, my outbox payload (so counts survive restarts), last-shown partner heart count, pending `untilOpened` banner, open-at-login setting.
 - **Leave and come back:** everything above persists. On launch the app fetches the partner's outbox, so anything missed while it was closed shows then (pour/splash, banner).
 - **Partner Simulator** uses a separate `UserDefaults` suite and Keychain entry.

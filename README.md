@@ -4,7 +4,9 @@ A cute little shared space for couples that lives in the MacBook notch: tap to s
 
 ## Run it
 
-Requirements: macOS 14+, Xcode 27.
+Requirements: macOS 14+, Xcode 27, a Mac signed into iCloud, and Xcode signed into an Apple Developer team that can use the CloudKit container (currently the company team `FFP4CMK386`, bundle `com.kshitijbhardwaj.OurNotch.dev`, container `iCloud.com.kshitijbhardwaj.OurNotch.dev`).
+
+**Switching accounts later:** change `DEVELOPMENT_TEAM` and `PRODUCT_BUNDLE_IDENTIFIER` in the project, the container in `OurNotch/OurNotch.entitlements`, and `Config.Cloud.containerId`. In the new container's CloudKit Console, add a **Queryable** index on `Outbox.ownerId` so pings work. CloudKit data doesn't move between accounts; couples pair again.
 
 1. Open `OurNotch.xcodeproj`.
 2. Select the **OurNotch** scheme and press ⌘R.
@@ -14,7 +16,7 @@ OurNotch has no Dock icon. It lives in the notch; hover to open it. Quit from th
 From the command line:
 
 ```bash
-xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/DerivedData build
+xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/DerivedData -allowProvisioningUpdates build
 open build/DerivedData/Build/Products/Debug/OurNotch.app
 ```
 
@@ -27,7 +29,7 @@ Tests: `xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath
 - `OurNotch/Notch/`: the notch window, its shape, header, banner, emoji effects, and shared controls.
 - `OurNotch/Notch/Tabs/`: the open notch's Home, Note, Emoji and Photo tabs.
 - `OurNotch/Model/`: app state and pure logic (outbox, note rules, time-together math).
-- `OurNotch/Sync/`: the mailbox (local file for now), pairing, and encryption.
+- `OurNotch/Sync/`: the mailbox (CloudKit `CloudStore` in the app; a local-file version for tests), pairing, encryption, and the Keychain.
 - `OurNotch/Onboarding/`, `OurNotch/Settings/`: the setup window and the Settings window.
 - `OurNotch/Debug/`: the Partner Simulator (Debug builds only) — a second partner on the same Mac.
 - `devpost/`: planning docs (scope, PRD, spec, build checklist) and `design_handoff/` (the v3 design).

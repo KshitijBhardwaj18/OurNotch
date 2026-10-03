@@ -7,9 +7,11 @@ import SwiftUI
 final class PartnerSimulator {
     static let suiteName = "OurNotch.PartnerSimulator"
 
-    private let model = SimulatorModel(store: LocalStore(defaults: UserDefaults(suiteName: suiteName)!),
-                                       mailbox: LocalFileMailbox())
+    private let model = SimulatorModel(store: LocalStore(defaults: UserDefaults(suiteName: suiteName)!, keychainService: suiteName),
+                                       mailbox: CloudStore())
     private var window: NSWindow?
+
+    func syncNow() { model.state?.syncNow() }
 
     func show() {
         if window == nil {

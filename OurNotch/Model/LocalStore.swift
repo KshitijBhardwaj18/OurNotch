@@ -2,9 +2,11 @@ import CryptoKit
 import Foundation
 
 /// Everything this Mac remembers for one identity, so it all survives restarts.
-/// The Partner Simulator passes its own `UserDefaults` suite to stay a separate person.
+/// The Partner Simulator passes its own `UserDefaults` suite and Keychain service to stay a separate person.
 struct LocalStore {
     let defaults: UserDefaults
+    /// Where the private key lives. Nil keeps it in `defaults`, which tests use so they don't touch the Keychain.
+    var keychainService: String? = nil
 
     /// A random id per install, not the iCloud account, so two identities can share one Mac for testing.
     var myId: String {
@@ -14,17 +16,27 @@ struct LocalStore {
         return id
     }
 
-    /// Created on first use.
-    // ponytail: kept in UserDefaults while builds are ad-hoc signed ("Sign to Run Locally"), because the
-    // Keychain re-prompts for the login password after every rebuild. Move to the Keychain in slice 5,
-    // when the app is signed with the company team.
+    /// Created on first use and kept in the Keychain (or `defaults` for tests).
     var privateKey: Crypto.PrivateKey {
-        if let raw = defaults.data(forKey: "privateKey"), let key = try? Crypto.PrivateKey(rawRepresentation: raw) {
-            return key
-        }
+        if let raw = loadKey(), let key = try? Crypto.PrivateKey(rawRepresentation: raw) { return key }
         let key = Crypto.PrivateKey()
-        defaults.set(key.rawRepresentation, forKey: "privateKey")
+        storeKey(key.rawRepresentation)
         return key
+    }
+
+    private func loadKey() -> Data? {
+        guard let keychainService else { return defaults.data(forKey: "privateKey") }
+        return Keychain.read(service: keychainService, account: "privateKey")
+    }
+
+    private func storeKey(_ raw: Data) {
+        guard let keychainService else { return defaults.set(raw, forKey: "privateKey") }
+        do {
+            try Keychain.save(raw, service: keychainService, account: "privateKey")
+        } catch {
+            // Without a saved key, pairing couldn't survive a restart; fail loudly in development.
+            assertionFailure("Couldn't save the private key to the Keychain: \(error)")
+        }
     }
 
     var myName: String? {

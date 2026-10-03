@@ -25,6 +25,16 @@ protocol Mailbox: Sendable {
     /// Throws `MailboxError.alreadyExists` if someone already joined with this code.
     func createJoin(_ join: Join, code: String) async throws
     func fetchJoin(code: String) async throws -> Join?
+
+    /// Whether the mailbox can be used right now (CloudKit needs an iCloud sign-in).
+    func accountAvailable() async -> Bool
+    /// Asks to be pinged when the partner's row changes, so checks happen within seconds.
+    func watchPartner(_ partnerId: String) async
+}
+
+extension Mailbox {
+    func accountAvailable() async -> Bool { true }
+    func watchPartner(_ partnerId: String) async {}
 }
 
 /// Stand-in mailbox: one file per record in Application Support, shared by every identity on this Mac.

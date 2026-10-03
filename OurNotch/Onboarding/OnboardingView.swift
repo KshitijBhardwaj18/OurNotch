@@ -2,10 +2,11 @@ import SwiftUI
 
 /// Drives the first-launch steps.
 /// Inviter: welcome → name → invite → date → login → done. Joiner: welcome → name → join → login → done.
+/// If the Mac isn't signed into iCloud, an iCloud step comes right after welcome.
 @MainActor
 @Observable
 final class OnboardingModel {
-    enum Step { case welcome, name, invite, join, date, login, done }
+    enum Step { case welcome, icloud, name, invite, join, date, login, done }
 
     var step: Step = .welcome
     var name = ""
@@ -20,12 +21,14 @@ final class OnboardingModel {
     private(set) var opensAtLogin = LoginItem.isEnabled
 
     @ObservationIgnored private let store: LocalStore
+    @ObservationIgnored private let mailbox: Mailbox
     @ObservationIgnored private let service: PairingService
     @ObservationIgnored private let onFinished: () -> Void
     @ObservationIgnored private var waitTask: Task<Void, Never>?
 
     init(store: LocalStore, mailbox: Mailbox, onFinished: @escaping () -> Void) {
         self.store = store
+        self.mailbox = mailbox
         self.service = PairingService(mailbox: mailbox, store: store)
         self.onFinished = onFinished
         name = store.myName ?? ""
@@ -46,6 +49,21 @@ final class OnboardingModel {
         if step != .invite { waitTask?.cancel() }
         self.step = step
         if step == .invite { startInvite() }
+    }
+
+    // MARK: iCloud
+
+    /// Hearts and notes travel through iCloud, so the Mac must be signed in before pairing.
+    func checkICloud() {
+        isWorking = true
+        Task {
+            defer { isWorking = false }
+            go(to: await mailbox.accountAvailable() ? .name : .icloud)
+        }
+    }
+
+    func openICloudSettings() {
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.systempreferences.AppleIDSettings")!)
     }
 
     // MARK: Invite
@@ -179,6 +197,11 @@ struct OnboardingView: View {
         case .welcome:
             Screen(icon: AnyView(AppIcon()), title: "Welcome to OurNotch",
                    message: "A little love note that lives in the top of your screen.") {}
+        case .icloud:
+            Screen(symbol: "icloud", title: "Sign in to iCloud",
+                   message: "OurNotch uses iCloud to carry your hearts and notes between your Macs. Sign in, then try again.") {
+                Button("Open System Settings…", action: model.openICloudSettings)
+            }
         case .name:
             Screen(symbol: "person", title: "What should your love call you?",
                    message: "Shown next to your hearts and notes.") {
@@ -303,6 +326,7 @@ struct OnboardingView: View {
     private var continueTitle: String? {
         switch model.step {
         case .welcome: "Get Started"
+        case .icloud: "Try Again"
         case .invite: nil // advances by itself when your love joins
         case .join: model.foundInvite.map { "Join \($0.inviterName.lowercased())" } ?? "Continue"
         case .done: "Done"
@@ -312,6 +336,7 @@ struct OnboardingView: View {
 
     private var canContinue: Bool {
         switch model.step {
+        case .welcome, .icloud: !model.isWorking
         case .name: !model.trimmedName.isEmpty
         case .join: !model.typedCode.isEmpty && !model.isWorking
         default: true
@@ -321,7 +346,7 @@ struct OnboardingView: View {
     private func continueAction() {
         guard canContinue else { return }
         switch model.step {
-        case .welcome: model.go(to: .name)
+        case .welcome, .icloud: model.checkICloud()
         case .name: model.go(to: .invite)
         case .invite: break
         case .join: model.foundInvite == nil ? model.lookUpCode() : model.join()
@@ -333,7 +358,7 @@ struct OnboardingView: View {
 
     private var backAction: (() -> Void)? {
         switch model.step {
-        case .name: { model.go(to: .welcome) }
+        case .icloud, .name: { model.go(to: .welcome) }
         case .invite: { model.go(to: .name) }
         case .join: model.foundInvite == nil ? { model.go(to: .invite) } : model.editCode
         case .done: { model.go(to: .login) }

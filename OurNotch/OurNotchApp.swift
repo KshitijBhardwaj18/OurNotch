@@ -1,3 +1,4 @@
+import os
 import SwiftUI
 
 @main
@@ -24,8 +25,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     #if DEBUG
     let partnerSimulator = PartnerSimulator()
     #endif
-    private let store = LocalStore(defaults: .standard)
-    private let mailbox = LocalFileMailbox()
+    static let keychainService = "OurNotch"
+    private let store = LocalStore(defaults: .standard, keychainService: AppDelegate.keychainService)
+    private let mailbox = CloudStore()
     private var state: AppState?
     private var panel: NotchPanel?
     private var geometry: NotchGeometry?
@@ -41,6 +43,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.placeNotch() }
         }
+        // A Mac that slept may have missed pings; check as soon as it wakes.
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.syncEveryone() }
+        }
+        NSApp.registerForRemoteNotifications()
+    }
+
+    // MARK: Pings
+
+    /// CloudKit's silent ping: the partner's row changed.
+    func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String: Any]) {
+        syncEveryone()
+    }
+
+    func application(_ application: NSApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        Logger(subsystem: "OurNotch", category: "cloud").error("No pings: \(error.localizedDescription, privacy: .public)")
+    }
+
+    private func syncEveryone() {
+        state?.syncNow()
+        #if DEBUG
+        partnerSimulator.syncNow()
+        #endif
     }
 
     /// Starts syncing and shows the notch. Returns false if this Mac isn't paired yet.
@@ -106,13 +133,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     #if DEBUG
-    /// Forgets both identities and the local mailbox, then quits, so the next launch is a fresh install.
+    /// Forgets both identities (settings, keys, cached photos), then quits, so the next launch is a fresh
+    /// install. Old records stay in CloudKit; new identities never read them.
     func resetForTesting() {
         if let bundleId = Bundle.main.bundleIdentifier {
             UserDefaults.standard.removePersistentDomain(forName: bundleId)
         }
         UserDefaults.standard.removePersistentDomain(forName: PartnerSimulator.suiteName)
-        try? FileManager.default.removeItem(at: LocalFileMailbox().directory)
+        Keychain.delete(service: AppDelegate.keychainService)
+        Keychain.delete(service: PartnerSimulator.suiteName)
+        try? FileManager.default.removeItem(at: PhotoCache.defaultRoot)
         NSApp.terminate(nil)
     }
     #endif

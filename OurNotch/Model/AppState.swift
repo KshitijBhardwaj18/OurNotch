@@ -48,6 +48,7 @@ final class AppState {
     @ObservationIgnored private let photos: PhotoCache
     @ObservationIgnored private var saveTask: Task<Void, Never>?
     @ObservationIgnored private var syncTask: Task<Void, Never>?
+    @ObservationIgnored private var isSyncing = false
     @ObservationIgnored private let log = Logger(subsystem: "OurNotch", category: "sync")
 
     /// Returns nil until this identity has paired.
@@ -72,15 +73,24 @@ final class AppState {
         }
     }
 
-    /// Starts checking the partner's row. Anything missed while the app was closed shows on the first check.
+    /// Starts checking the partner's row: right away (anything missed while the app was closed shows then),
+    /// whenever a ping or wake-up calls `syncNow`, and every `pollInterval` as a safety net.
     func start() {
         guard syncTask == nil else { return }
         syncTask = Task { [weak self] in
-            while let self, !Task.isCancelled {
+            guard let self else { return }
+            await self.mailbox.watchPartner(self.pairing.partnerId)
+            while !Task.isCancelled {
                 await self.sync()
                 try? await Task.sleep(for: self.mailbox.pollInterval)
             }
         }
+    }
+
+    /// Checks now, e.g. after a ping or when the Mac wakes. Skipped if a check is already running.
+    func syncNow() {
+        guard !isSyncing else { return }
+        Task { await sync() }
     }
 
     // MARK: Sending
@@ -116,7 +126,7 @@ final class AppState {
             try await mailbox.savePhoto(Crypto.seal(jpeg, with: key), owner: pairing.myId)
             try photos.save(jpeg, .mine)
         } catch {
-            log.error("Sending photo failed: \(error.localizedDescription)")
+            log.error("Sending photo failed: \(error.localizedDescription, privacy: .public)")
             return false
         }
         myPhoto = NSImage(data: jpeg)
@@ -154,6 +164,8 @@ final class AppState {
 
     /// Reads the partner's row, shows anything new, and retries an outbox that didn't save.
     func sync() async {
+        isSyncing = true
+        defer { isSyncing = false }
         if saveTask == nil, myOutbox != savedOutbox { await save() }
 
         let partner: Outbox
@@ -161,7 +173,7 @@ final class AppState {
             guard let sealed = try await mailbox.fetchOutbox(owner: pairing.partnerId) else { return }
             partner = try JSONDecoder().decode(Outbox.self, from: Crypto.open(sealed, with: key))
         } catch {
-            log.error("Fetching partner outbox failed: \(error.localizedDescription)")
+            log.error("Fetching partner outbox failed: \(error.localizedDescription, privacy: .public)")
             return
         }
         partnerOutbox = partner
@@ -202,7 +214,7 @@ final class AppState {
             log.notice("New photo from partner")
             return true
         } catch {
-            log.error("Fetching partner photo failed: \(error.localizedDescription)")
+            log.error("Fetching partner photo failed: \(error.localizedDescription, privacy: .public)")
             return false
         }
     }
@@ -215,7 +227,7 @@ final class AppState {
             savedOutbox = snapshot
             store.savedOutbox = snapshot
         } catch {
-            log.error("Saving outbox failed, will retry: \(error.localizedDescription)")
+            log.error("Saving outbox failed, will retry: \(error.localizedDescription, privacy: .public)")
         }
     }
 }
