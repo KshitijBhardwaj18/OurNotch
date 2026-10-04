@@ -177,6 +177,32 @@ struct PartnersTests {
         #expect((try? JSONDecoder().decode(Outbox.self, from: stored)) == nil)
     }
 
+    @Test func partnerIsCoveredByTheBuyersKey() async throws {
+        let people = TwoPartners()
+        people.you.licence = Licence(key: "BUYER-KEY", activationId: "lki_1")
+        let (you, partner) = try await people.paired()
+        var changed = 0
+        partner.onLicenceChanged = { changed += 1 }
+        await you.sync()     // saves the buyer's outbox, key included (encrypted)
+        await partner.sync()
+        #expect(people.partner.licence == Licence(key: "BUYER-KEY"))
+        #expect(people.partner.licence?.isBuyer == false) // the partner uses no slot
+        #expect(changed == 1)
+        await partner.sync()
+        #expect(changed == 1) // only once
+        let stored = try #require(try await people.mailbox.fetchOutbox(owner: people.you.myId))
+        #expect(stored.range(of: Data("BUYER-KEY".utf8)) == nil)
+    }
+
+    @Test func onlyTheBuyerCanInvite() {
+        let store = LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
+        let model = OnboardingModel(store: store, mailbox: LocalFileMailbox(directory: .temporaryDirectory.appending(path: UUID().uuidString))) {}
+        #expect(model.step == .gate)
+        model.go(to: .invite)
+        #expect(model.inviteCode == nil)
+        #expect(model.error?.hasPrefix("Only the person who bought") == true)
+    }
+
     @Test func joinerReceivesTogetherSince() async throws {
         let date = Date(timeIntervalSince1970: 1_676_332_800) // 2023-02-14
         let (you, partner) = try await TwoPartners().paired(togetherSince: date)
@@ -349,6 +375,23 @@ struct LicenceTests {
         #expect(LicenceService.validity(status: 404, body: Data()) == false)
         #expect(LicenceService.validity(status: 500, body: Data()) == nil) // Dodo down: keep the last answer
         #expect(LicenceService.validity(status: nil, body: Data()) == nil) // offline: keep the last answer
+    }
+
+    @Test func dodosAnswerSetsTheStatus() {
+        let active = Licence(key: "K", activationId: "lki_1")
+        #expect(LicenceService.applying(false, to: active).status == .revoked)
+        #expect(LicenceService.applying(true, to: Licence(key: "K", status: .revoked)).status == .active) // restored
+        #expect(LicenceService.applying(nil, to: Licence(key: "K", status: .revoked)).status == .revoked) // offline: unchanged
+        #expect(LicenceService.applying(true, to: Licence(key: "K", status: .removed)).status == .removed) // removed stays removed
+        #expect(Licence(key: "K", status: .revoked).isLocked && Licence(key: "K", status: .removed).isLocked && !active.isLocked)
+    }
+
+    @Test func partnerAdoptsTheBuyersNewestKeyButNeverReplacesItsOwn() {
+        #expect(Licence.adopts("A", over: nil))
+        #expect(Licence.adopts("B", over: Licence(key: "A", status: .revoked))) // buyer bought a new key
+        #expect(!Licence.adopts("A", over: Licence(key: "A")))                  // already have it
+        #expect(!Licence.adopts("B", over: Licence(key: "A", activationId: "lki_1"))) // bought their own
+        #expect(!Licence.adopts("B", over: Licence(key: "A", status: .removed)))
     }
 
     @Test func licenceSurvivesInTheStore() {

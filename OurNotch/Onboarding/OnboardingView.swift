@@ -35,7 +35,7 @@ final class OnboardingModel {
         self.mailbox = mailbox
         self.service = PairingService(mailbox: mailbox, store: store)
         self.onFinished = onFinished
-        let start: Step = store.licence?.revoked == false ? .welcome : .gate
+        let start: Step = store.licence?.status == .active ? .welcome : .gate
         self.start = start
         step = start
         name = store.myName ?? ""
@@ -110,6 +110,11 @@ final class OnboardingModel {
 
     /// Posts the invite (once), then waits in the background for my love to join.
     private func startInvite() {
+        // Only the buyer invites; a partner is covered through the pairing (`spec-m2.md > Partner Coverage`).
+        guard store.licence?.isBuyer == true, store.licence?.status == .active else {
+            error = "Only the person who bought OurNotch can invite. Go back and choose I Have an Invite Code."
+            return
+        }
         Task {
             if inviteCode == nil {
                 do {
@@ -446,7 +451,7 @@ struct OnboardingView: View {
 }
 
 /// One screen: an icon, a title, a short line, then the screen's controls.
-private struct Screen<Content: View>: View {
+struct Screen<Content: View>: View {
     var icon: AnyView? = nil
     var symbol: String? = nil
     let title: String
@@ -476,7 +481,7 @@ private struct Screen<Content: View>: View {
 }
 
 /// The OurNotch icon: a white heart on a pink gradient tile.
-private struct AppIcon: View {
+struct AppIcon: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 17)
             .fill(LinearGradient(colors: [Color(hex: 0xFF5C7A), Color(hex: 0xFF2D55)], startPoint: .top, endPoint: .bottom))

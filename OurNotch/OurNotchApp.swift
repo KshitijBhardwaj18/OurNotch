@@ -46,6 +46,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var geometry: NotchGeometry?
     private var onboardingWindow: NSWindow?
     private var onboarding: OnboardingModel?
+    private var licenceWindow: NSWindow?
+    private var isLocked: Bool { store.licence?.isLocked == true }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Unit tests run inside the app; they don't need a notch on screen.
@@ -66,6 +68,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated {
                 Diagnostics.shared.record("Mac woke")
                 self?.syncEveryone(.wake)
+                self?.checkLicence()
             }
         }
         NSApp.registerForRemoteNotifications()
@@ -169,13 +172,73 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @discardableResult
     private func startNotch() -> Bool {
         guard let state = AppState(store: store, mailbox: mailbox) else { return false }
-        state.onEmojisArrived = { [effects] count, emoji in effects.play(newCount: count, emoji: emoji) }
+        // Syncing carries on while locked (a new key from the partner must still arrive); effects don't play.
+        state.onEmojisArrived = { [weak self] count, emoji in
+            guard let self, !self.isLocked else { return }
+            self.effects.play(newCount: count, emoji: emoji)
+        }
+        state.onLicenceChanged = { [weak self] in self?.checkLicence() }
         state.start()
         Diagnostics.shared.startUploading(owner: state.pairing.myId, mailbox: mailbox)
         startAutoExport()
         self.state = state
         placeNotch()
+        applyLicence()
+        startLicenceChecks()
         return true
+    }
+
+    // MARK: Licence
+
+    /// On launch and then daily (`Config.Licence.checkInterval`); wake and a newly received key check too.
+    private func startLicenceChecks() {
+        Task {
+            while true {
+                await runLicenceCheck()
+                try? await Task.sleep(for: Config.Licence.checkInterval)
+            }
+        }
+    }
+
+    func checkLicence() {
+        Task { await runLicenceCheck() }
+    }
+
+    private func runLicenceCheck() async {
+        guard state != nil else { return }
+        await LicenceService(store: store).check()
+        Diagnostics.shared.record("licence check: \(store.licence?.status.rawValue ?? "none")")
+        applyLicence()
+    }
+
+    /// Locked: the notch hides and the licence window shows. Unlocked: the reverse.
+    private func applyLicence() {
+        guard let state else { return }
+        if isLocked {
+            panel?.orderOut(nil)
+            showLicenceWindow()
+        } else {
+            state.shareLicence()
+            if let licenceWindow {
+                licenceWindow.close()
+                self.licenceWindow = nil
+                NSApp.setActivationPolicy(.accessory)
+            }
+            panel?.orderFrontRegardless()
+        }
+    }
+
+    private func showLicenceWindow() {
+        guard licenceWindow == nil else { return }
+        let model = LicenceBlockedModel(store: store) { [weak self] in self?.applyLicence() }
+        let window = NSWindow(contentViewController: NSHostingController(rootView: LicenceBlockedView(model: model)))
+        window.title = "OurNotch"
+        window.styleMask = [.titled] // not closable: quit from the ♡ menu instead
+        window.isReleasedWhenClosed = false
+        window.center()
+        licenceWindow = window
+        NSApp.setActivationPolicy(.regular) // typing a key needs a regular app
+        window.showInFront()
     }
 
     // MARK: Onboarding
@@ -226,7 +289,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         panel.alphaValue = 0
         panel.setFrame(newGeometry.panelFrame, display: false)
         panel.contentView = hostingView
-        panel.orderFrontRegardless()
+        if !isLocked { panel.orderFrontRegardless() }
         panel.alphaValue = 1
         self.panel = panel
     }
