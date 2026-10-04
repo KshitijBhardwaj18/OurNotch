@@ -1,3 +1,5 @@
+import type { Copy } from './i18n';
+import { fill } from './i18n';
 import { act, fmt, rand, together } from './motion';
 
 type Who = 'pip' | 'bun';
@@ -15,7 +17,8 @@ const SHOTS: Record<'desktop' | 'phone', Record<Shot, [number, number]>> = {
 const PHONE = '(max-width: 599px)'; // keep in step with .demo-shell's aspect-ratio in globals.css
 
 // Plays the notch like a short looping video: Pip (you) and Bun (your person in the notch) narrate.
-export function runHeroTour(root: HTMLElement) {
+// `d` is the demo's static text, `t` the script's lines and statuses, both in the page's language.
+export function runHeroTour(root: HTMLElement, d: Copy['demo'], t: Copy['tour']) {
   const q = <T extends HTMLElement = HTMLElement>(s: string) => root.querySelector(s) as T;
   const qa = (s: string) => [...root.querySelectorAll<HTMLElement>(s)];
   const timers = new Set<number>();
@@ -35,12 +38,13 @@ export function runHeroTour(root: HTMLElement) {
 
   /* ---------- live bits: clock, calendar, time together ---------- */
   const today = new Date();
-  q('.x-day').textContent = today.toLocaleDateString('en-US', { weekday: 'long' });
+  const locale = t.locale;
+  q('.x-day').textContent = today.toLocaleDateString(t.locale, { weekday: 'long' });
   q('.x-num').textContent = String(today.getDate());
   function tick() {
     const t = together(), now = new Date();
     q('.s-hours').textContent = fmt(t.hours); q('.s-weekends').textContent = fmt(t.weekends); q('.s-secs').textContent = fmt(t.secs);
-    q('.clock').textContent = now.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    q('.clock').textContent = now.toLocaleDateString(locale, { weekday: 'short' }) + ' ' + now.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
   }
   tick();
   const clock = setInterval(tick, 1000);
@@ -122,11 +126,11 @@ export function runHeroTour(root: HTMLElement) {
   function typeNote(text: string) {
     [...text].forEach((_, i) => later(() => {
       noteIn.value = text.slice(0, i + 1);
-      noteState(`${noteIn.value.trim().split(/\s+/).length} of 10 words`, 'ter');
+      noteState(fill(t.ofWords, { n: noteIn.value.trim().split(/\s+/).length }), 'ter');
     }, i * 70));
     const done = text.length * 70;
-    later(() => noteState('Sending…', 'sec'), done + 250);
-    later(() => { noteState('Delivered ♡', 'pk'); bunLoves('🥹'); }, done + 850);
+    later(() => noteState(t.sending, 'sec'), done + 250);
+    later(() => { noteState(t.delivered, 'pk'); bunLoves('🥹'); }, done + 850);
   }
   function sendEmoji(i: number) {
     const buttons = qa('.emojis button'), b = buttons[i], e = b.textContent!, st = q('.emoji-status');
@@ -136,9 +140,9 @@ export function runHeroTour(root: HTMLElement) {
       s.animate([{ transform: 'translate(0,0)', opacity: 1 }, { transform: `translate(${(j - 1) * 10}px,-40px)`, opacity: 0 }],
         { duration: 900, delay: j * 70, fill: 'backwards' }).onfinish = () => s.remove();
     }
-    st.textContent = `Sent ${e}`; st.className = 'st emoji-status';
-    later(() => { st.textContent = `Delivered ${e}`; st.className = 'st emoji-status pk'; bunLoves(e + '!!'); }, 1200);
-    later(() => { st.textContent = 'Tap to send'; st.className = 'st emoji-status ter'; b.classList.remove('last'); }, 4200);
+    st.textContent = fill(t.sent, { e }); st.className = 'st emoji-status';
+    later(() => { st.textContent = fill(t.deliveredE, { e }); st.className = 'st emoji-status pk'; bunLoves(e + '!!'); }, 1200);
+    later(() => { st.textContent = d.tapToSend; st.className = 'st emoji-status ter'; b.classList.remove('last'); }, 4200);
   }
   const PHOTO_TEXT = ['.p-eye', '.p-title', '.p-body', '.pbtn'].map(s => [s, q(s).textContent] as const);
   function resetPhoto() {
@@ -150,51 +154,52 @@ export function runHeroTour(root: HTMLElement) {
   function sendPhoto() {
     const tile = q('.ptile'), pic = sunday.cloneNode(true) as HTMLElement;
     tile.classList.add('has'); tile.prepend(pic); pop(pic);
-    q('.p-title').textContent = 'Last sent to bun'; q('.p-body').textContent = 'Shows on their Home until you send a new one ♡';
-    q('.pbtn').textContent = 'Send New Photo…'; q('.pbtn').classList.add('bordered');
-    q('.p-eye').textContent = 'Just now · Sending…';
-    later(() => { q('.p-eye').textContent = 'Just now · Delivered ♡'; bunLoves('on my home now 😭'); }, 1400);
+    q('.p-title').textContent = t.lastSent; q('.p-body').textContent = t.staysHome;
+    q('.pbtn').textContent = t.sendNew; q('.pbtn').classList.add('bordered');
+    q('.p-eye').textContent = t.justSending;
+    later(() => { q('.p-eye').textContent = t.justDelivered; bunLoves(L[13]); }, 1400);
   }
   // What bun sent lands on Pip's Home: the new photo pops in, and the note tile shows the latest note.
   function homeArrives() {
     const pic = sunday.cloneNode(true) as HTMLElement;
     pic.querySelector('span')?.remove();
     selfie.replaceChildren(pic); pop(pic);
-    q('.ph .cap').textContent = 'from bun · just now';
-    q('.notetile .when').textContent = 'bun · just now';
-    q('.notetile .txt').textContent = "lunch at 1? i'll bring dumplings 🥟";
+    q('.ph .cap').textContent = t.fromBunNow;
+    q('.notetile .when').textContent = t.bunNow;
+    q('.notetile .txt').textContent = d.ticker;
     glow(q('.ph'));
   }
   function reset() {
     stopBanner(); close(); tab('home'); setMood('🥰');
-    noteIn.value = ''; noteState('Up to 10 words', 'ter');
+    noteIn.value = ''; noteState(d.upTo, 'ter');
     resetPhoto();
-    selfie.innerHTML = selfieHTML; q('.ph .cap').textContent = 'from bun · 1h';
-    q('.notetile .when').textContent = 'bun · 2m ago'; q('.notetile .txt').textContent = "you're my favorite notification";
+    selfie.innerHTML = selfieHTML; q('.ph .cap').textContent = d.fromBun1h;
+    q('.notetile .when').textContent = d.bun2m; q('.notetile .txt').textContent = d.favorite;
   }
 
   /* ---------- the script ---------- */
   // A real back-and-forth: one line at a time with a beat between, and the last shot (wide, notch closed)
   // is where the first one starts, so the loop has no seam.
+  const L = t.lines;
   const STEPS: Step[] = [
-    [2800, 'pip', 'meet bun, who lives in my notch ♡', () => { reset(); camera('close'); later(() => glow(q('.n-who')), 1000); }],
-    [3000, 'bun', 'brb, coffee ☕️', () => { close(); setMood('☕️'); glow(q('.n-who')); act(bun, 'is-happy', 1600); }],
-    [3000, 'bun', 'psst… read your notch 👀', () => { close(); act(bun, 'is-tap', 450); showBanner("lunch at 1? i'll bring dumplings 🥟"); }],
-    [3200, 'pip', 'dumplings?! marry me 🥟', () => act(pip, 'is-love', 2200)],
-    [3000, 'bun', 'here, have a heart ♥', () => { close(); act(bun, 'is-tap', 450); fxPour(); act(pip, 'is-love', 2000); glow(q('.n-heart')); }],
-    [3400, 'bun', 'actually, have a hundred 🥰', () => {
+    [2800, 'pip', L[0], () => { reset(); camera('close'); later(() => glow(q('.n-who')), 1000); }],
+    [3000, 'bun', L[1], () => { close(); setMood('☕️'); glow(q('.n-who')); act(bun, 'is-happy', 1600); }],
+    [3000, 'bun', L[2], () => { close(); act(bun, 'is-tap', 450); showBanner(d.ticker); }],
+    [3200, 'pip', L[3], () => act(pip, 'is-love', 2200)],
+    [3000, 'bun', L[4], () => { close(); act(bun, 'is-tap', 450); fxPour(); act(pip, 'is-love', 2000); glow(q('.n-heart')); }],
+    [3400, 'bun', L[5], () => {
       close(); camera('wide'); act(bun, 'is-jump', 800);
       later(() => { fxSplash('🥰'); act(pip, 'is-love', 2400); }, 700);
     }],
-    [3800, 'pip', 'wait, what else did you send? 👀', () => {
+    [3800, 'pip', L[6], () => {
       camera('mid'); tab('home');
-      later(open, 600); later(homeArrives, 1300); later(() => say('bun', 'our sunday pic 📸', 1900), 1700);
+      later(open, 600); later(homeArrives, 1300); later(() => say('bun', L[7], 1900), 1700);
     }, 1600],
-    [3000, 'pip', 'aww, it counts our weekends too 🥹', () => { open(); tab('home'); glow(q('.stats')); }],
-    [4400, 'pip', 'my turn ✍️', () => { open(); tab('note'); typeNote('see you at 1 ♡'); }, 1600],
-    [3800, 'pip', '+ a kiss 😘', () => { open(); tab('emoji'); later(() => sendEmoji(2), 500); }, 1500],
-    [4400, 'pip', 'and one for your home 📸', () => { open(); tab('photo'); later(sendPhoto, 600); }, 1700],
-    [3000, 'bun', 'see you at 1 ♡', () => { close(); camera('wide'); act(bun, 'is-happy', 1800); }],
+    [3000, 'pip', L[8], () => { open(); tab('home'); glow(q('.stats')); }],
+    [4400, 'pip', L[9], () => { open(); tab('note'); typeNote(L[10]); }, 1600],
+    [3800, 'pip', L[11], () => { open(); tab('emoji'); later(() => sendEmoji(2), 500); }, 1500],
+    [4400, 'pip', L[12], () => { open(); tab('photo'); later(sendPhoto, 600); }, 1700],
+    [3000, 'bun', L[10], () => { close(); camera('wide'); act(bun, 'is-happy', 1800); }],
   ];
   function play() {
     let t = 0;

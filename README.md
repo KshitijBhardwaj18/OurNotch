@@ -36,6 +36,19 @@ Get a test key by buying with card 4242 4242 4242 4242 at the gate's *Get OurNot
 
 Tests: `xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/DerivedData test`
 
+## Website (`website/`)
+
+ournotch.app: landing page with regional prices, thank-you page, *My licence* help, privacy and terms, each in English (`/`), French (`/fr`) and German (`/de`) — all words in `website/lib/i18n.ts` — plus the owner's `/admin`.
+
+```bash
+npm --prefix website run dev            # http://localhost:3000 (add ?country=IN / DE to see other prices)
+npm --prefix website run build:vinext   # build for Cloudflare Workers
+npm --prefix website run start:vinext   # run that build locally in the Workers runtime
+node website/lib/admin.test.mjs         # the /admin sign-in check
+```
+
+`website/.env.local` (ignored by git) holds `DODO_API_KEY` (Dodo test mode) for `/admin` locally, and optionally `DOWNLOAD_URL`. Live (slice 12), set with `wrangler secret put`: `DODO_API_KEY`, `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`, `ADMIN_EMAIL` — `/admin` answers 404 unless a valid Cloudflare Access token for that email comes with the request.
+
 ## Project layout
 
 - `OurNotch/OurNotchApp.swift`: entry point; the app delegate places the notch window.

@@ -15,7 +15,7 @@ const short = (key: string) => `${key.slice(0, 8)}…`;
 
 // The owner's page (devpost/prd-m2.md > Admin Page): sales, keys, and the kill switch, live from Dodo.
 export default async function Admin() {
-  if (!adminAllowed()) notFound();
+  if (!(await adminAllowed())) notFound();
   if (!hasKey()) {
     return (
       <main className="y-wrap a-page">

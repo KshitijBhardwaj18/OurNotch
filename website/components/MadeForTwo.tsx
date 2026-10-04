@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import type { Copy } from '@/lib/i18n';
 import { act, rand } from '@/lib/motion';
 import { Char } from './Char';
 
@@ -22,7 +23,7 @@ function Laptop({ x, id }: { x: number; id: string }) {
 }
 
 // Two Macs: you tap, a heart flies along the route and pours out of your person's notch.
-export function MadeForTwo() {
+export function MadeForTwo({ t }: { t: Copy['two'] }) {
   const ref = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -101,13 +102,13 @@ export function MadeForTwo() {
 
   return (
     <svg className="scene" ref={ref} viewBox="0 0 1000 400" role="img"
-      aria-label="Pip, labelled you, taps their notch and a heart flies over to Bun, labelled your person, whose notch pours out hearts.">
+      aria-label={t.aria}>
       <path className="route" d="M320 172 C 380 0, 620 0, 680 172" />
       <Laptop x={175} id="lapL" /><Laptop x={535} id="lapR" />
       <g className="slot-pip"><Char kind="pip" x="18" y="206" width="150" height="162" /></g>
       <g className="slot-bun"><Char kind="bun" x="832" y="206" width="150" height="162" /></g>
-      <text className="who" x="93" y="396">you</text>
-      <text className="who" x="907" y="396">your person</text>
+      <text className="who" x="93" y="396">{t.you}</text>
+      <text className="who" x="907" y="396">{t.person}</text>
       <g className="fly" />
     </svg>
   );
