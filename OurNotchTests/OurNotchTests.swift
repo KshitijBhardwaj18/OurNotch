@@ -36,6 +36,23 @@ struct TogetherTests {
     }
 }
 
+struct HideTests {
+    private let calendar = Calendar(identifier: .gregorian)
+    private func date(_ d: Int, _ h: Int, _ m: Int = 0) -> Date {
+        calendar.date(from: DateComponents(year: 2026, month: 10, day: d, hour: h, minute: m))!
+    }
+
+    @Test func comesBackAtTheRightTime() {
+        #expect(Hide.hour.until(now: date(5, 14), calendar: calendar) == date(5, 15))
+        #expect(Hide.untilTomorrow.until(now: date(5, 14), calendar: calendar) == date(6, 6))  // afternoon → tomorrow 6 am
+        #expect(Hide.untilTomorrow.until(now: date(5, 2), calendar: calendar) == date(5, 6))   // 2 am → this morning
+        #expect(Hide.untilBack.until(now: date(5, 14), calendar: calendar) == .distantFuture)
+        #expect(Hide.isHidden(until: date(5, 15), now: date(5, 14)))
+        #expect(!Hide.isHidden(until: date(5, 15), now: date(5, 15, 1)))
+        #expect(!Hide.isHidden(until: nil))
+    }
+}
+
 struct ArrivalTests {
     @Test func missedEmojisAreTheDifference() {
         #expect(Arrival.newCount(partnerSent: 12, lastShown: 9) == 3)
@@ -224,6 +241,45 @@ struct PartnersTests {
         #expect(changed == 1) // only once
         let stored = try #require(try await people.mailbox.fetchOutbox(owner: people.you.myId))
         #expect(stored.range(of: Data("BUYER-KEY".utf8)) == nil)
+    }
+
+    @Test func arrivalsWaitWhileHiddenAndPlayOnce() async throws {
+        let people = TwoPartners()
+        let (you, partner) = try await people.paired()
+        var played: [Int] = []
+        partner.onEmojisArrived = { count, _ in played.append(count) }
+
+        partner.hide(until: Hide.hour.until())
+        #expect(partner.isHidden)
+        you.sendEmoji("❤️", mode: .notch)
+        you.sendEmoji("❤️", mode: .notch)
+        #expect(you.sendMessage("miss you", mode: .three))
+        try await Task.sleep(for: .milliseconds(1200)) // emoji taps are bundled for a second
+        await you.sync()
+        #expect(you.partnerIsAway()) // my notch shows "away"
+
+        await partner.sync()
+        #expect(played.isEmpty)               // nothing plays while hidden
+        #expect(partner.visibleBanner == nil) // the note waits too
+        #expect(partner.banner?.text == "miss you")
+
+        partner.show()
+        #expect(played == [2])                // both, once, on return
+        #expect(partner.visibleBanner?.text == "miss you")
+        try await Task.sleep(for: .milliseconds(100))
+        await you.sync()
+        #expect(!you.partnerIsAway())
+    }
+
+    @Test func hiddenSurvivesARestartUntilItsTime() async throws {
+        let people = TwoPartners()
+        let (_, partner) = try await people.paired()
+        partner.hide(until: Hide.untilBack.until())
+        let relaunched = try #require(AppState(store: people.partner, mailbox: people.mailbox, photosRoot: people.photosRoot))
+        #expect(relaunched.isHidden)
+        people.partner.hiddenUntil = .now.addingTimeInterval(-1) // the hour passed while the app was closed
+        let later = try #require(AppState(store: people.partner, mailbox: people.mailbox, photosRoot: people.photosRoot))
+        #expect(!later.isHidden && later.myOutbox.awayUntil == nil)
     }
 
     @Test func onlyTheBuyerCanInvite() {

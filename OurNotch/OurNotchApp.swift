@@ -8,6 +8,18 @@ struct OurNotchApp: App {
 
     var body: some Scene {
         MenuBarExtra("OurNotch", systemImage: "heart") {
+            if appDelegate.menu.isPaired {
+                if appDelegate.menu.isHidden {
+                    Button("Show OurNotch") { appDelegate.state?.show() }
+                } else {
+                    Menu("Hide OurNotch") {
+                        ForEach(Hide.allCases, id: \.self) { choice in
+                            Button(choice.label) { appDelegate.state?.hide(until: choice.until()) }
+                        }
+                    }
+                }
+                Divider()
+            }
             #if DEBUG
             Button("Partner Simulator…") { appDelegate.partnerSimulator.show() }
             Button("Reset Everything (test)") { appDelegate.resetForTesting() }
@@ -21,9 +33,18 @@ struct OurNotchApp: App {
     }
 }
 
+/// What the ♡ menu shows, observed by the menu.
+@MainActor
+@Observable
+final class MenuState {
+    var isPaired = false
+    var isHidden = false
+}
+
 /// Shows onboarding until this Mac is paired, then owns the app state, the heart effects, and the notch window.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    let menu = MenuState()
     let effects = EmojiEffect()
     #if DEBUG
     let partnerSimulator = PartnerSimulator()
@@ -41,13 +62,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         return LocalStore(defaults: .standard, keychainService: AppDelegate.keychainService)
     }()
     private let mailbox = CloudStore()
-    private var state: AppState?
+    private(set) var state: AppState?
     private var panel: NotchPanel?
     private var geometry: NotchGeometry?
     private var onboardingWindow: NSWindow?
     private var onboarding: OnboardingModel?
     private var licenceWindow: NSWindow?
     private var isLocked: Bool { store.licence?.isLocked == true }
+    /// The notch shows unless the licence is locked or OurNotch is hidden for a while.
+    private var notchVisible: Bool { !isLocked && state?.isHidden != true }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Unit tests run inside the app; they don't need a notch on screen.
@@ -178,10 +201,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.effects.play(newCount: count, emoji: emoji)
         }
         state.onLicenceChanged = { [weak self] in self?.checkLicence() }
+        state.onHiddenChanged = { [weak self] in self?.updateNotchVisibility() }
         state.start()
         Diagnostics.shared.startUploading(owner: state.pairing.myId, mailbox: mailbox)
         startAutoExport()
         self.state = state
+        menu.isPaired = true
+        menu.isHidden = state.isHidden
         placeNotch()
         applyLicence()
         startLicenceChecks()
@@ -224,8 +250,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self.licenceWindow = nil
                 NSApp.setActivationPolicy(.accessory)
             }
-            panel?.orderFrontRegardless()
+            updateNotchVisibility()
         }
+    }
+
+    private func updateNotchVisibility() {
+        menu.isHidden = state?.isHidden ?? false
+        if notchVisible { panel?.orderFrontRegardless() } else { panel?.orderOut(nil) }
     }
 
     private func showLicenceWindow() {
@@ -289,7 +320,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         panel.alphaValue = 0
         panel.setFrame(newGeometry.panelFrame, display: false)
         panel.contentView = hostingView
-        if !isLocked { panel.orderFrontRegardless() }
+        if notchVisible { panel.orderFrontRegardless() }
         panel.alphaValue = 1
         self.panel = panel
     }

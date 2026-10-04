@@ -62,7 +62,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
   Learner check: Open http://localhost:3000/admin, find your test purchase, revoke its key and watch OurNotch block, then restore it.
   Commit: `Add owner admin page for sales, keys, and revoking`
 
-- [ ] **6. Hide OurNotch for a while**
+- [x] **6. Hide OurNotch for a while**
   Becomes usable: Settings → *Hide OurNotch* → for 1 hour / until tomorrow / until I bring it back. The notch disappears; ♡ menu → *Show OurNotch* brings it back early. Hearts and notes that arrive while hidden wait and play once on return. Your love's closed notch shows "away" where your mood sits.
   Why now: Independent of licensing and a requested feature; it lands before the UI/UX pass so the pass can polish it with everything else.
   PRD ref: `prd-m2.md > Hide and Pause`
@@ -162,3 +162,6 @@ Activity mode:
 - Admin actions are Next.js server actions rather than route handlers — the same server-only boundary with less code; each action re-checks access, since server actions can be POSTed directly.
 - `/admin` answers 404 in any production build until slice 10 puts it behind Cloudflare Access and verifies Access's signed token; only the local dev server shows it.
 - Slice 5 verified without the learner's secret key (it lives only in their Claude settings): the build succeeds, a production build returns 404 for `/admin`, no browser bundle mentions the key, and against a local stand-in serving Dodo's real response shapes the page listed the ₹200 sale from India and the key with its Mac, and Revoke → `PATCH {disabled:true}`, Restore → `{disabled:false}`, Free slot → `POST /licenses/deactivate`. The real-key run is a learner action in Final Review.
+- Slice 6 verified by tests (hide timing incl. "until tomorrow" = next 6 am; two emojis and a note sent while hidden don't play, then play once together on show; the partner's notch shows "away" and clears; hidden survives a restart and ends if its time passed while closed) and by rendering the Settings row and the closed notch's "away". Showing and hiding the real notch window and the ♡ menu wasn't driven live (the learner was on a call); that's in the learner check.
+- Held emojis are marked seen when they arrive, so the sender sees *Delivered* while their love is away; the "away" label tells them why nothing reacted yet. Holding the delivery back too would need a second "seen" counter.
+- "away" is a small text label in the mood slot, re-checked each minute so it clears on time even without a new sync.

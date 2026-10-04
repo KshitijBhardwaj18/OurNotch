@@ -20,8 +20,13 @@ struct NotchHeaderView: View {
         HStack(spacing: 0) {
             HStack(spacing: 4) {
                 PartnerAvatar(state: state, size: 20)
-                if let mood = state.partnerOutbox.mood {
-                    Text(mood).font(.system(size: 13)).transition(.scale.combined(with: .opacity))
+                // "away" while my love has hidden their OurNotch; re-checked each minute so it clears on time.
+                TimelineView(.everyMinute) { context in
+                    if state.partnerIsAway(now: context.date) {
+                        Text("away").font(.system(size: 10, weight: .medium)).foregroundStyle(Color.secondaryLabel)
+                    } else if let mood = state.partnerOutbox.mood {
+                        Text(mood).font(.system(size: 13)).transition(.scale.combined(with: .opacity))
+                    }
                 }
             }
             .animation(.spring(response: 0.35, dampingFraction: 0.6), value: state.partnerOutbox.mood)

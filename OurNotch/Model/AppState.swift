@@ -20,6 +20,13 @@ final class AppState {
     private(set) var partnerOutbox = Outbox()
     /// The message currently scrolling under the notch, if any. Saved so `untilOpened` survives a restart.
     private(set) var banner: Message?
+    /// While set and in the future, OurNotch is hidden: no notch, and arrivals wait.
+    private(set) var hiddenUntil: Date?
+    var isHidden: Bool { Hide.isHidden(until: hiddenUntil) }
+    /// The banner, held back while hidden so it scrolls when OurNotch comes back.
+    var visibleBanner: Message? { isHidden ? nil : banner }
+    /// Whether my love has hidden their OurNotch ("away" in my closed notch).
+    func partnerIsAway(now: Date = .now) -> Bool { Hide.isHidden(until: partnerOutbox.awayUntil, now: now) }
     /// The latest photo my partner sent me, shown on Home.
     private(set) var partnerPhoto: NSImage?
     /// The latest photo I sent, shown on the Photo tab.
@@ -47,6 +54,11 @@ final class AppState {
     @ObservationIgnored var onEmojisArrived: ((Int, SentEmoji) -> Void)?
     /// Called when this Mac's licence changed here (received from the partner, or removed), so it gets checked.
     @ObservationIgnored var onLicenceChanged: (() -> Void)?
+    /// Called when OurNotch is hidden or shown, so the notch window follows.
+    @ObservationIgnored var onHiddenChanged: (() -> Void)?
+    /// Emojis that arrived while hidden: they play once, together, when OurNotch comes back.
+    @ObservationIgnored private var heldEmojis: (count: Int, emoji: SentEmoji)?
+    @ObservationIgnored private var returnTask: Task<Void, Never>?
 
     var licence: Licence? { store.licence }
 
@@ -88,6 +100,8 @@ final class AppState {
         myOutbox = store.myOutbox ?? Outbox()
         savedOutbox = store.savedOutbox ?? Outbox()
         banner = store.banner
+        hiddenUntil = Hide.isHidden(until: store.hiddenUntil) ? store.hiddenUntil : nil
+        if hiddenUntil == nil { myOutbox.awayUntil = nil } // came back while the app was closed
         togetherSince = store.togetherSince
         if pairing.role == .inviter {
             myOutbox.togetherSince = togetherSince // shared on the next save
@@ -127,6 +141,7 @@ final class AppState {
     /// Ticking each second (no network) means opening the notch or sending speeds up the very next check.
     func start() {
         guard syncTask == nil else { return }
+        scheduleReturn()
         note("started: paired with \(pairing.partnerName) as \(pairing.role.rawValue); checks every \(mailbox.pollInterval) when idle")
         syncTask = Task { [weak self] in
             guard let self else { return }
@@ -218,6 +233,47 @@ final class AppState {
         Task { await save() }
     }
 
+    // MARK: Hide
+
+    /// Hides OurNotch until `date`; my love sees "away" meanwhile.
+    func hide(until date: Date) {
+        hiddenUntil = date
+        store.hiddenUntil = date
+        myOutbox.awayUntil = date
+        store.myOutbox = myOutbox
+        note("hidden until \(date == .distantFuture ? "I'm back" : date.formatted(date: .omitted, time: .shortened))")
+        Task { await save() }
+        scheduleReturn()
+        onHiddenChanged?()
+    }
+
+    /// Brings OurNotch back; anything that arrived meanwhile plays once.
+    func show() {
+        returnTask?.cancel()
+        guard hiddenUntil != nil else { return }
+        hiddenUntil = nil
+        store.hiddenUntil = nil
+        myOutbox.awayUntil = nil
+        store.myOutbox = myOutbox
+        note("shown again")
+        Task { await save() }
+        onHiddenChanged?()
+        if let held = heldEmojis {
+            heldEmojis = nil
+            onEmojisArrived?(held.count, held.emoji)
+        }
+    }
+
+    private func scheduleReturn() {
+        returnTask?.cancel()
+        guard let hiddenUntil, hiddenUntil != .distantFuture else { return }
+        returnTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(max(0, hiddenUntil.timeIntervalSinceNow)))
+            guard !Task.isCancelled else { return }
+            self?.show()
+        }
+    }
+
     // MARK: Banner
 
     /// The banner finished its 3 passes.
@@ -291,7 +347,11 @@ final class AppState {
         let newEmojis = Arrival.newCount(partnerSent: partner.emojisSent, lastShown: myOutbox.seenEmojis)
         if newEmojis > 0, let emoji = partner.lastEmoji {
             myOutbox.seenEmojis = partner.emojisSent
-            onEmojisArrived?(newEmojis, emoji)
+            if isHidden {
+                heldEmojis = ((heldEmojis?.count ?? 0) + newEmojis, emoji)
+            } else {
+                onEmojisArrived?(newEmojis, emoji)
+            }
             let age = emoji.sentAt.map { ", sent \(Self.ms(since: $0)) ago" } ?? ""
             found.append("\(newEmojis) emoji \(emoji.char) (\(emoji.mode.rawValue)\(age))")
             if let sentAt = emoji.sentAt { arrived("emoji", sentAt: sentAt, source: source) }
@@ -389,6 +449,7 @@ final class AppState {
         if new.mood != old.mood { parts.append("mood \(new.mood ?? "cleared")") }
         if new.togetherSince != old.togetherSince { parts.append("date") }
         if new.licenceKey != old.licenceKey { parts.append("licence") }
+        if new.awayUntil != old.awayUntil { parts.append(new.awayUntil == nil ? "back" : "away") }
         if new.seenEmojis != old.seenEmojis { parts.append("seen emojis \(new.seenEmojis)") }
         if new.seenMessageId != old.seenMessageId { parts.append("seen note") }
         if new.seenPhotoId != old.seenPhotoId { parts.append("seen photo") }

@@ -53,6 +53,29 @@ struct SettingsPanel: View {
                 .padding(12)
                 .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
 
+                VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Hide OurNotch").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
+                        Text("Hearts and notes wait for you. Your love sees you're away.")
+                            .font(.system(size: 11.5))
+                            .foregroundStyle(Color.secondaryLabel)
+                    }
+                    HStack(spacing: 6) {
+                        ForEach(Hide.allCases, id: \.self) { choice in
+                            Button(choice.label) { state.hide(until: choice.until()) }
+                                .buttonStyle(.plain)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 10)
+                                .frame(height: 24)
+                                .background(Color.notchPressed, in: Capsule())
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
+
                 if state.licence?.isBuyer == true {
                     LicenceRow(state: state)
                 }

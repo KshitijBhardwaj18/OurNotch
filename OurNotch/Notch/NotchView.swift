@@ -47,7 +47,7 @@ struct NotchView: View {
                             .combined(with: .opacity)
                             .animation(.easeOut(duration: 0.22).delay(0.08)),
                         removal: .opacity.animation(.easeOut(duration: 0.12))))
-            } else if let banner = state.banner {
+            } else if let banner = state.visibleBanner {
                 MessageBanner(message: banner, senderName: state.partnerName, onFinished: state.bannerFinished)
                     .id(banner.id) // a new note restarts the scroll
                     .frame(height: 20)
@@ -61,7 +61,7 @@ struct NotchView: View {
         .clipShape(NotchShape(topRadius: radii.top, bottomRadius: radii.bottom))
         .compositingGroup()
         .animation(Config.Notch.spring, value: isOpen)
-        .animation(Config.Notch.spring, value: state.banner?.id)
+        .animation(Config.Notch.spring, value: state.visibleBanner?.id)
         .contentShape(Rectangle())
         .onHover(perform: hoverChanged)
         .sensoryFeedback(.alignment, trigger: isOpen)
@@ -77,7 +77,7 @@ struct NotchView: View {
 
     private var radii: Radii {
         if isOpen { return Self.openRadii }
-        return state.banner == nil ? Self.closedRadii : Self.bannerRadii
+        return state.visibleBanner == nil ? Self.closedRadii : Self.bannerRadii
     }
 
     private var closedHeight: CGFloat { geometry.notchSize.height + Config.Notch.closedExtraHeight }
@@ -85,7 +85,7 @@ struct NotchView: View {
     private var size: CGSize {
         if isOpen { return Config.Notch.openSize }
         let width = geometry.notchSize.width + Config.Notch.closedSideWidth * 2 + Self.closedRadii.top * 2
-        let bannerRoom = state.banner == nil ? 0 : Config.Message.bannerHeight
+        let bannerRoom = state.visibleBanner == nil ? 0 : Config.Message.bannerHeight
         return CGSize(width: width, height: closedHeight + bannerRoom)
     }
 
