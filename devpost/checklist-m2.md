@@ -52,7 +52,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
   Learner check: Invite from your notch and join from the simulator: say no once and watch the gentle message, then join again and say yes on both sides. Look at the surprise email draft.
   Commit: `Ask both partners to confirm before pairing and expire codes after 24 hours`
 
-- [ ] **5. Your admin page: sales, keys, and the kill switch**
+- [x] **5. Your admin page: sales, keys, and the kill switch**
   Becomes usable: `localhost:3000/admin` lists test sales (date, country, price, refunds) and licence keys (status, Macs in use), with *Revoke* / *Restore* and *Free a slot* buttons that change the key in Dodo. The secret key never reaches the browser.
   Why now: It's the owner's side of slices 1–3 (revoking and freeing slots), and checks which Dodo API lists a key's activations (verify item 3). Its lock (Cloudflare Access) comes with the deploy in slice 10.
   PRD ref: `prd-m2.md > Admin Page`, `prd-m2.md > Revoked or Refunded Licence`
@@ -120,6 +120,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
 ## Final Review
 
 - [ ] **Learner action before pairing through CloudKit:** in CloudKit Console (Development), add a **Queryable** index on `Join.code` — without it the buyer's Mac can't see join requests. (Production gets it in slice 9.)
+- [ ] **Learner action, admin page with real data:** put your Dodo **test-mode** API key in `website/.env.local` as `DODO_API_KEY=…` (ignored by git), restart the dev server, open http://localhost:3000/admin, and confirm the ₹200 test purchase and its key show. Revoke / Restore / Free slot were verified against a stand-in with Dodo's real response shapes, not yet against Dodo with your key.
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
@@ -156,3 +157,8 @@ Activity mode:
 - Declined joiners are remembered in memory for the current code, not in UserDefaults — an invite code doesn't survive relaunching onboarding anyway (a fresh code is made), so there is nothing to restore.
 - The invite screen gained *New Code* (any time, e.g. after 24 hours or a wrong person) instead of a timer that offers one after 24 hours.
 - A joiner who is declined, or whose code was used or expired, goes back to typing a code, so they can't keep re-asking with the same one.
+- Verify item 3 settled: `GET /license_key_instances?license_key_id=…` lists a key's Macs, and *Free slot* frees one through Dodo's public `deactivate` call (no secret needed).
+- The payment list has no country, so the admin page reads each sale once more for `billing.country` (one request per sale, latest 50; marked `ponytail:`).
+- Admin actions are Next.js server actions rather than route handlers — the same server-only boundary with less code; each action re-checks access, since server actions can be POSTed directly.
+- `/admin` answers 404 in any production build until slice 10 puts it behind Cloudflare Access and verifies Access's signed token; only the local dev server shows it.
+- Slice 5 verified without the learner's secret key (it lives only in their Claude settings): the build succeeds, a production build returns 404 for `/admin`, no browser bundle mentions the key, and against a local stand-in serving Dodo's real response shapes the page listed the ₹200 sale from India and the key with its Mac, and Revoke → `PATCH {disabled:true}`, Restore → `{disabled:false}`, Free slot → `POST /licenses/deactivate`. The real-key run is a learner action in Final Review.
