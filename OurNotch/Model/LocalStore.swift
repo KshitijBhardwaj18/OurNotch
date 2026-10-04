@@ -24,18 +24,30 @@ struct LocalStore {
         return key
     }
 
-    private func loadKey() -> Data? {
-        guard let keychainService else { return defaults.data(forKey: "privateKey") }
-        return Keychain.read(service: keychainService, account: "privateKey")
+    private func loadKey() -> Data? { readSecret("privateKey") }
+
+    private func storeKey(_ raw: Data) { writeSecret(raw, "privateKey") }
+
+    /// The licence key and Dodo's last answer, in the Keychain (or `defaults` for tests).
+    var licence: Licence? {
+        get { readSecret("licence").flatMap { try? JSONDecoder().decode(Licence.self, from: $0) } }
+        nonmutating set { writeSecret(newValue.flatMap { try? JSONEncoder().encode($0) }, "licence") }
     }
 
-    private func storeKey(_ raw: Data) {
-        guard let keychainService else { return defaults.set(raw, forKey: "privateKey") }
+    private func readSecret(_ account: String) -> Data? {
+        guard let keychainService else { return defaults.data(forKey: account) }
+        return Keychain.read(service: keychainService, account: account)
+    }
+
+    /// Nil removes it.
+    private func writeSecret(_ data: Data?, _ account: String) {
+        guard let keychainService else { return defaults.set(data, forKey: account) }
+        guard let data else { return Keychain.delete(service: keychainService, account: account) }
         do {
-            try Keychain.save(raw, service: keychainService, account: "privateKey")
+            try Keychain.save(data, service: keychainService, account: account)
         } catch {
-            // Without a saved key, pairing couldn't survive a restart; fail loudly in development.
-            assertionFailure("Couldn't save the private key to the Keychain: \(error)")
+            // Without a saved key, pairing or the licence couldn't survive a restart; fail loudly in development.
+            assertionFailure("Couldn't save \(account) to the Keychain: \(error)")
         }
     }
 

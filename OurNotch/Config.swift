@@ -43,6 +43,19 @@ enum Config {
         static let exportInterval: Duration = .seconds(120)
     }
 
+    enum Licence {
+        // ponytail: every build uses Dodo's test mode until slice 9 adds the sold Release build with live values.
+        /// Dodo's public licence endpoints (activate / validate / deactivate need no API key).
+        static let baseURL = URL(string: "https://test.dodopayments.com")!
+        static let productId = "pdt_0Np1n3lC4hykWhTwMaNVV"
+        /// Dodo's hosted checkout; it picks $4.50 / ₹200 / €3 from the buyer's currency.
+        static let checkoutURL = URL(string: "https://test.checkout.dodopayments.com/buy/\(productId)?quantity=1")!
+        /// The price on the gate. The Mac doesn't know the buyer's country, so checkout shows the local price.
+        static let priceLabel = "$4.50"
+        /// Placeholder until the learner picks the support address.
+        static let supportEmail = "hello@ournotch.app"
+    }
+
     enum Pairing {
         /// How often the inviter checks whether their love has joined, while the waiting screen is open.
         static let joinCheckInterval: Duration = .seconds(3)

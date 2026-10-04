@@ -22,6 +22,14 @@ open build/DerivedData/Build/Products/Debug/OurNotch.app
 
 Performance and delivery logs: every event is appended to `~/Library/Logs/OurNotch/this-mac.log` as it happens (no note text, photos or keys). Lines tagged `[perf]` give each animation's dropped frames (notch open/close, tabs, pour, splash, banner) and any main-thread hang of 250 ms or more; `sent … ago` gives delivery time. Both Macs also save every measurement (animation frames, hangs, delivery delay on each side, CloudKit request times, pings) as `Metric` records in CloudKit; every 2 minutes the app downloads both sides into `metrics.csv` and the partner's latest log lines into `partner-mac.log` (♡ → *Save Diagnostics* does it now). Before shipping to Production, deploy the `Metric` schema with `ownerId` Queryable, or turn `Config.Diagnostics.uploads` off.
 
+**Licence (Dodo Payments, test mode):** a fresh install opens on the licence gate. Every build talks to Dodo's test mode for now (`Config.Licence`). To try the gate without touching your real pairing, run a separate fresh identity in a Debug build:
+
+```bash
+OURNOTCH_PROFILE=gate1 build/DerivedData/Build/Products/Debug/OurNotch.app/Contents/MacOS/OurNotch
+```
+
+Get a test key by buying with card 4242 4242 4242 4242 at the gate's *Get OurNotch*, or ask the agent to create one through Dodo's API.
+
 Tests: `xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/DerivedData test`
 
 ## Project layout
@@ -32,7 +40,8 @@ Tests: `xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath
 - `OurNotch/Notch/Tabs/`: the open notch's Home, Note, Emoji and Photo tabs.
 - `OurNotch/Model/`: app state and pure logic (outbox, note rules, time-together math).
 - `OurNotch/Sync/`: the mailbox (CloudKit `CloudStore` in the app; a local-file version for tests), pairing, encryption, and the Keychain.
-- `OurNotch/Onboarding/`, `OurNotch/Settings/`: the setup window and the Settings window.
+- `OurNotch/Licence/`: the licence service (Dodo activate / validate).
+- `OurNotch/Onboarding/`, `OurNotch/Settings/`: the setup window (starting at the licence gate) and the Settings window.
 - `OurNotch/Debug/`: the Partner Simulator (Debug builds only) — a second partner on the same Mac.
 - `devpost/`: planning docs (scope, PRD, spec, build checklist) and `design_handoff/` (the v3 design).
 

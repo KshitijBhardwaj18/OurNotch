@@ -12,7 +12,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
 
 ## Slices
 
-- [ ] **1. Paste a licence key and OurNotch is yours**
+- [x] **1. Paste a licence key and OurNotch is yours**
   Becomes usable: First open shows the **licence gate**: *Get OurNotch*, *I have a licence key*, *I have an invite code*. Paste a key from a Dodo test purchase → OurNotch activates and continues into onboarding. A made-up key shows a kind error; a key already active on another Mac says how to free it; with Wi-Fi off an activated OurNotch still opens.
   Why now: The learner chose licensing first, and it holds the milestone's riskiest unknowns: whether Dodo's `validate` really uses no slot (the whole partner-coverage design rests on it) and whether test mode issues keys. Pasting a key needs no website, so it proves Dodo from the Mac before anything is built around it. Setting up the Dodo test product is folded in here.
   PRD ref: `prd-m2.md > Activation`, `prd-m2.md > Screens and Layout` (Licence gate), `prd-m2.md > States and Boundaries`
@@ -135,3 +135,8 @@ Activity mode:
 
 ## Revisions
 - Dodo test-mode product created before slice 1 (learner asked): `pdt_0Np1n3lC4hykWhTwMaNVV`, one-time USD 4.50, `by_currency` fixed prices INR 200 and EUR 3, **tax-inclusive** so the shown price is what people pay, licence key with 1 activation and no expiry. Verify item 3 answered from Dodo's API docs: `GET /license_key_instances?license_key_id=…` lists a key's activations, so "free a slot" can remove the lost Mac's activation instead of raising the limit.
+- Verify item 1 confirmed live against Dodo test mode with a key made through the API: activate → 201; a second Mac → 422; `validate` with only the key → `valid: true`; the second Mac is *still* 422 afterwards, so the partner's check uses no slot. A made-up key → 404. Partner coverage stands as designed.
+- Slice 1's live check ran through the real `OnboardingModel` against Dodo (made-up key → kind error, stays on the key step; the real key with stray spaces → activated, on to the name step, activation id stored; offline check keeps the licence), with the gate and key screens rendered to images, instead of clicking the onboarding window — the learner was on a full-screen call, so nothing was shown on their screen. The learner's hands-on check covers the real window.
+- The activation is named after the Mac's computer name ("Kshitij's MacBook Pro") instead of "<name>'s <Mac model>" — the name step comes after the gate, and the computer name is usually exactly that.
+- Debug builds accept `OURNOTCH_PROFILE=<name>` to run a separate fresh identity beside the real one — fresh-install checks no longer need *Reset Everything*, which would wipe the learner's real pairing with their partner.
+- The gate's path decides joining: the "I Have a Code" link left the invite screen, since partners now choose *I Have an Invite Code* at the gate.
