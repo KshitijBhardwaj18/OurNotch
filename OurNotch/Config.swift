@@ -70,8 +70,10 @@ enum Config {
         /// How often the inviter checks whether their love has joined, while the waiting screen is open.
         static let joinCheckInterval: Duration = .seconds(3)
         static let codeLength = 6
-        /// Linked from the invite email. Placeholder until the website exists.
-        static let downloadURL = "https://github.com/KshitijBhardwaj18/OurNotch/releases"
+        /// Codes work for a day, so an old code in an email can't pair someone later.
+        static let codeLifetime: TimeInterval = 24 * 60 * 60
+        /// Linked from the invite email.
+        static let downloadURL = "\(Licence.website)/download"
     }
 
     enum Message {

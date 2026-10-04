@@ -34,6 +34,9 @@ private final class SimulatorModel {
     var togetherSince = Calendar.current.date(from: DateComponents(year: 2023, month: 2, day: 14))!
     private(set) var state: AppState?
     private(set) var inviteCode: String?
+    /// Someone asked to join the simulator's invite; approve or decline it.
+    private(set) var pendingJoin: Join?
+    private(set) var waitingForYes = false
     private(set) var error: String?
 
     @ObservationIgnored private let store: LocalStore
@@ -52,16 +55,37 @@ private final class SimulatorModel {
         do {
             let code = try await service.createInvite(name: name)
             inviteCode = code
-            _ = try await service.waitForJoin(code: code)
-            startIfPaired()
+            pendingJoin = try await service.waitForJoinRequest(code: code, declined: [])
         } catch {
             self.error = error.localizedDescription
         }
     }
 
-    func join() async {
+    func answer(_ yes: Bool) async {
+        guard let join = pendingJoin, let code = inviteCode else { return }
+        pendingJoin = nil
         do {
-            _ = try await service.join(code: typedCode, name: name)
+            if yes {
+                _ = try await service.approve(join, code: code)
+                startIfPaired()
+            } else {
+                try await service.decline(join, code: code)
+                pendingJoin = try await service.waitForJoinRequest(code: code, declined: [join.joinerId])
+            }
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    /// Plays the joiner: confirms the inviter, asks, and waits for their yes.
+    func join() async {
+        error = nil
+        do {
+            let invite = try await service.lookUpInvite(code: typedCode)
+            try await service.requestJoin(code: typedCode, name: name)
+            waitingForYes = true
+            defer { waitingForYes = false }
+            _ = try await service.waitForAnswer(code: typedCode, invite: invite)
             startIfPaired()
         } catch {
             self.error = error.localizedDescription
@@ -107,12 +131,19 @@ private struct PartnerSimulatorView: View {
                     TextField("Code", text: $model.typedCode)
                     Button("Join") { Task { await model.join() } }
                 }
+                if model.waitingForYes { Text("Asked — waiting for the notch to say yes…").foregroundStyle(.secondary) }
             }
 
             GroupBox("Or invite the notch") {
                 VStack(alignment: .leading) {
                     DatePicker("Together since", selection: $model.togetherSince, displayedComponents: .date)
-                    if let code = model.inviteCode {
+                    if let join = model.pendingJoin {
+                        Text("\(join.joinerName) wants to join. Is this your love?")
+                        HStack {
+                            Button("No") { Task { await model.answer(false) } }
+                            Button("Yes") { Task { await model.answer(true) } }
+                        }
+                    } else if let code = model.inviteCode {
                         Text("Code: \(code) — waiting…").textSelection(.enabled).monospaced()
                     } else {
                         Button("Invite") { Task { await model.invite() } }

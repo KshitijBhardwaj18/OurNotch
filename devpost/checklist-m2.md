@@ -42,7 +42,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
   Learner check: Pair with the Partner Simulator, then I'll revoke your test key — watch the blocked screen appear, then come back when it's restored. Try *Find my licence* and *Remove from this Mac* in Settings.
   Commit: `Cover the partner with the buyer's licence and block revoked keys`
 
-- [ ] **4. Pairing needs a yes from both of you**
+- [x] **4. Pairing needs a yes from both of you**
   Becomes usable: The partner enters the code → "**Kshitij** invited you, is that right?" → yes → the buyer's Mac asks "**Manya** wants to join, is this your love?" → only yes pairs. A no tells the joiner gently and keeps the code open for the right person. Codes expire after 24 hours. The invite email becomes the surprise: "Kshitij planned a surprise for you, sweetheart", with the download link, code and "expires in 24 hours".
   Why now: The "must fix before real users" safety item; it builds on the gate's invite-code path from slice 1 and the buyer-only invites from slice 3.
   PRD ref: `prd-m2.md > Pairing With the Right Person`, `prd-m2.md > Invite as a Surprise`
@@ -119,6 +119,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
 
 ## Final Review
 
+- [ ] **Learner action before pairing through CloudKit:** in CloudKit Console (Development), add a **Queryable** index on `Join.code` — without it the buyer's Mac can't see join requests. (Production gets it in slice 9.)
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
@@ -151,3 +152,7 @@ Activity mode:
 - Locking applies only when this Mac has a licence that's revoked or removed; Macs paired in Milestone 1 have no licence and keep working (they re-pair on the new container in slice 9).
 - In-notch Settings now scrolls: with the Licence row it is 241 pt tall in a 200 pt area, and Hide and Language rows are still to come.
 - The early checkpoint moved from after slice 3 to just before slice 7: the learner asked to keep building through the coding first ("let's just build what we can"), and slice 7 is where their walk-through is needed. Slices 4–6 don't depend on it.
+- Slice 4 verified with unit tests on the local mailbox (both sides say yes before pairing; a declined stranger doesn't use up the code and is told gently; a late joiner after approval gets "already used"; expired and made-up codes refused) and by driving the real onboarding models end to end (invite → partner confirms "Kshitij invited you" → asks → buyer sees "Manya wants to join" → yes → both paired), with each screen rendered. Not yet run through CloudKit: it needs the `Join.code` Queryable index the learner adds in CloudKit Console.
+- Declined joiners are remembered in memory for the current code, not in UserDefaults — an invite code doesn't survive relaunching onboarding anyway (a fresh code is made), so there is nothing to restore.
+- The invite screen gained *New Code* (any time, e.g. after 24 hours or a wrong person) instead of a timer that offers one after 24 hours.
+- A joiner who is declined, or whose code was used or expired, goes back to typing a code, so they can't keep re-asking with the same one.

@@ -22,9 +22,15 @@ protocol Mailbox: Sendable {
     /// Throws `MailboxError.alreadyExists` if the code is taken.
     func createInvite(_ invite: Invite, code: String) async throws
     func fetchInvite(code: String) async throws -> Invite?
-    /// Throws `MailboxError.alreadyExists` if someone already joined with this code.
+    /// One request per joiner per code. Throws `MailboxError.alreadyExists` if this joiner already asked.
     func createJoin(_ join: Join, code: String) async throws
-    func fetchJoin(code: String) async throws -> Join?
+    func fetchJoins(code: String) async throws -> [Join]
+    /// The inviter's yes, once per code. Throws `MailboxError.alreadyExists` if the code was already approved.
+    func createApproval(joinerId: String, code: String) async throws
+    func fetchApproval(code: String) async throws -> String?
+    /// The inviter's no to one joiner.
+    func createDecline(joinerId: String, code: String) async throws
+    func fetchDecline(joinerId: String, code: String) async throws -> Bool
 
     /// The owner's latest diagnostics log (plain text, no message content). One per owner.
     func saveDiagnostics(_ text: String, owner: String) async throws
@@ -98,11 +104,31 @@ struct LocalFileMailbox: Mailbox {
     }
 
     func createJoin(_ join: Join, code: String) async throws {
-        try create(join, name: "join-\(code)")
+        try create(join, name: "join-\(code)-\(join.joinerId)")
     }
 
-    func fetchJoin(code: String) async throws -> Join? {
-        try decode(name: "join-\(code)")
+    func fetchJoins(code: String) async throws -> [Join] {
+        let files = (try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: [.creationDateKey])) ?? []
+        let mine = files.filter { $0.lastPathComponent.hasPrefix("join-\(code)-") }
+        let created = { (url: URL) in (try? url.resourceValues(forKeys: [.creationDateKey]).creationDate) ?? .distantPast }
+        return try mine.sorted { created($0) < created($1) }
+            .compactMap { try decode(name: $0.deletingPathExtension().lastPathComponent) }
+    }
+
+    func createApproval(joinerId: String, code: String) async throws {
+        try create(joinerId, name: "approval-\(code)")
+    }
+
+    func fetchApproval(code: String) async throws -> String? {
+        try decode(name: "approval-\(code)")
+    }
+
+    func createDecline(joinerId: String, code: String) async throws {
+        try create(true, name: "decline-\(code)-\(joinerId)")
+    }
+
+    func fetchDecline(joinerId: String, code: String) async throws -> Bool {
+        try read(name: "decline-\(code)-\(joinerId)") != nil
     }
 
     // MARK: Files

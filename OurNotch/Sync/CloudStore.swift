@@ -6,8 +6,10 @@ import CloudKit
 ///
 /// | Record      | Name              | Fields                                 |
 /// |-------------|-------------------|----------------------------------------|
-/// | `Invite`    | `invite-<CODE>`   | inviterId, inviterName, inviterKey     |
-/// | `Join`      | `join-<CODE>`     | joinerId, joinerName, joinerKey        |
+/// | `Invite`    | `invite-<CODE>`   | inviterId, inviterName, inviterKey (`creationDate` sets the 24 h expiry) |
+/// | `Join`      | `join-<CODE>-<joinerId>` | code (queryable), joinerId, joinerName, joinerKey |
+/// | `Approval`  | `approval-<CODE>` | joinerId (created once: the inviter's yes) |
+/// | `Decline`   | `decline-<CODE>-<joinerId>` | code (the inviter's no)      |
 /// | `Outbox`    | `outbox-<userId>` | ownerId (queryable), payload           |
 /// | `Photo`     | `photo-<userId>`  | ownerId, image (asset)                 |
 /// | `Diagnostics` | `diag-<userId>` | ownerId, text (event log, no content)  |
@@ -126,22 +128,50 @@ struct CloudStore: Mailbox {
         guard let record = try await fetch("invite-\(code)"),
               let id = record["inviterId"] as? String, let name = record["inviterName"] as? String,
               let key = record["inviterKey"] as? Data else { return nil }
-        return Invite(inviterId: id, inviterName: name, inviterKey: key)
+        // The server's clock, not the inviter's, decides when the code expires.
+        return Invite(inviterId: id, inviterName: name, inviterKey: key, createdAt: record.creationDate ?? .now)
     }
 
     func createJoin(_ join: Join, code: String) async throws {
-        let record = CKRecord(recordType: "Join", recordID: .init(recordName: "join-\(code)"))
+        let record = CKRecord(recordType: "Join", recordID: .init(recordName: "join-\(code)-\(join.joinerId)"))
+        record["code"] = code
         record["joinerId"] = join.joinerId
         record["joinerName"] = join.joinerName
         record["joinerKey"] = join.joinerKey
         try await create(record)
     }
 
-    func fetchJoin(code: String) async throws -> Join? {
-        guard let record = try await fetch("join-\(code)"),
-              let id = record["joinerId"] as? String, let name = record["joinerName"] as? String,
-              let key = record["joinerKey"] as? Data else { return nil }
-        return Join(joinerId: id, joinerName: name, joinerKey: key)
+    /// Needs `Join.code` marked Queryable in CloudKit Console.
+    func fetchJoins(code: String) async throws -> [Join] {
+        let query = CKQuery(recordType: "Join", predicate: NSPredicate(format: "code == %@", code))
+        let (results, _) = try await retrying { try await database.records(matching: query) }
+        return results.compactMap { try? $0.1.get() }
+            .sorted { ($0.creationDate ?? .distantPast) < ($1.creationDate ?? .distantPast) }
+            .compactMap { record in
+                guard let id = record["joinerId"] as? String, let name = record["joinerName"] as? String,
+                      let key = record["joinerKey"] as? Data else { return nil }
+                return Join(joinerId: id, joinerName: name, joinerKey: key)
+            }
+    }
+
+    func createApproval(joinerId: String, code: String) async throws {
+        let record = CKRecord(recordType: "Approval", recordID: .init(recordName: "approval-\(code)"))
+        record["joinerId"] = joinerId
+        try await create(record)
+    }
+
+    func fetchApproval(code: String) async throws -> String? {
+        try await fetch("approval-\(code)")?["joinerId"] as? String
+    }
+
+    func createDecline(joinerId: String, code: String) async throws {
+        let record = CKRecord(recordType: "Decline", recordID: .init(recordName: "decline-\(code)-\(joinerId)"))
+        record["code"] = code
+        try await create(record)
+    }
+
+    func fetchDecline(joinerId: String, code: String) async throws -> Bool {
+        try await fetch("decline-\(code)-\(joinerId)") != nil
     }
 
     // MARK: Pings
