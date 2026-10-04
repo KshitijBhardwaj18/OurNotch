@@ -1,0 +1,212 @@
+import { act, fmt, rand, together } from './motion';
+
+type Who = 'pip' | 'bun';
+// [step length, who talks, their line, what happens, how long the line stays up (default: the step minus a beat)]
+type Step = [ms: number, who: Who, line: string, run: () => void, up?: number];
+type Shot = 'wide' | 'mid' | 'close';
+
+// Desk coordinates: the screen spans x 70..1094, so the notch is centred at x 582.
+const CX = 582;
+// [visible width, top margin] in desk px. Phones get tighter shots so the notch stays readable.
+const SHOTS: Record<'desktop' | 'phone', Record<Shot, [number, number]>> = {
+  desktop: { wide: [1084, 0], mid: [820, 0], close: [520, 0] },
+  phone: { wide: [800, 0], mid: [560, 0], close: [380, 0] },
+};
+const PHONE = '(max-width: 599px)'; // keep in step with .demo-shell's aspect-ratio in globals.css
+
+// Plays the notch like a short looping video: Pip (you) and Bun (your person in the notch) narrate.
+export function runHeroTour(root: HTMLElement) {
+  const q = <T extends HTMLElement = HTMLElement>(s: string) => root.querySelector(s) as T;
+  const qa = (s: string) => [...root.querySelectorAll<HTMLElement>(s)];
+  const timers = new Set<number>();
+  const later = (fn: () => void, ms: number) => {
+    const id = window.setTimeout(() => { timers.delete(id); fn(); }, ms);
+    timers.add(id);
+  };
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const phone = matchMedia(PHONE);
+
+  const shell = q('.demo-shell'), desk = q('.desk'), notch = q('.notch'), fx = q('.fx');
+  const banner = q('.n-banner span'), mood = q('.n-mood');
+  const pip = q('.pal-pip .char'), bun = q('.pal-bun .char');
+  const noteIn = q<HTMLInputElement>('.composer input'), noteStatus = q('.note-status');
+  const selfie = q('.ph .chars'), selfieHTML = selfie.innerHTML;
+  const sunday = q('.x-tpl .x-pic');
+
+  /* ---------- live bits: clock, calendar, time together ---------- */
+  const today = new Date();
+  q('.x-day').textContent = today.toLocaleDateString('en-US', { weekday: 'long' });
+  q('.x-num').textContent = String(today.getDate());
+  function tick() {
+    const t = together(), now = new Date();
+    q('.s-hours').textContent = fmt(t.hours); q('.s-weekends').textContent = fmt(t.weekends); q('.s-secs').textContent = fmt(t.secs);
+    q('.clock').textContent = now.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+  tick();
+  const clock = setInterval(tick, 1000);
+
+  /* ---------- camera: wide on the whole screen, close on the notch ---------- */
+  let shot: Shot = 'wide';
+  function applyCam() {
+    const [zw, oy] = SHOTS[phone.matches ? 'phone' : 'desktop'][shot], w = shell.clientWidth, k = w / zw;
+    desk.style.transform = `translate(${w / 2 - CX * k}px, ${oy * k}px) scale(${k})`;
+  }
+  const camera = (s: Shot) => { shot = s; applyCam(); };
+  // Sizing (first paint, resize) jumps straight to the shot; only camera moves glide.
+  const ro = new ResizeObserver(() => {
+    desk.style.transition = 'none'; applyCam(); void desk.offsetWidth; desk.style.transition = '';
+    shell.classList.add('ready');
+  });
+  ro.observe(shell);
+
+  /* ---------- the notch ---------- */
+  let bannerAnim: Animation | null = null;
+  const isOpen = () => notch.classList.contains('open');
+  function endBanner() { notch.classList.remove('banner'); bannerAnim = null; }
+  // Jump to the end rather than cancel, so the text stays off-strip instead of snapping back into view.
+  function stopBanner() { if (!bannerAnim) return; bannerAnim.onfinish = null; bannerAnim.finish(); endBanner(); }
+  const open = () => { if (!isOpen()) { stopBanner(); notch.classList.add('open'); } };
+  const close = () => notch.classList.remove('open');
+  function showBanner(text: string, speed = 85) {
+    banner.innerHTML = `<b>bun</b>&nbsp;&nbsp;${text}`;
+    notch.classList.add('banner');
+    const w = banner.offsetWidth, strip = 234;
+    bannerAnim = banner.animate([{ transform: `translateX(${strip}px)` }, { transform: `translateX(${-w}px)` }],
+      { duration: (strip + w) / speed * 1000, delay: 300, fill: 'both' });
+    bannerAnim.onfinish = endBanner;
+  }
+  function setMood(e: string) {
+    mood.textContent = e;
+    mood.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.4)' }, { transform: 'scale(1)' }], { duration: 450, easing: 'cubic-bezier(.3,1.6,.5,1)' });
+  }
+  const tab = (t: string) => {
+    qa('.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+    qa('.pane').forEach(p => p.classList.toggle('on', p.dataset.pane === t));
+  };
+  // A soft pink glow on whatever the characters are talking about.
+  const glow = (el: Element) => act(el, 'x-glow', 1800);
+
+  /* ---------- the cast ---------- */
+  const say = (who: Who, text: string, ms = 2600) => { const b = q(`.bubble-${who}`); b.textContent = text; act(b, 'show', ms); };
+  function bunLoves(text: string) { act(pip, 'is-tap', 450); act(bun, 'is-jump', 800); act(bun, 'is-love', 2200); say('bun', text, 2000); }
+
+  /* ---------- effects out of the notch ---------- */
+  const heart = '<svg viewBox="-11 -11 22 19" width="100%"><use href="#hrt"/></svg>';
+  function fxPour(n = 3) {
+    for (let i = 0; i < n; i++) {
+      const el = document.createElement('div'); el.innerHTML = heart; fx.appendChild(el);
+      const size = rand(17, 25), x = fx.clientWidth / 2 + rand(-50, 50) - size / 2, sway = rand(6, 8) * (i % 2 ? 1 : -1);
+      el.style.width = size + 'px';
+      el.animate([
+        { transform: `translate(${x}px,20px) scale(.2)`, opacity: 0 },
+        { transform: `translate(${x + sway}px,60px) rotate(${sway}deg) scale(1)`, opacity: 1, offset: .3 },
+        { transform: `translate(${x - sway}px,152px) rotate(${-sway}deg)`, opacity: 0 },
+      ], { duration: 1500, delay: i * 250, easing: 'ease-out', fill: 'backwards' }).onfinish = () => el.remove();
+    }
+  }
+  function fxSplash(emoji: string) {
+    for (let i = 0; i < 18; i++) {
+      const el = document.createElement('div'); el.textContent = emoji; fx.appendChild(el);
+      const size = rand(14, 32), x = rand(20, fx.clientWidth - 40), h = fx.clientHeight;
+      el.style.fontSize = size + 'px';
+      el.animate([
+        { transform: `translate(${x}px,${h + 10}px)`, opacity: 0 },
+        { transform: `translate(${x + rand(-14, 14)}px,${h - 80}px) rotate(${rand(-15, 15)}deg)`, opacity: 1, offset: .2 },
+        { transform: `translate(${x + rand(-30, 30)}px,${h - 350}px) rotate(${rand(-20, 20)}deg)`, opacity: 0 },
+      ], { duration: 3000, delay: i * 80, easing: 'ease-out', fill: 'backwards' }).onfinish = () => el.remove();
+    }
+  }
+
+  /* ---------- the open notch's tabs ---------- */
+  const noteState = (text: string, cls: string) => { noteStatus.textContent = text; noteStatus.className = 'note-status ' + cls; };
+  function typeNote(text: string) {
+    [...text].forEach((_, i) => later(() => {
+      noteIn.value = text.slice(0, i + 1);
+      noteState(`${noteIn.value.trim().split(/\s+/).length} of 10 words`, 'ter');
+    }, i * 70));
+    const done = text.length * 70;
+    later(() => noteState('Sending…', 'sec'), done + 250);
+    later(() => { noteState('Delivered ♡', 'pk'); bunLoves('🥹'); }, done + 850);
+  }
+  function sendEmoji(i: number) {
+    const buttons = qa('.emojis button'), b = buttons[i], e = b.textContent!, st = q('.emoji-status');
+    buttons.forEach(x => x.classList.toggle('last', x === b));
+    for (let j = 0; j < 3; j++) {
+      const s = document.createElement('span'); s.className = 'pop'; s.textContent = e; b.appendChild(s);
+      s.animate([{ transform: 'translate(0,0)', opacity: 1 }, { transform: `translate(${(j - 1) * 10}px,-40px)`, opacity: 0 }],
+        { duration: 900, delay: j * 70, fill: 'backwards' }).onfinish = () => s.remove();
+    }
+    st.textContent = `Sent ${e}`; st.className = 'st emoji-status';
+    later(() => { st.textContent = `Delivered ${e}`; st.className = 'st emoji-status pk'; bunLoves(e + '!!'); }, 1200);
+    later(() => { st.textContent = 'Tap to send'; st.className = 'st emoji-status ter'; b.classList.remove('last'); }, 4200);
+  }
+  const PHOTO_TEXT = ['.p-eye', '.p-title', '.p-body', '.pbtn'].map(s => [s, q(s).textContent] as const);
+  function resetPhoto() {
+    const tile = q('.ptile'); tile.classList.remove('has'); tile.querySelector('.x-pic')?.remove();
+    q('.pbtn').classList.remove('bordered');
+    PHOTO_TEXT.forEach(([s, t]) => { q(s).textContent = t; });
+  }
+  const pop = (el: Element) => el.animate([{ transform: 'scale(.55)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, easing: 'cubic-bezier(.3,1.4,.5,1)' });
+  function sendPhoto() {
+    const tile = q('.ptile'), pic = sunday.cloneNode(true) as HTMLElement;
+    tile.classList.add('has'); tile.prepend(pic); pop(pic);
+    q('.p-title').textContent = 'Last sent to bun'; q('.p-body').textContent = 'Shows on their Home until you send a new one ♡';
+    q('.pbtn').textContent = 'Send New Photo…'; q('.pbtn').classList.add('bordered');
+    q('.p-eye').textContent = 'Just now · Sending…';
+    later(() => { q('.p-eye').textContent = 'Just now · Delivered ♡'; bunLoves('on my home now 😭'); }, 1400);
+  }
+  // What bun sent lands on Pip's Home: the new photo pops in, and the note tile shows the latest note.
+  function homeArrives() {
+    const pic = sunday.cloneNode(true) as HTMLElement;
+    pic.querySelector('span')?.remove();
+    selfie.replaceChildren(pic); pop(pic);
+    q('.ph .cap').textContent = 'from bun · just now';
+    q('.notetile .when').textContent = 'bun · just now';
+    q('.notetile .txt').textContent = "lunch at 1? i'll bring dumplings 🥟";
+    glow(q('.ph'));
+  }
+  function reset() {
+    stopBanner(); close(); tab('home'); setMood('🥰');
+    noteIn.value = ''; noteState('Up to 10 words', 'ter');
+    resetPhoto();
+    selfie.innerHTML = selfieHTML; q('.ph .cap').textContent = 'from bun · 1h';
+    q('.notetile .when').textContent = 'bun · 2m ago'; q('.notetile .txt').textContent = "you're my favorite notification";
+  }
+
+  /* ---------- the script ---------- */
+  // A real back-and-forth: one line at a time with a beat between, and the last shot (wide, notch closed)
+  // is where the first one starts, so the loop has no seam.
+  const STEPS: Step[] = [
+    [2800, 'pip', 'meet bun, who lives in my notch ♡', () => { reset(); camera('close'); later(() => glow(q('.n-who')), 1000); }],
+    [3000, 'bun', 'brb, coffee ☕️', () => { close(); setMood('☕️'); glow(q('.n-who')); act(bun, 'is-happy', 1600); }],
+    [3000, 'bun', 'psst… read your notch 👀', () => { close(); act(bun, 'is-tap', 450); showBanner("lunch at 1? i'll bring dumplings 🥟"); }],
+    [3200, 'pip', 'dumplings?! marry me 🥟', () => act(pip, 'is-love', 2200)],
+    [3000, 'bun', 'here, have a heart ♥', () => { close(); act(bun, 'is-tap', 450); fxPour(); act(pip, 'is-love', 2000); glow(q('.n-heart')); }],
+    [3400, 'bun', 'actually, have a hundred 🥰', () => {
+      close(); camera('wide'); act(bun, 'is-jump', 800);
+      later(() => { fxSplash('🥰'); act(pip, 'is-love', 2400); }, 700);
+    }],
+    [3800, 'pip', 'wait, what else did you send? 👀', () => {
+      camera('mid'); tab('home');
+      later(open, 600); later(homeArrives, 1300); later(() => say('bun', 'our sunday pic 📸', 1900), 1700);
+    }, 1600],
+    [3000, 'pip', 'aww, it counts our weekends too 🥹', () => { open(); tab('home'); glow(q('.stats')); }],
+    [4400, 'pip', 'my turn ✍️', () => { open(); tab('note'); typeNote('see you at 1 ♡'); }, 1600],
+    [3800, 'pip', '+ a kiss 😘', () => { open(); tab('emoji'); later(() => sendEmoji(2), 500); }, 1500],
+    [4400, 'pip', 'and one for your home 📸', () => { open(); tab('photo'); later(sendPhoto, 600); }, 1700],
+    [3000, 'bun', 'see you at 1 ♡', () => { close(); camera('wide'); act(bun, 'is-happy', 1800); }],
+  ];
+  function play() {
+    let t = 0;
+    for (const [ms, who, line, run, up = ms - 500] of STEPS) {
+      later(() => { run(); say(who, line, up); }, t);
+      t += ms;
+    }
+    later(play, t);
+  }
+
+  if (reduce) { camera('mid'); open(); homeArrives(); } // a still frame
+  else later(play, 700); // hold the wide shot for a moment, then glide in
+
+  return () => { timers.forEach(clearTimeout); clearInterval(clock); ro.disconnect(); };
+}

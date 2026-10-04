@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OurNotch — notch to notch, under the same moon</title>
+<meta name="description" content="OurNotch turns your MacBook notch into a tiny shared space for two. One $8 purchase covers both of your Macs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#120E16; --bg2:#19131F;
+  --ink:#2A1C26;                                  /* character outlines: stays dark */
+  --text:#F4EAF1; --text2:rgba(244,234,241,.62); --text3:rgba(244,234,241,.38);
+  --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+  --pink:#FF6F93; --blush:#FFB3C2; --moon:#FFE6C2; --violet:#A895E8;
+  --glow:0 0 40px -6px rgba(255,111,147,.45);
+  --sys:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  --wall:
+    radial-gradient(1.4px 1.4px at 12% 18%,#fff 50%,transparent),
+    radial-gradient(1px 1px at 28% 9%,#fff 50%,transparent),
+    radial-gradient(1.2px 1.2px at 64% 14%,#fff 50%,transparent),
+    radial-gradient(1px 1px at 82% 26%,#ffd6e0 50%,transparent),
+    radial-gradient(1.4px 1.4px at 92% 8%,#fff 50%,transparent),
+    radial-gradient(1px 1px at 46% 30%,#fff 50%,transparent),
+    radial-gradient(60px 60px at 80% 16%,rgba(255,230,194,.9) 30%,rgba(255,230,194,.12) 46%,transparent 70%),
+    radial-gradient(120% 60% at 50% 115%,#C9728E 0%,#6E3C6B 38%,transparent 72%),
+    linear-gradient(180deg,#120D1C 0%,#2A1E3E 55%,#4B2C55 100%);
+  --bubble-bg:#231A2A; --bubble-ink:var(--text);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:var(--text);font:400 17px/1.65 "Manrope",sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(90% 520px at 50% -120px,rgba(168,149,232,.16),transparent 70%),var(--bg)}
+h1,h2,h3{font-family:"Fredoka",sans-serif;font-weight:600;line-height:1.08;letter-spacing:-.01em;margin:0}
+a{color:inherit}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px}
+section{position:relative}
+::selection{background:rgba(255,111,147,.35)}
+
+/* sparse twinkling stars */
+.sky{position:fixed;inset:0;pointer-events:none;z-index:-1}
+.sky i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.55;animation:twinkle 4s ease-in-out infinite}
+.sky i.p{background:var(--blush)}
+.sky i.b{width:3px;height:3px;box-shadow:0 0 6px 1px rgba(255,255,255,.5)}
+@keyframes twinkle{0%,100%{opacity:.15}50%{opacity:.85}}
+
+.moon{display:block;color:var(--moon);filter:drop-shadow(0 0 14px rgba(255,214,190,.45)) drop-shadow(0 0 40px rgba(255,111,147,.25))}
+
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 16px/1 "Manrope";text-decoration:none;color:#2A1220;background:var(--blush);
+  padding:15px 26px;border-radius:999px;transition:transform .25s,box-shadow .25s;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,var(--glow)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 0 0 1px rgba(255,255,255,.2) inset,0 0 56px -4px rgba(255,111,147,.6)}
+.btn.quiet{background:transparent;color:var(--text);box-shadow:inset 0 0 0 1px var(--line2)}
+.btn.quiet:hover{box-shadow:inset 0 0 0 1px rgba(255,179,194,.5),0 0 30px -10px rgba(255,111,147,.5)}
+.btn:focus-visible,.chip:focus-visible,summary:focus-visible{outline:2px solid var(--blush);outline-offset:3px}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding-block:24px}
+.logo{display:flex;align-items:center;gap:10px;font:600 20px "Fredoka";text-decoration:none}
+.logo-notch{width:32px;height:12px;background:#000;border-radius:0 0 6px 6px;display:grid;place-items:center;position:relative;top:-3px;box-shadow:0 0 0 1px var(--line2),0 0 16px -2px rgba(255,111,147,.5)}
+.logo-notch svg{width:7px;fill:var(--pink);animation:beat 2.6s infinite}
+nav .links{display:flex;gap:28px;align-items:center;font-size:15px}
+nav .links a{text-decoration:none;color:var(--text2);transition:color .2s}
+nav .links a:hover{color:var(--text)}
+nav .links .btn{color:#2A1220;padding:10px 18px;font-size:14.5px;white-space:nowrap}
+@media (max-width:640px){nav .links a:not(.btn){display:none}}
+
+/* hero */
+.hero{text-align:center;padding-top:48px}
+.hero .moon{width:54px;margin:0 auto 26px;transform:rotate(-14deg)}
+.hero h1{font-size:clamp(40px,6.6vw,72px);max-width:780px;margin:0 auto}
+.hero h1 em{font-style:normal;color:var(--blush);text-shadow:0 0 28px rgba(255,111,147,.45)}
+.hero .lede{max-width:520px;margin:22px auto 32px;font-size:clamp(17px,2vw,19px);color:var(--text2)}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.both{display:inline-flex;align-items:center;gap:10px;margin-top:22px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;font-size:14.5px;color:var(--text2)}
+.both b{color:var(--text);font-weight:600}
+.both svg{width:12px;fill:var(--pink)}
+.scene{display:block;width:100%;max-width:920px;margin:52px auto 0;overflow:visible;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.scene .who{font:500 32px "Fredoka";fill:var(--text2);text-anchor:middle}
+.scene .route{fill:none;stroke:var(--blush);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:.5 12;opacity:.45}
+.lap-lid{fill:#25212B;stroke:rgba(255,255,255,.2);stroke-width:1.5}
+.lap-base{fill:#1D1A22;stroke:rgba(255,255,255,.2);stroke-width:1.5;stroke-linejoin:round}
+.lap-screen{fill:url(#dusk);stroke:none}
+.mini-notch{transform-box:fill-box;transform-origin:50% 0}
+.beat{animation:beat 2.6s infinite;transform-box:fill-box;transform-origin:center}
+
+/* characters */
+.char{overflow:visible}
+.char .c-line{stroke:var(--ink);stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}
+.char .c-shadow{fill:var(--ink);opacity:.07}
+.char .c-bob{transform-box:view-box;transform-origin:60px 124px;animation:bob 2.6s ease-in-out infinite}
+.char .eyes-open{transform-box:view-box;transform-origin:60px 70px;animation:blink 4.4s infinite}
+.char .c-arm-r{transform-box:view-box;transform-origin:100px 80px}
+.char .c-arm-l{transform-box:view-box;transform-origin:20px 80px}
+.char .eyes-happy,.char .eyes-heart,.char .eyes-sleep,.char .mouth-o{display:none}
+.char.is-happy .eyes-open,.char.is-love .eyes-open,.char.is-sleep .eyes-open{display:none}
+.char.is-happy .eyes-happy{display:inline}
+.char.is-love .eyes-heart{display:inline}
+.char.is-love .mouth-smile{display:none}
+.char.is-love .mouth-o{display:inline}
+.char.is-sleep .eyes-sleep{display:inline}
+.char.is-sleep .c-bob{animation:breathe 3.2s ease-in-out infinite}
+.char.is-jump .c-bob{animation:jump .8s cubic-bezier(.3,.7,.4,1)}
+.char.is-tap .c-bob{animation:squash .45s ease-out}
+.char.is-tap .c-arm-r{animation:tap .45s ease-out}
+.char.is-wave .c-arm-r{animation:wave 1.1s ease-in-out infinite}
+.char.is-wave-l .c-arm-l{animation:wave-l 1.1s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(.985,1.025)}}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.97)}}
+@keyframes blink{0%,91%,100%{transform:scaleY(1)}93.5%{transform:scaleY(.1)}96%{transform:scaleY(1)}}
+@keyframes jump{0%{transform:scale(1.12,.86)}35%{transform:translateY(-30px) scale(.9,1.12)}68%{transform:translateY(0) scale(1.12,.88)}84%{transform:scale(.97,1.04)}100%{transform:none}}
+@keyframes squash{0%{transform:none}40%{transform:scale(1.08,.9)}100%{transform:none}}
+@keyframes tap{0%,100%{transform:none}40%{transform:rotate(-55deg)}}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-70deg)}}
+@keyframes wave-l{0%,100%{transform:rotate(0)}50%{transform:rotate(70deg)}}
+@keyframes beat{0%,33%,100%{transform:scale(1)}8%{transform:scale(1.18)}16%{transform:scale(1)}24%{transform:scale(1.1)}}
+
+/* characters keep their colors; a faint glow sits behind them */
+.char .c-shadow{fill:var(--pink);opacity:.18}
+.person .char,.perch .char,.sleepers .char,.desk .pal .char{filter:drop-shadow(0 0 22px rgba(255,143,171,.28))}
+
+.head{text-align:center;max-width:600px;margin:0 auto 56px}
+.head h2{font-size:clamp(32px,4.6vw,48px)}
+.head p{margin:14px 0 0;color:var(--text2)}
+.eyebrow{font:600 12.5px "Manrope";letter-spacing:.16em;text-transform:uppercase;color:var(--blush);display:block;margin-bottom:14px;opacity:.85}
+
+/* made for two: same moon, apart */
+.two{padding-block:150px 40px}
+.apart{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;max-width:760px;margin:0 auto;position:relative}
+.apart::before{content:"";position:absolute;left:16%;right:16%;bottom:62px;border-top:1px dashed var(--line2)}
+.person{text-align:center;position:relative}
+.person .char{width:min(120px,26vw)}
+.person b{display:block;font:600 20px "Fredoka";margin-top:10px}
+.person span{font-size:14.5px;color:var(--text2)}
+.mid{text-align:center;padding:0 16px 34px;position:relative}
+.mid .moon{width:64px;margin:0 auto 14px;transform:rotate(-14deg)}
+.mid .p{font:600 44px/1 "Fredoka";color:var(--blush);text-shadow:0 0 30px rgba(255,111,147,.5)}
+.mid .s{font-size:14px;color:var(--text2);margin-top:6px;background:var(--bg);padding:0 8px;position:relative}
+
+.steps{list-style:none;max-width:560px;margin:90px auto 0;padding:0 0 0 30px;position:relative}
+.steps::before{content:"";position:absolute;left:4px;top:10px;bottom:10px;border-left:1px solid var(--line2)}
+.step{position:relative;padding-bottom:34px}
+.step:last-child{padding-bottom:0}
+.step::before{content:"";position:absolute;left:-30px;top:9px;width:9px;height:9px;border-radius:50%;background:var(--blush);box-shadow:0 0 12px 2px rgba(255,111,147,.55)}
+.step .n{font:500 13px "Manrope";letter-spacing:.12em;color:var(--text3);text-transform:uppercase}
+.step h3{font:600 21px "Fredoka";margin:2px 0 4px}
+.step p{margin:0;font-size:15.5px;color:var(--text2)}
+.person b,.mid .s{white-space:nowrap}
+@media (max-width:520px){.mid{padding-inline:4px}.mid .p{font-size:36px}.mid .s{font-size:13px}.person b{font-size:17px}.apart::before{display:none}}
+
+/* demo */
+.demo{padding-block:130px 20px}
+.demo-shell{position:relative;margin:0 auto;max-width:860px}
+.desk{position:absolute;top:0;left:50%;width:860px;height:560px;transform-origin:top center}
+.screen{position:absolute;left:70px;top:0;width:720px;height:460px;border:12px solid #1d1d1f;border-radius:22px;overflow:hidden;
+  background:var(--wall,radial-gradient(120% 90% at 15% 0%,#FFE1D3 0%,transparent 60%),radial-gradient(90% 90% at 100% 100%,#FFCAD6 0%,transparent 60%),linear-gradient(160deg,#FFF0E6,#FFD6DF));
+  box-shadow:0 30px 60px -30px rgba(46,34,40,.35)}
+.menubar{position:absolute;inset:0 0 auto 0;height:24px;background:rgba(255,255,255,.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;justify-content:space-between;align-items:center;padding:0 14px;font:500 12.5px var(--sys);color:#1d1d1f}
+.menubar .mbl span{margin-right:16px}
+.camera{position:absolute;top:9px;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:#151a22;box-shadow:inset 0 0 0 1.5px #2a3240;z-index:6;pointer-events:none}
+.win{position:absolute;left:48px;top:70px;width:330px;height:220px;background:rgba(255,255,255,.9);border-radius:12px;box-shadow:0 18px 40px rgba(90,30,50,.12),0 0 0 .5px rgba(0,0,0,.1);font:500 12px var(--sys);color:#333;padding:34px 22px 0}
+.win::before{content:"";position:absolute;left:12px;top:12px;width:9px;height:9px;border-radius:50%;background:#ff5f57;box-shadow:15px 0 #febc2e,30px 0 #28c840}
+.win .t{position:absolute;top:9px;left:0;right:0;text-align:center;color:#888;font-size:11.5px}
+.win i{display:block;height:7px;border-radius:4px;background:#f0eef2;margin:10px 0}
+.fx{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+.fx > *{position:absolute;left:0;top:0;will-change:transform,opacity}
+.fx svg{fill:var(--pink)}
+.stand{position:absolute;left:380px;top:472px;width:100px;height:56px;background:linear-gradient(#e6e1e4,#d6d0d4);clip-path:polygon(18% 0,82% 0,100% 100%,0 100%)}
+.stand-foot{position:absolute;left:330px;top:526px;width:200px;height:10px;background:#ddd7db;border-radius:6px}
+.desk .pal{position:absolute;bottom:20px;width:120px}
+.desk .pal-pip{left:-40px}
+.desk .pal-bun{right:-40px}
+.bubble{position:absolute;bottom:150px;background:var(--bubble-bg,#fff);color:var(--bubble-ink,#2E2228);border-radius:16px;padding:6px 14px 4px;font:600 21px/1.1 "Caveat";white-space:nowrap;box-shadow:0 6px 20px -6px rgba(46,34,40,.25);
+  opacity:0;transform:translateY(8px) scale(.9);transition:.25s cubic-bezier(.3,1.5,.5,1);pointer-events:none}
+.bubble.show{opacity:1;transform:none}
+.bubble-pip{left:-50px}.bubble-bun{right:-54px}
+
+/* the notch (mirrors devpost/design_handoff) */
+.notch{--ear:6px;position:absolute;top:0;left:50%;width:270px;height:34px;transform:translateX(-50%);background:#000;border-radius:0 0 12px 12px;z-index:5;color:#fff;font-family:var(--sys);
+  transition:width .5s cubic-bezier(.32,1.35,.5,1),height .5s cubic-bezier(.32,1.35,.5,1),border-radius .45s;cursor:default}
+.notch::before,.notch::after{content:"";position:absolute;top:0;width:var(--ear);height:var(--ear);transition:width .45s,height .45s,left .45s,right .45s}
+.notch::before{left:calc(-1 * var(--ear));background:radial-gradient(circle at 0 100%,transparent calc(var(--ear) - .5px),#000 var(--ear))}
+.notch::after{right:calc(-1 * var(--ear));background:radial-gradient(circle at 100% 100%,transparent calc(var(--ear) - .5px),#000 var(--ear))}
+.notch.banner{height:56px;border-radius:0 0 16px 16px}
+.notch.open{--ear:14px;width:520px;height:272px;border-radius:0 0 24px 24px}
+.n-closed{position:absolute;inset:0 0 auto 0;height:34px;display:flex;justify-content:space-between;align-items:center;padding:0 22px;transition:opacity .15s}
+.n-who{display:flex;align-items:center;gap:4px}
+.n-av{width:20px;height:20px;border-radius:50%;overflow:hidden;background:linear-gradient(160deg,#FFE0C8,#FFB3C2);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.15);position:relative}
+.n-av svg{position:absolute;width:26px;left:-3px;top:0}
+.n-mood{font-size:13px;line-height:1;display:inline-block}
+.n-heart{width:14px;fill:#FF375F;animation:beat 2.6s infinite}
+.notch.open .n-closed{opacity:0}
+.n-banner{position:absolute;top:34px;left:18px;right:18px;height:20px;overflow:hidden;opacity:0;transition:opacity .2s;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 18px,#000 calc(100% - 18px),transparent);mask:linear-gradient(90deg,transparent,#000 18px,#000 calc(100% - 18px),transparent)}
+.notch.banner .n-banner{opacity:1}
+.n-banner span{position:absolute;left:0;top:2px;white-space:nowrap;font:500 12px var(--sys)}
+.n-banner b{color:#FF375F;font-weight:600}
+.n-open{position:absolute;top:0;left:50%;width:520px;height:272px;margin-left:-260px;opacity:0;transform:scale(.94);transform-origin:top;pointer-events:none;transition:opacity .15s,transform .15s}
+.notch.open .n-open{opacity:1;transform:none;pointer-events:auto;transition:opacity .22s .08s ease-out,transform .22s .08s ease-out}
+.n-top{position:absolute;top:0;left:22px;right:22px;height:34px;display:flex;justify-content:space-between;align-items:center;font:600 13px var(--sys)}
+.n-top .hr{color:#FF375F;font-size:11px;margin:0 4px}
+.n-top svg{width:16px;stroke:rgba(235,235,245,.6);fill:none}
+.pane{position:absolute;left:16px;top:40px;width:488px;height:184px;display:none}
+.pane.on{display:flex}
+.card{background:#1C1C1E;border-radius:12px;padding:12px;width:100%;display:flex;flex-direction:column;justify-content:space-between}
+.sec{color:rgba(235,235,245,.6)}.ter{color:rgba(235,235,245,.3)}.pk{color:#FF375F}
+.tabbar{position:absolute;left:50%;bottom:10px;width:420px;margin-left:-210px;height:28px;background:rgba(118,118,128,.24);border-radius:8px;padding:2px;display:flex}
+.tabbar button{flex:1;height:24px;border:0;border-radius:6px;background:transparent;color:rgba(235,235,245,.6);font:500 12px var(--sys);display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer}
+.tabbar svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round;stroke-linecap:round}
+.tabbar button.on{background:#636366;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+.tabbar button.on svg{stroke:#FF375F;fill:rgba(255,55,95,.35)}
+/* home bento */
+.ph{width:184px;height:184px;flex:none;border-radius:14px;overflow:hidden;position:relative;background:linear-gradient(160deg,#FFE0C8,#FFB3C2)}
+.ph .chars{position:absolute;inset:0;filter:saturate(.75) brightness(.94) contrast(1.05)}
+.ph .chars svg{position:absolute;bottom:-14px;width:118px}
+.ph::before{content:"";position:absolute;inset:0;background:rgba(255,55,95,.22);mix-blend-mode:soft-light;z-index:1}
+.ph::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(0,0,0,.55));box-shadow:inset 0 0 0 .5px rgba(255,255,255,.08);border-radius:14px;z-index:1}
+.ph .cap{position:absolute;left:12px;bottom:10px;z-index:2;font:500 11.5px var(--sys);color:rgba(255,255,255,.9)}
+.rcol{flex:1;display:flex;flex-direction:column;gap:8px;margin-left:8px}
+.tile{background:#1C1C1E;border-radius:12px}
+.notetile{flex:1;padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.notetile .who{font:500 11px var(--sys);display:flex;align-items:center;gap:5px}
+.notetile .who svg{width:12px;fill:#FF375F}
+.notetile .txt{font:500 15px/1.3 var(--sys);letter-spacing:-.1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.stats{flex:1;display:flex;gap:8px}
+.stat{flex:1;padding:12px 11px;display:flex;flex-direction:column;justify-content:space-between}
+.stat:last-child{flex:2.1}
+.stat .l{font:500 11px var(--sys);color:rgba(235,235,245,.6);display:flex;align-items:center;gap:4px}
+.stat .l svg{width:10px;fill:#FF375F;animation:beat 2.6s infinite}
+.stat .v{font:600 16px var(--sys);letter-spacing:-.3px;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* note */
+.their .l{font:500 11px var(--sys)}
+.their .t{font:400 16px var(--sys);margin-top:2px}
+.composer{display:flex;gap:8px;border-top:1px solid rgba(255,255,255,.08);padding-top:10px;align-items:center}
+.composer input{flex:1;height:34px;border-radius:9px;background:#2C2C2E;border:1px solid rgba(255,255,255,.08);padding:0 10px;color:#fff;font:400 13px var(--sys);outline:none;transition:box-shadow .15s,border-color .15s}
+.composer input::placeholder{color:rgba(235,235,245,.3)}
+.composer input:focus,.composer input.bad{border-color:#FF375F;box-shadow:0 0 0 3px rgba(255,55,95,.35)}
+.composer input:disabled{opacity:.5}
+.send{width:32px;height:32px;border-radius:50%;border:0;background:#FF375F;display:grid;place-items:center;cursor:pointer}
+.send svg{width:15px;stroke:#fff;stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.send:disabled{background:rgba(255,255,255,.1);cursor:default}
+.send:disabled svg{stroke:rgba(235,235,245,.3)}
+.foot{display:flex;justify-content:space-between;align-items:center;font:500 11.5px var(--sys)}
+.foot .lbl{font:400 12px var(--sys);margin-right:8px}
+.seg{display:inline-flex;background:rgba(118,118,128,.24);border-radius:7px;padding:2px}
+.seg button{height:20px;border:0;border-radius:5px;background:transparent;color:rgba(235,235,245,.6);font:500 11.5px var(--sys);padding:0 9px;cursor:pointer}
+.seg button.on{background:#636366;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+/* emoji */
+.hrow{display:flex;justify-content:space-between;align-items:flex-start}
+.hrow h4{margin:0;font:600 15px var(--sys)}
+.hrow p{margin:2px 0 0;font:400 11.5px var(--sys)}
+.hrow .st{font:500 11.5px var(--sys)}
+.emojis{display:flex;gap:6px}
+.emojis button{flex:1;height:54px;border-radius:12px;border:0;background:#2C2C2E;font-size:27px;cursor:pointer;position:relative;transition:transform .25s cubic-bezier(.3,1.6,.5,1),background .15s}
+.emojis button:active{transform:scale(.9);background:#3A3A3C}
+.emojis button.last{background:rgba(255,55,95,.16);box-shadow:inset 0 0 0 1px rgba(255,55,95,.6)}
+.mood-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.mood-grid button{height:52px;border:0;border-radius:12px;background:#2C2C2E;color:rgba(235,235,245,.6);font:500 10.5px var(--sys);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}
+.mood-grid button span{font-size:21px;line-height:1}
+.mood-grid button.on{background:rgba(255,55,95,.16);box-shadow:inset 0 0 0 1px rgba(255,55,95,.6);color:#fff}
+/* photo */
+.prow{flex-direction:row!important;align-items:center;justify-content:flex-start!important;gap:16px}
+.ptile{width:150px;height:150px;flex:none;border-radius:12px;border:1px dashed rgba(235,235,245,.3);display:grid;place-items:center;overflow:hidden;position:relative}
+.ptile>svg{width:28px;stroke:rgba(235,235,245,.3);fill:none;stroke-width:1.5}
+.ptile img{width:100%;height:100%;object-fit:cover;filter:saturate(.75) brightness(.94) contrast(1.05)}
+.ptile.has{border:0}.ptile.has>svg{display:none}
+.ptile.has::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(28,28,30,.55)),rgba(255,55,95,.22);mix-blend-mode:soft-light}
+.pcol{display:flex;flex-direction:column;gap:3px}
+.pcol .e{font:500 11px var(--sys)}
+.pcol .ti{font:600 15px var(--sys)}
+.pcol .b{font:400 12px var(--sys);max-width:250px}
+.pbtn{margin-top:10px;height:24px;border-radius:6px;border:0;background:#FF375F;color:#fff;font:500 12px var(--sys);padding:0 12px;align-self:flex-start;cursor:pointer}
+.pbtn.bordered{background:transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+
+
+/* the desk, at night */
+.screen{box-shadow:0 0 0 1px var(--line2),0 40px 90px -40px rgba(255,111,147,.45)}
+.menubar{background:rgba(18,13,28,.35);color:#F4EAF1}
+.win{background:rgba(250,246,250,.92)}
+.stand{background:linear-gradient(#2E2A34,#221F27)}
+.stand-foot{background:#26222B;box-shadow:0 0 0 1px var(--line)}
+.bubble{font:500 17px/1.2 "Fredoka";padding:8px 14px;box-shadow:0 0 0 1px var(--line2),0 0 30px -8px rgba(255,111,147,.5)}
+
+.try{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin-top:40px;font-size:15px}
+.try .lbl{color:var(--text2);margin-right:6px;width:100%;text-align:center;margin-bottom:4px}
+.chip{font:500 14.5px "Manrope";background:transparent;border:1px solid var(--line2);border-radius:999px;padding:8px 16px;cursor:pointer;color:var(--text);transition:border-color .2s,box-shadow .2s,background .2s}
+.chip:hover{border-color:rgba(255,179,194,.55);background:rgba(255,111,147,.06);box-shadow:0 0 24px -8px rgba(255,111,147,.6)}
+
+/* what you can send */
+.features{padding-block:150px 40px}
+.feats{display:grid;grid-template-columns:1fr 1fr;max-width:820px;margin:0 auto;border-top:1px solid var(--line)}
+.feat{display:flex;gap:18px;padding:30px 26px 30px 0;border-bottom:1px solid var(--line)}
+.feat:nth-child(even){padding:30px 0 30px 26px;border-left:1px solid var(--line)}
+.feat .ic{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:21px;background:radial-gradient(circle,rgba(255,111,147,.18),transparent 70%)}
+.feat h3{font:600 19px "Fredoka";margin:2px 0 4px}
+.feat p{margin:0;font-size:15.5px;color:var(--text2)}
+@media (max-width:640px){.feats{grid-template-columns:1fr}.feat,.feat:nth-child(even){padding:26px 0;border-left:0}}
+
+/* privacy */
+.private{padding-block:130px 20px}
+.vault{max-width:820px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:20px 56px;align-items:start}
+.vault h2{font-size:clamp(28px,3.6vw,38px);max-width:300px}
+.vault h2 + p{margin:12px 0 0;color:var(--text2);font-size:15.5px;max-width:300px}
+.vault ul{list-style:none;margin:0;padding:0}
+.vault li{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);font-size:15.5px}
+.vault li:first-child{padding-top:4px}
+.vault li::before{content:"";flex:none;width:6px;height:6px;margin-top:10px;border-radius:50%;background:var(--moon);box-shadow:0 0 10px 2px rgba(255,230,194,.45)}
+.vault li span{color:var(--text2)}
+@media (max-width:720px){.vault{grid-template-columns:1fr}}
+
+/* pricing */
+.price{padding-block:190px 40px}
+.pcard{max-width:420px;margin:0 auto;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01));border:1px solid var(--line2);border-radius:28px;padding:46px 32px 34px;text-align:center;position:relative;
+  box-shadow:0 0 120px -50px rgba(255,111,147,.55)}
+.perch{position:absolute;top:-80px;left:50%;width:200px;margin-left:-100px;height:90px;display:flex;justify-content:center}
+.perch .char{width:96px;margin:0 -8px}
+.pcard .amt{font:600 78px/1 "Fredoka";color:var(--blush);text-shadow:0 0 36px rgba(255,111,147,.55);margin-top:10px}
+.pcard .for{font:500 22px "Fredoka";margin-top:6px}
+.pcard .each{font-size:14.5px;color:var(--text2);margin:6px 0 28px}
+.pcard ul{list-style:none;padding:0;margin:0 0 30px;text-align:left;font-size:15.5px}
+.pcard li{padding:11px 0;border-top:1px solid var(--line);display:flex;gap:12px}
+.pcard li svg{flex:none;width:11px;fill:var(--pink);margin-top:7px}
+.pcard .btn{width:100%;justify-content:center}
+.pcard .fine{font-size:13px;color:var(--text3);margin-top:16px}
+
+/* faq */
+.faq{padding-block:150px 20px;max-width:680px;margin:0 auto}
+details{border-bottom:1px solid var(--line)}
+details:first-of-type{border-top:1px solid var(--line)}
+summary{list-style:none;cursor:pointer;padding:22px 0;font:500 17px "Manrope";display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--blush);font:400 22px/1 "Manrope";transition:transform .25s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{margin:0;padding:0 0 22px;color:var(--text2);font-size:16px}
+
+footer{text-align:center;padding-block:150px 50px}
+footer .moon{width:40px;margin:0 auto 30px;transform:rotate(-14deg)}
+.sleepers{position:relative;width:200px;height:110px;margin:0 auto}
+.sleepers .char{position:absolute;bottom:0;width:106px}
+.sleepers .s1{left:0;transform:rotate(7deg)}.sleepers .s2{right:0;transform:rotate(-7deg)}
+.zz{position:absolute;top:-10px;right:14px;font:500 20px "Fredoka";color:var(--text3);animation:zz 3s ease-in-out infinite}
+@keyframes zz{0%{opacity:0;transform:translate(0,10px)}40%{opacity:1}100%{opacity:0;transform:translate(12px,-18px)}}
+footer h2{font-size:clamp(30px,4vw,40px);margin:34px 0 24px}
+footer .small{margin-top:70px;font-size:13px;color:var(--text3)}
+
+.rv{opacity:0;transform:translateY(16px);transition:opacity .9s,transform .9s cubic-bezier(.2,.8,.3,1)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" id="defs">
+  <defs>
+    <filter id="boil" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n">
+        <animate attributeName="seed" values="1;2;3;4" dur=".6s" repeatCount="indefinite" calcMode="discrete"/>
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <path id="hrt" d="M0 7 C -11 -1 -11 -10 -4.5 -10 C -1.5 -10 0 -7.5 0 -6 C 0 -7.5 1.5 -10 4.5 -10 C 11 -10 11 -1 0 7 Z"/>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF0E6"/><stop offset="1" stop-color="#FFD6DF"/></linearGradient>
+  </defs>
+</svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B2A52"/><stop offset=".6" stop-color="#7A4A78"/><stop offset="1" stop-color="#D6849A"/></linearGradient>
+    <radialGradient id="halo"><stop offset="0" stop-color="#FF8FAB" stop-opacity=".26"/><stop offset="1" stop-color="#FF8FAB" stop-opacity="0"/></radialGradient>
+    <mask id="moonCut"><rect width="64" height="64" fill="#fff"/><circle cx="42" cy="21" r="20" fill="#000"/></mask>
+    <symbol id="moon" viewBox="0 0 64 64"><g filter="url(#boil)"><circle cx="30" cy="33" r="25" fill="currentColor" mask="url(#moonCut)"/></g></symbol>
+  </defs>
+</svg>
+<div class="sky" id="sky" aria-hidden="true"></div>
+
+<div class="wrap">
+  <nav>
+    <a class="logo" href="#top"><span class="logo-notch"><svg viewBox="-11 -11 22 19"><use href="#hrt"/></svg></span>OurNotch</a>
+    <div class="links"><a href="#two">How it works</a><a href="#play">Try it</a><a href="#faq">FAQ</a><a class="btn" href="#buy">Get it for two · $8</a></div>
+  </nav>
+</div>
+
+<header class="hero wrap" id="top">
+  <svg class="moon" viewBox="0 0 64 64" aria-hidden="true"><use href="#moon"/></svg>
+  <h1>Under the same moon, <em>notch to notch.</em></h1>
+  <p class="lede">Send a heart, a short note or a photo, and it glows out of your person's MacBook notch, however far apart you are tonight.</p>
+  <div class="cta">
+    <a class="btn" href="#buy">Get it for both of you · $8</a>
+    <a class="btn quiet" href="#play">Try the notch</a>
+  </div>
+  <div><span class="both"><svg viewBox="-11 -11 22 19"><use href="#hrt"/></svg><span><b>Buy once, for two.</b> One purchase covers both of your Macs.</span></span></div>
+  <svg class="scene" id="scene" viewBox="0 0 1000 400" role="img" aria-label="Pip, labelled you, taps their notch and a heart flies over to Bun, labelled your person, whose notch pours out hearts."></svg>
+</header>
+
+<section class="two wrap" id="two">
+  <div class="head rv"><span class="eyebrow">Made for two</span><h2>Buy it once. It's for both of you.</h2>
+    <p>OurNotch only works in pairs, so one purchase covers your Mac and theirs.</p></div>
+  <div class="apart rv">
+    <div class="person"><div id="twoPip"></div><b>You</b><span>on your Mac</span></div>
+    <div class="mid"><svg class="moon" viewBox="0 0 64 64" aria-hidden="true"><use href="#moon"/></svg><div class="p">$8</div><div class="s">covers you both</div></div>
+    <div class="person"><div id="twoBun"></div><b>Your person</b><span>on theirs</span></div>
+  </div>
+  <ol class="steps">
+    <li class="step rv"><span class="n">One</span><h3>Buy it once</h3><p>A single $8 purchase. That's $4 each.</p></li>
+    <li class="step rv"><span class="n">Two</span><h3>Install on both Macs</h3><p>It lives in the notch, not your Dock. Macs without a notch get a small black pill at the top.</p></li>
+    <li class="step rv"><span class="n">Three</span><h3>Pair with a code</h3><p>No sign-up. You get a six-letter code, they type it in, and you're paired.</p></li>
+    <li class="step rv"><span class="n">Four</span><h3>Hover and send</h3><p>Move your pointer to the notch and it opens. Send a heart before bed.</p></li>
+  </ol>
+</section>
+
+<section class="demo wrap" id="play">
+  <div class="head rv"><span class="eyebrow">Try it</span><h2>Hover the notch.</h2><p>It works just like the app. On a phone, tap it.</p></div>
+  <div class="demo-shell rv" id="shell">
+    <div class="desk" id="desk">
+      <div class="screen">
+        <div class="menubar"><span class="mbl"><span><b>Finder</b></span><span>File</span><span>Edit</span><span>View</span><span>Window</span></span><span id="clock"></span></div>
+        <div class="win"><span class="t">Q3 report — final — FINAL (2).pages</span><i style="width:60%;height:12px;background:#ddd"></i><i></i><i style="width:86%"></i><i style="width:92%"></i><i style="width:70%"></i><i></i><i style="width:40%"></i></div>
+        <div class="fx" id="fx"></div>
+        <div class="camera"></div>
+        <div class="notch" id="notch">
+          <div class="n-closed"><span class="n-who"><span class="n-av" id="nAv"></span><span class="n-mood" id="nMood">🥰</span></span><svg class="n-heart" viewBox="-11 -11 22 19"><use href="#hrt"/></svg>
+            <div class="n-banner"><span id="bannerText"></span></div>
+          </div>
+          <div class="n-open">
+            <div class="n-top"><span>you<span class="hr">♥</span>bun</span>
+              <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.2" stroke-width="1.4"/><circle cx="8" cy="8" r="5.3" stroke-width="2.6" stroke-dasharray="2.1 2"/></svg></div>
+
+            <div class="pane on" data-pane="home">
+              <div class="ph"><div class="chars" id="selfie"></div><span class="cap">from bun · 1h</span></div>
+              <div class="rcol">
+                <div class="tile notetile"><span class="who sec"><svg viewBox="-11 -11 22 19"><use href="#hrt"/></svg>bun · 2m ago</span><span class="txt">you're my favorite notification</span></div>
+                <div class="stats">
+                  <div class="tile stat"><span class="l">Hours</span><span class="v" id="sHours">—</span></div>
+                  <div class="tile stat"><span class="l">Weekends</span><span class="v" id="sWeekends">—</span></div>
+                  <div class="tile stat"><span class="l">Seconds <svg viewBox="-11 -11 22 19"><use href="#hrt"/></svg></span><span class="v pk" id="sSeconds">—</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pane" data-pane="note"><div class="card">
+              <div class="their"><div class="l sec">From bun · 2m ago</div><div class="t">lunch at 1? i'll bring the dumplings 🥟</div></div>
+              <div>
+                <div class="composer"><input id="noteIn" maxlength="90" placeholder="Say something sweet…" autocomplete="off"><button class="send" id="noteSend" disabled aria-label="Send note"><svg viewBox="0 0 16 16"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5"/></svg></button></div>
+                <div class="foot" style="margin-top:8px"><span><span class="lbl sec">Scroll</span><span class="seg" id="scrollSeg"><button class="on">3 times</button><button>Until opened</button></span></span><span id="noteStatus" class="ter">Up to 10 words</span></div>
+              </div>
+            </div></div>
+
+            <div class="pane" data-pane="emoji"><div class="card">
+              <div class="hrow"><div><h4>Send an emoji</h4><p class="sec">Tap one, and it pops up on bun's screen ♡</p></div><span class="st ter" id="emojiStatus">Tap to send</span></div>
+              <div class="emojis" id="emojis"></div>
+              <div class="foot"><span><span class="lbl sec">Appears</span><span class="seg" id="emojiSeg"><button class="on">Out of the notch</button><button>Full screen</button></span></span></div>
+            </div></div>
+
+            <div class="pane" data-pane="mood"><div class="card">
+              <div class="hrow"><div><h4>Your mood</h4><p class="sec">Shows next to your photo on bun's notch ♡</p></div><span class="st ter" id="moodStatus">Tap one to set</span></div>
+              <div class="mood-grid" id="moods"></div>
+            </div></div>
+
+            <div class="pane" data-pane="photo"><div class="card prow">
+              <label class="ptile" id="ptile"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="15" height="13" rx="2"/><path d="m3 15 4-4 4 4 3-3 4 4M19 3v6M16 6h6"/></svg><input type="file" accept="image/*" id="photoIn" hidden></label>
+              <div class="pcol"><span class="e sec" id="pEye">Photo</span><span class="ti" id="pTitle">Send bun a photo</span><span class="b sec" id="pBody">It shows up on their Home the next time they open their notch ♡</span>
+                <button class="pbtn" id="pBtn">Choose Photo…</button></div>
+            </div></div>
+
+            <div class="tabbar" id="tabs">
+              <button class="on" data-tab="home"><svg viewBox="0 0 16 16"><path d="M2.5 7.5 8 3l5.5 4.5V13a.5.5 0 0 1-.5.5H10V10H6v3.5H3a.5.5 0 0 1-.5-.5z"/></svg>Home</button>
+              <button data-tab="note"><svg viewBox="0 0 16 16"><path d="M3 3h10a1 1 0 0 1 1 1v5.5a1 1 0 0 1-1 1H7.5L4.5 13v-2.5H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/></svg>Note</button>
+              <button data-tab="emoji"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.8"/><path d="M5.6 9.4c1.2 1.4 3.6 1.4 4.8 0M6 6.4h.01M10 6.4h.01"/></svg>Emoji</button>
+              <button data-tab="mood"><svg viewBox="0 0 16 16"><path d="M5 13h6.5a2.5 2.5 0 0 0 .2-5A3.6 3.6 0 0 0 5.2 7 3 3 0 0 0 5 13z"/><path d="M11 2.2v1M13.8 3.4l-.7.7M15 6h-1"/></svg>Mood</button>
+              <button data-tab="photo"><svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="1.6"/><path d="m2.5 11.5 3.5-3.5 3 3 2-2 2.5 2.5"/><circle cx="10.5" cy="6" r="1"/></svg>Photo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stand"></div><div class="stand-foot"></div>
+      <div class="pal pal-pip" id="dPip"></div>
+      <div class="pal pal-bun" id="dBun"></div>
+      <div class="bubble bubble-pip" id="bPip"></div>
+      <div class="bubble bubble-bun" id="bBun"></div>
+    </div>
+  </div>
+
+  <div class="try rv">
+    <span class="lbl">Or see what it's like to get one:</span>
+    <button class="chip" data-recv="heart">♥ a heart</button>
+    <button class="chip" data-recv="hearts">a lot of hearts</button>
+    <button class="chip" data-recv="note">a note</button>
+    <button class="chip" data-recv="emoji">🥰 full screen</button>
+  </div>
+</section>
+
+<section class="features wrap">
+  <div class="head rv"><span class="eyebrow">What you can send</span><h2>Little things, all day long.</h2></div>
+  <div class="feats rv">
+    <div class="feat"><div class="ic">💗</div><div><h3>Hearts</h3><p>Tap once and a few drip out of their notch. Tap a lot and they float up across the whole screen.</p></div></div>
+    <div class="feat"><div class="ic">💬</div><div><h3>Notes</h3><p>Ten words or fewer, drifting across their closed notch.</p></div></div>
+    <div class="feat"><div class="ic">🖼️</div><div><h3>Photos and moods</h3><p>A photo for their Home tab, and how you're feeling at a glance.</p></div></div>
+    <div class="feat"><div class="ic">🌙</div><div><h3>Days together</h3><p>Your count rests in the closed notch beside a beating heart.</p></div></div>
+  </div>
+</section>
+
+<section class="private wrap">
+  <div class="vault rv">
+    <div><span class="eyebrow">Just between you two</span><h2>Quiet, and only yours.</h2><p>What you send is meant for one person, so that's who can read it.</p></div>
+    <ul>
+      <li><div>End-to-end encrypted. <span>Only your two Macs can read it.</span></div></li>
+      <li><div>Doesn't use your iCloud storage. <span>It syncs through iCloud's public database.</span></div></li>
+      <li><div>No sign-up. <span>Pair with a six-letter code.</span></div></li>
+      <li><div>macOS 14 or later. <span>Both Macs need to be signed in to iCloud.</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<section class="price wrap" id="buy">
+  <div class="pcard rv">
+    <div class="perch" id="perch"></div>
+    <div class="amt">$8</div>
+    <div class="for">for the two of you</div>
+    <div class="each">That's $4 each, paid once.</div>
+    <ul>
+      <li><svg viewBox="-11 -11 22 19"><use href="#hrt"/></svg>OurNotch on both of your Macs</li>
+      <li><svg viewBox="-11 -11 22 19"><use href="#hrt"/></svg>Hearts, notes, emojis, photos and moods</li>
+      <li><svg viewBox="-11 -11 22 19"><use href="#hrt"/></svg>Your days-together count in the notch</li>
+    </ul>
+    <!-- checkout link goes here -->
+    <a class="btn" href="#">Get OurNotch for two</a>
+    <div class="fine">macOS 14 or later · Mac only for now</div>
+  </div>
+</section>
+
+<section class="faq wrap" id="faq">
+  <div class="head rv"><h2>Questions</h2></div>
+  <details class="rv"><summary>Do we each need to buy it?</summary><p>No. One $8 purchase covers both of you: you on your Mac and your person on theirs.</p></details>
+  <details class="rv"><summary>Can anyone else read our notes?</summary><p>No. Everything is end-to-end encrypted, so only your two paired Macs can read it.</p></details>
+  <details class="rv"><summary>My iCloud storage is full.</summary><p>That's fine. OurNotch doesn't use your iCloud storage; it syncs through iCloud's public database. Both Macs do need to be signed in to iCloud.</p></details>
+  <details class="rv"><summary>My Mac doesn't have a notch.</summary><p>It still works. You get a small black pill at the top of the screen that does everything the notch does.</p></details>
+  <details class="rv"><summary>Is there an iPhone app?</summary><p>Not yet. OurNotch is Mac-only for now, and needs macOS 14 or later.</p></details>
+</section>
+
+<footer class="wrap">
+  <svg class="moon" viewBox="0 0 64 64" aria-hidden="true"><use href="#moon"/></svg>
+  <div class="sleepers" id="sleepers"><span class="zz">z z</span></div>
+  <h2>Say goodnight from the notch.</h2>
+  <a class="btn" href="#buy">Get it for both of you · $8</a>
+  <div class="small">OurNotch · made with ♡ for two</div>
+</footer>
+
+<script>
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (reduce) document.getElementById('defs').pauseAnimations();
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const rand = (a, b) => a + Math.random() * (b - a);
+const fmt = n => n.toLocaleString('en-US');
+
+/* ---------- characters: Pip (pink, sprout) and Bun (cream, round ears) ---------- */
+const COL = { pip: ['#FF8FAB', '#F06A8D'], bun: ['#FFE2B3', '#F0C487'] };
+function charSVG(kind, cls = '', attrs = '') {
+  const [b, s] = COL[kind];
+  const top = kind === 'bun'
+    ? `<circle class="c-line" cx="33" cy="34" r="13" fill="${b}"/><circle cx="33" cy="34" r="6" fill="#FFB3C2"/><circle class="c-line" cx="87" cy="34" r="13" fill="${b}"/><circle cx="87" cy="34" r="6" fill="#FFB3C2"/>`
+    : `<path class="c-line" d="M60 22 C 58 14 60 9 63 5" fill="none"/><path class="c-line" d="M62 8 C 69 0 80 4 77 11 C 73 15 65 13 62 8 Z" fill="#8BD3A8"/><path class="c-line" d="M61 10 C 54 4 46 8 49 13 C 52 16 58 14 61 10 Z" fill="#8BD3A8"/>`;
+  const delay = `style="animation-delay:-${rand(0, 4).toFixed(2)}s"`;
+  return `<svg class="char char-${kind} ${cls}" viewBox="0 0 120 130" ${attrs} aria-hidden="true">
+  <ellipse class="c-shadow" cx="60" cy="125" rx="36" ry="5"/>
+  <g class="c-bob" ${delay}><g filter="url(#boil)">
+    ${top}
+    <ellipse class="c-line" cx="44" cy="119" rx="10" ry="6" fill="${s}"/><ellipse class="c-line" cx="76" cy="119" rx="10" ry="6" fill="${s}"/>
+    <path class="c-line" fill="${b}" d="M60 20 C 94 19 109 50 108 80 C 107 107 88 121 60 121 C 31 121 12 107 12 79 C 12 50 27 21 60 20 Z"/>
+    <path d="M29 54 C 32 43 40 35 50 31" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none" opacity=".65"/>
+    <g class="c-arm-l"><ellipse class="c-line" cx="16" cy="90" rx="7.5" ry="11" transform="rotate(22 16 90)" fill="${b}"/></g>
+    <g class="c-arm-r"><ellipse class="c-line" cx="104" cy="90" rx="7.5" ry="11" transform="rotate(-22 104 90)" fill="${b}"/></g>
+    <ellipse cx="33" cy="83" rx="7.5" ry="4.2" fill="#FF4F78" opacity=".33"/><ellipse cx="87" cy="83" rx="7.5" ry="4.2" fill="#FF4F78" opacity=".33"/>
+    <g class="eyes-open" ${delay}><ellipse cx="45" cy="70" rx="5" ry="6.5" fill="#3A2430"/><ellipse cx="75" cy="70" rx="5" ry="6.5" fill="#3A2430"/><circle cx="46.8" cy="67.2" r="1.9" fill="#fff"/><circle cx="76.8" cy="67.2" r="1.9" fill="#fff"/></g>
+    <g class="eyes-happy" fill="none" stroke="#3A2430" stroke-width="3.2" stroke-linecap="round"><path d="M39 72 Q45 63 51 72"/><path d="M69 72 Q75 63 81 72"/></g>
+    <g class="eyes-heart" fill="#FF375F" stroke="#3A2430" stroke-width="2.2"><use href="#hrt" transform="translate(45 71) scale(.62)"/><use href="#hrt" transform="translate(75 71) scale(.62)"/></g>
+    <g class="eyes-sleep" fill="none" stroke="#3A2430" stroke-width="3" stroke-linecap="round"><path d="M39 70 Q45 75 51 70"/><path d="M69 70 Q75 75 81 70"/></g>
+    <path class="mouth-smile" d="M54.5 81 Q60 87 65.5 81" fill="none" stroke="#3A2430" stroke-width="2.8" stroke-linecap="round"/>
+    <ellipse class="mouth-o" cx="60" cy="84" rx="4" ry="4.6" fill="#8A2B44" stroke="#3A2430" stroke-width="2"/>
+  </g></g></svg>`;
+}
+// Add a class for a moment, restarting its animation if it's already running.
+const timers = new WeakMap();
+function act(el, cls, ms) {
+  el.classList.remove(cls); el.getBoundingClientRect(); el.classList.add(cls);
+  const t = timers.get(el) || {}; clearTimeout(t[cls]);
+  t[cls] = setTimeout(() => el.classList.remove(cls), ms); timers.set(el, t);
+}
+
+
+/* ---------- hero scene: you tap, a heart flies to your person's notch ---------- */
+const scene = $('#scene');
+const laptop = (x, id) => `<g transform="translate(${x} 150)" id="${id}">
+  <rect class="lap-lid" x="0" y="0" width="290" height="196" rx="16"/>
+  <rect class="lap-screen" x="11" y="11" width="268" height="172" rx="8" fill="url(#wall)"/>
+  <clipPath id="${id}-clip"><rect x="11" y="11" width="268" height="172" rx="8"/></clipPath>
+  <g clip-path="url(#${id}-clip)"><g class="pour"></g></g>
+  <path class="mini-notch" d="M100 11 Q105 11 105 16 V20 Q105 27 112 27 H178 Q185 27 185 20 V16 Q185 11 190 11 Z" fill="#000"/>
+  <g transform="translate(173 19)"><g class="beat"><use href="#hrt" transform="scale(.42)" fill="#FF375F"/></g></g>
+  <circle cx="117" cy="19" r="5" fill="#FF8FAB"/><text x="125" y="22.5" font-size="9">🥰</text>
+  <path class="lap-base" d="M-22 196 H312 Q316 210 300 212 H-10 Q-26 210 -22 196 Z"/>
+</g>`;
+scene.innerHTML = `
+  <path id="route" class="route" d="M320 172 C 380 0, 620 0, 680 172"/>
+  ${laptop(175, 'lapL')}${laptop(535, 'lapR')}
+  <g id="pipSlot">${charSVG('pip', '', 'x="18" y="206" width="150" height="162"')}</g>
+  <g id="bunSlot">${charSVG('bun', '', 'x="832" y="206" width="150" height="162"')}</g>
+  <text class="who" x="93" y="396">you</text>
+  <text class="who" x="907" y="396">your person</text>
+  <g id="fly"></g>`;
+const route = $('#route'), routeLen = route.getTotalLength();
+const pip = $('#pipSlot .char'), bun = $('#bunSlot .char');
+const NS = 'http://www.w3.org/2000/svg';
+const heartEl = (fill, stroke = true) => {
+  const u = document.createElementNS(NS, 'use');
+  u.setAttribute('href', '#hrt'); u.setAttribute('fill', fill);
+  if (stroke) { u.setAttribute('stroke', 'var(--ink, #2E2228)'); u.setAttribute('stroke-width', '2.2'); }
+  return u;
+};
+function pour(lap, n) {
+  const g = $(`#${lap} .pour`);
+  for (let i = 0; i < n; i++) {
+    const h = heartEl(i % 2 ? '#FFB3C2' : '#FF375F', false);
+    g.appendChild(h);
+    const x = 145 + rand(-40, 40), sc = rand(1, 1.6), r = rand(-25, 25);
+    h.animate([
+      { transform: `translate(${x}px,24px) scale(0)`, opacity: 1 },
+      { transform: `translate(${x + rand(-8, 8)}px,70px) scale(${sc}) rotate(${r / 2}deg)`, opacity: 1, offset: .35 },
+      { transform: `translate(${x + rand(-14, 14)}px,170px) scale(${sc}) rotate(${r}deg)`, opacity: 0 },
+    ], { duration: 1600, delay: i * 140, easing: 'ease-in', fill: 'backwards' }).onfinish = () => h.remove();
+  }
+}
+function popAbove(cx, n) {
+  const g = $('#fly');
+  for (let i = 0; i < n; i++) {
+    const h = heartEl('#FF375F'); g.appendChild(h);
+    const dx = (i - (n - 1) / 2) * 26;
+    h.animate([
+      { transform: `translate(${cx}px,230px) scale(0)`, opacity: 1 },
+      { transform: `translate(${cx + dx}px,196px) scale(1)`, opacity: 1, offset: .4 },
+      { transform: `translate(${cx + dx * 1.3}px,176px) scale(.9)`, opacity: 0 },
+    ], { duration: 1300, delay: i * 90, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'backwards' }).onfinish = () => h.remove();
+  }
+}
+function sendHeart(dir) {
+  const [from, to, lap, toX] = dir > 0 ? [pip, bun, 'lapR', 907] : [bun, pip, 'lapL', 93];
+  act(from, 'is-tap', 450); act(from, 'is-happy', 1700);
+  const g = $('#fly'), h = heartEl('#FF375F'); g.appendChild(h);
+  const t0 = performance.now() + 220, dur = 1150;
+  let frame = 0;
+  (function step(now) {
+    const p = Math.min(1, Math.max(0, (now - t0) / dur));
+    const e = p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2;
+    const pt = route.getPointAtLength((dir > 0 ? e : 1 - e) * routeLen);
+    const s = p === 0 ? 0 : 1.1 + Math.sin(p * Math.PI) * .5;
+    h.setAttribute('transform', `translate(${pt.x} ${pt.y}) rotate(${Math.sin(p * 12) * 12}) scale(${s})`);
+    if (p > 0 && p < 1 && frame++ % 3 === 0) {
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('r', rand(2, 4)); c.setAttribute('fill', Math.random() < .5 ? '#FF375F' : '#FFB3C2');
+      g.insertBefore(c, h);
+      c.animate([{ transform: `translate(${pt.x}px,${pt.y}px)`, opacity: .9 }, { transform: `translate(${pt.x + rand(-10, 10)}px,${pt.y + rand(6, 18)}px) scale(.2)`, opacity: 0 }], { duration: 700 }).onfinish = () => c.remove();
+    }
+    if (p < 1) return requestAnimationFrame(step);
+    h.remove();
+    $(`#${lap} .mini-notch`).animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18,1.5)' }, { transform: 'scale(1)' }], { duration: 500, easing: 'cubic-bezier(.3,1.6,.5,1)' });
+    pour(lap, 7);
+    act(to, 'is-jump', 800); act(to, 'is-love', 2000);
+    popAbove(toX, 3);
+  })(performance.now());
+}
+let dir = 1;
+scene.addEventListener('click', e => {
+  const x = e.clientX - scene.getBoundingClientRect().left;
+  sendHeart(x < scene.clientWidth / 2 ? 1 : -1);
+});
+if (!reduce) (function loop() { sendHeart(dir); dir = -dir; setTimeout(loop, 3600); })();
+
+/* ---------- counters (one shared start date) ---------- */
+const START = new Date(2022, 4, 21, 19, 30);
+function together(now = new Date()) {
+  const ms = now - START, days = Math.floor(ms / 864e5);
+  const firstSat = (6 - START.getDay() + 7) % 7;
+  return { days, hours: Math.floor(ms / 36e5), secs: Math.floor(ms / 1e3), weekends: days >= firstSat ? Math.floor((days - firstSat) / 7) + 1 : 0 };
+}
+function tick() {
+  const t = together(), now = new Date();
+  $('#sHours').textContent = fmt(t.hours); $('#sWeekends').textContent = fmt(t.weekends); $('#sSeconds').textContent = fmt(t.secs);
+  $('#clock').textContent = now.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+tick(); setInterval(tick, 1000);
+
+
+/* ---------- demo: scale the 860px desk to fit ---------- */
+const shell = $('#shell'), desk = $('#desk');
+new ResizeObserver(() => {
+  const s = Math.min(1, shell.clientWidth / 1000); // 860 desk + the two characters hanging off its sides
+  desk.style.transform = `translateX(-50%) scale(${s})`;
+  shell.style.height = 560 * s + 'px';
+}).observe(shell);
+
+$('#dPip').innerHTML = charSVG('pip'); $('#dBun').innerHTML = charSVG('bun');
+$('#selfie').innerHTML = charSVG('pip', 'is-happy', 'style="left:-6px"') + charSVG('bun', 'is-love', 'style="right:-8px"');
+const dPip = $('#dPip .char'), dBun = $('#dBun .char');
+$('#nAv').innerHTML = charSVG('bun', 'is-happy');
+function setMood(e) { const m = $('#nMood'); m.textContent = e; m.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.4)' }, { transform: 'scale(1)' }], { duration: 450, easing: 'cubic-bezier(.3,1.6,.5,1)' }); }
+function say(who, text, ms = 2600) {
+  const b = who === 'pip' ? $('#bPip') : $('#bBun');
+  b.textContent = text; act(b, 'show', ms);
+}
+function bunLoves(text) { act(dPip, 'is-tap', 450); act(dBun, 'is-jump', 800); act(dBun, 'is-love', 2200); if (text) say('bun', text, 2000); }
+
+/* hover-intent open/close, like the app */
+const notch = $('#notch');
+let openT, closeT, pendingBanner = null, bannerAnim = null;
+const isOpen = () => notch.classList.contains('open');
+function openNotch() { stopBanner(); notch.classList.add('open'); }
+function closeNotch() {
+  notch.classList.remove('open');
+  if (pendingBanner) { const b = pendingBanner; pendingBanner = null; setTimeout(() => showBanner(...b), 450); }
+}
+notch.addEventListener('pointerenter', e => { if (e.pointerType === 'touch') return; clearTimeout(closeT); openT = setTimeout(openNotch, 250); });
+notch.addEventListener('pointerleave', e => {
+  if (e.pointerType === 'touch') return; clearTimeout(openT);
+  closeT = setTimeout(() => { if (document.activeElement === noteIn && noteIn.value) return; closeNotch(); }, 350);
+});
+notch.addEventListener('click', () => { if (!isOpen()) openNotch(); });
+document.addEventListener('pointerdown', e => { if (isOpen() && !notch.contains(e.target)) closeNotch(); });
+setTimeout(() => { if (typeof touring === 'undefined' || !touring) say('pip', 'hover the notch! ↑', 3200); }, 800);
+
+$('#tabs').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  $$('.pane').forEach(p => p.classList.toggle('on', p.dataset.pane === b.dataset.tab));
+});
+function seg(el) { el.addEventListener('click', e => { const b = e.target.closest('button'); if (b) $$('button', el).forEach(x => x.classList.toggle('on', x === b)); }); }
+seg($('#scrollSeg')); seg($('#emojiSeg'));
+
+/* incoming note banner: scrolls right→left at 40 pt/s, 3 times */
+function showBanner(name, text, speed = 40, iterations = 3) {
+  if (isOpen()) { pendingBanner = [name, text]; return; }
+  const span = $('#bannerText');
+  span.innerHTML = `<b>${name}</b>&nbsp;&nbsp;${text}`;
+  notch.classList.add('banner');
+  const w = span.offsetWidth, strip = 234;
+  bannerAnim = span.animate([{ transform: `translateX(${strip}px)` }, { transform: `translateX(${-w}px)` }], { duration: (strip + w) / speed * 1000, iterations, delay: 300, fill: 'both' });
+  bannerAnim.onfinish = endBanner;
+}
+function endBanner() { notch.classList.remove('banner'); bannerAnim = null; }
+function stopBanner() { if (!bannerAnim) return; bannerAnim.onfinish = null; bannerAnim.finish(); endBanner(); }
+
+/* effects that come out of YOUR notch (when Bun sends something) */
+const fx = $('#fx');
+const fxHeart = () => `<svg viewBox="-11 -11 22 19" width="100%"><use href="#hrt"/></svg>`;
+function fxPour(make, n = 3) {
+  for (let i = 0; i < n; i++) {
+    const el = document.createElement('div'); el.innerHTML = make(i); fx.appendChild(el);
+    const size = rand(17, 25), x = fx.clientWidth / 2 + rand(-50, 50) - size / 2;
+    el.style.width = size + 'px'; el.style.fontSize = size + 'px';
+    const sway = rand(6, 8) * (i % 2 ? 1 : -1);
+    el.animate([
+      { transform: `translate(${x}px,20px) scale(.2)`, opacity: 0 },
+      { transform: `translate(${x + sway}px,60px) rotate(${sway}deg) scale(1)`, opacity: 1, offset: .3 },
+      { transform: `translate(${x - sway}px,${36 + 116}px) rotate(${-sway}deg)`, opacity: 0 },
+    ], { duration: 1500, delay: i * 250, easing: 'ease-out', fill: 'backwards' }).onfinish = () => el.remove();
+  }
+}
+function fxSplash(make) {
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div'); el.innerHTML = make(i); fx.appendChild(el);
+    const size = rand(14, 32), x = rand(20, fx.clientWidth - 40), h = fx.clientHeight;
+    el.style.width = size + 'px'; el.style.fontSize = size + 'px';
+    if (!/span/.test(make(i))) el.style.color = ['#FF375F', '#FFB3C2', '#fff'][i % 3];
+    el.animate([
+      { transform: `translate(${x}px,${h + 10}px)`, opacity: 0 },
+      { transform: `translate(${x + rand(-14, 14)}px,${h - 80}px) rotate(${rand(-15, 15)}deg)`, opacity: 1, offset: .2 },
+      { transform: `translate(${x + rand(-30, 30)}px,${h - 350}px) rotate(${rand(-20, 20)}deg)`, opacity: 0 },
+    ], { duration: 3000, delay: i * 80, easing: 'ease-out', fill: 'backwards' }).onfinish = () => el.remove();
+  }
+}
+fx.style.color = '#FF375F';
+const heartFill = i => `<svg viewBox="-11 -11 22 19" width="100%" style="fill:${['#FF375F', '#FFB3C2', '#fff'][i % 3]}"><use href="#hrt"/></svg>`;
+const replies = ['aww stop it 🥺 love you more', 'smiling at my desk rn', 'come home already', 'you are the cutest human'];
+$$('[data-recv]').forEach(b => b.addEventListener('click', () => {
+  act(dBun, 'is-tap', 450); act(dBun, 'is-happy', 1600);
+  setTimeout(() => {
+    act(dPip, 'is-jump', 800); act(dPip, 'is-love', 2000);
+    const k = b.dataset.recv;
+    if (k === 'heart') fxPour(() => fxHeart(), 3);
+    if (k === 'hearts') fxSplash(heartFill);
+    if (k === 'emoji') fxSplash(() => '<span>🥰</span>');
+    if (k === 'mood') setMood(['☕️', '🥺', '😴', '🍕', '🥰'][Math.floor(rand(0, 5))]);
+    if (k === 'note') { if (isOpen()) say('pip', 'close the notch to read it 👀'); showBanner('bun', replies[Math.floor(rand(0, replies.length))]); }
+  }, 250);
+}));
+
+/* Note tab: rules from Config.Message */
+const noteIn = $('#noteIn'), noteSend = $('#noteSend'), noteStatus = $('#noteStatus');
+function noteCheck() {
+  const v = noteIn.value.trim(), words = v ? v.split(/\s+/) : [];
+  const err = v.length > 60 ? 'A little shorter ♡' : words.length > 10 ? '10 words max ♡' : words.some(w => w.length > 15) ? 'One word is too long ♡' : '';
+  noteIn.classList.toggle('bad', !!err);
+  noteSend.disabled = !!err || !v;
+  noteStatus.className = err ? 'pk' : 'ter';
+  noteStatus.textContent = err || (v ? `${words.length} of 10 words` : 'Up to 10 words');
+}
+noteIn.addEventListener('input', noteCheck);
+noteIn.addEventListener('keydown', e => { if (e.key === 'Enter' && !noteSend.disabled) sendNote(); });
+noteSend.addEventListener('click', sendNote);
+function sendNote() {
+  noteIn.disabled = true; noteSend.disabled = true;
+  const st = (t, c) => { noteStatus.textContent = t; noteStatus.className = c; };
+  st('Sending…', 'sec');
+  setTimeout(() => st('Sent ♡', ''), 600);
+  setTimeout(() => { st('Delivered ♡', 'pk'); bunLoves('omg 🥹'); }, 1300);
+  setTimeout(() => {
+    noteIn.value = ''; noteIn.disabled = false; noteCheck();
+    say('bun', 'replied! move away from the notch 👀', 3000);
+    showBanner('bun', replies[Math.floor(rand(0, replies.length))]);
+    if (!notch.matches(':hover')) closeNotch();
+  }, 3300);
+}
+
+/* Emoji tab */
+const emojiStatus = $('#emojiStatus');
+let emojiT = [];
+$('#emojis').innerHTML = ['❤️', '🥰', '😘', '🫶', '🤗', '🌹'].map(e => `<button>${e}</button>`).join('');
+$('#emojis').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  $$('#emojis button').forEach(x => x.classList.toggle('last', x === b));
+  for (let i = 0; i < 3; i++) {
+    const s = document.createElement('span'); s.textContent = b.textContent;
+    s.style.cssText = 'position:absolute;left:50%;top:50%;font-size:16px;pointer-events:none;margin:-10px 0 0 -10px';
+    b.appendChild(s);
+    s.animate([{ transform: 'translate(0,0)', opacity: 1 }, { transform: `translate(${(i - 1) * 10}px,-40px)`, opacity: 0 }], { duration: 900, delay: i * 70, fill: 'backwards' }).onfinish = () => s.remove();
+  }
+  emojiT.forEach(clearTimeout);
+  emojiStatus.textContent = `Sent ${b.textContent}`; emojiStatus.className = 'st';
+  emojiT = [
+    setTimeout(() => { emojiStatus.textContent = `Delivered ${b.textContent}`; emojiStatus.className = 'st pk'; bunLoves(b.textContent + '!!'); }, 1200),
+    setTimeout(() => { emojiStatus.textContent = 'Tap to send'; emojiStatus.className = 'st ter'; b.classList.remove('last'); }, 4200),
+  ];
+});
+
+/* Mood tab: Config.moods */
+const moods = [['🥰', 'In love'], ['😊', 'Happy'], ['🥺', 'Missing you'], ['🎉', 'Excited'], ['☕️', 'On a break'], ['🍕', 'Hungry'], ['💻', 'Busy'], ['🎧', 'Focused'], ['🏃', 'Out'], ['😴', 'Sleepy'], ['😔', 'Low'], ['🤒', 'Unwell']];
+$('#moods').innerHTML = moods.map(([e, l]) => `<button><span>${e}</span>${l}</button>`).join('');
+$('#moods').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const on = !b.classList.contains('on');
+  $$('#moods button').forEach(x => x.classList.toggle('on', on && x === b));
+  const st = $('#moodStatus');
+  st.textContent = on ? `Now ${b.textContent.replace(/(\p{Extended_Pictographic}️?)/u, '$1 ')}` : 'Tap one to set';
+  st.className = on ? 'st' : 'st ter';
+  if (on) { act(dBun, 'is-happy', 1600); say('bun', `aw, ${b.lastChild.textContent.toLowerCase()}?`); }
+});
+
+/* Photo tab: your own photo, kept local */
+const photoIn = $('#photoIn');
+$('#pBtn').addEventListener('click', () => photoIn.click());
+photoIn.addEventListener('change', () => {
+  const f = photoIn.files[0]; if (!f) return;
+  const img = new Image(); img.src = URL.createObjectURL(f); sendPhoto(img);
+});
+const pTexts = ['pEye', 'pTitle', 'pBody', 'pBtn'].map(id => $('#' + id).textContent);
+function resetPhoto() {
+  $('#ptile').classList.remove('has'); $('#ptile .pic')?.remove(); $('#pBtn').classList.remove('bordered');
+  ['pEye', 'pTitle', 'pBody', 'pBtn'].forEach((id, i) => $('#' + id).textContent = pTexts[i]);
+}
+function sendPhoto(el) {
+  const tile = $('#ptile'); tile.classList.add('has');
+  tile.querySelector('.pic')?.remove(); el.classList.add('pic'); tile.prepend(el);
+  el.animate([{ transform: 'scale(.6)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 500, easing: 'cubic-bezier(.3,1.4,.5,1)' });
+  $('#pTitle').textContent = 'Last sent to bun'; $('#pBody').textContent = 'Shows on their Home until you send a new one ♡';
+  $('#pBtn').textContent = 'Send New Photo…'; $('#pBtn').classList.add('bordered');
+  $('#pEye').textContent = 'Just now · Sending…';
+  setTimeout(() => { $('#pEye').textContent = 'Just now · Delivered ♡'; bunLoves('on my home now 😭'); }, 1400);
+}
+
+
+/* ---------- a soft glow behind the hero pair ---------- */
+scene.insertAdjacentHTML('afterbegin', '<circle cx="93" cy="296" r="100" fill="url(#halo)"/><circle cx="907" cy="296" r="100" fill="url(#halo)"/>');
+
+/* ---------- a few stars, not a starfield ---------- */
+$('#sky').innerHTML = Array.from({ length: 16 }, (_, i) =>
+  `<i class="${i % 5 === 0 ? 'b' : i % 3 === 0 ? 'p' : ''}" style="left:${rand(2, 98).toFixed(1)}%;top:${rand(2, 96).toFixed(1)}%;animation-delay:-${rand(0, 4).toFixed(2)}s;animation-duration:${rand(3, 6).toFixed(1)}s"></i>`).join('');
+
+/* ---------- the pair, the perch, the sleepers ---------- */
+$('#twoPip').innerHTML = charSVG('pip', 'is-wave');
+$('#twoBun').innerHTML = charSVG('bun', 'is-wave-l');
+$('#perch').innerHTML = charSVG('pip', 'is-happy') + charSVG('bun', 'is-happy');
+$('#sleepers').insertAdjacentHTML('afterbegin', charSVG('pip', 'is-sleep s1') + charSVG('bun', 'is-sleep s2'));
+
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
+$$('.rv').forEach((el, i) => { el.style.transitionDelay = (i % 4) * 80 + 'ms'; io.observe(el); });
+</script>
+</body>
+</html>

@@ -249,6 +249,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = OurNotch;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_FILE = "OurNotch-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -275,6 +276,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = OurNotch;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_FILE = "OurNotch-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
