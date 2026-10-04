@@ -58,6 +58,14 @@ final class AppState {
     /// A ping or wake that arrived mid-check; it runs right after, so a fresh change isn't missed.
     @ObservationIgnored private var queuedSync: SyncSource?
     @ObservationIgnored private var hasFetchedPartner = false
+    /// Checks speed up while the notch is open and for a few minutes after sending or receiving.
+    @ObservationIgnored private var isNotchOpen = false
+    @ObservationIgnored private var lastActivity: Date?
+    @ObservationIgnored private var lastCheck = Date.distantPast
+
+    private var checkInterval: Duration {
+        CheckPace.interval(notchOpen: isNotchOpen, lastActivity: lastActivity, idle: mailbox.pollInterval)
+    }
 
     /// Returns nil until this identity has paired.
     init?(store: LocalStore, mailbox: Mailbox, photosRoot: URL = PhotoCache.defaultRoot, who: String = "me") {
@@ -89,18 +97,25 @@ final class AppState {
     }
 
     /// Starts checking the partner's row: right away (anything missed while the app was closed shows then),
-    /// whenever a ping or wake-up calls `syncNow`, and every `pollInterval` as a safety net.
+    /// whenever a ping or wake-up calls `syncNow`, and as a safety net every `checkInterval` since the last check.
+    /// Ticking each second (no network) means opening the notch or sending speeds up the very next check.
     func start() {
         guard syncTask == nil else { return }
-        note("started: paired with \(pairing.partnerName) as \(pairing.role.rawValue); checks every \(mailbox.pollInterval)")
+        note("started: paired with \(pairing.partnerName) as \(pairing.role.rawValue); checks every \(mailbox.pollInterval) when idle")
         syncTask = Task { [weak self] in
             guard let self else { return }
             await self.mailbox.watchPartner(self.pairing.partnerId)
-            var source = SyncSource.launch
+            await self.sync(.launch)
+            var interval = self.checkInterval
             while !Task.isCancelled {
-                await self.sync(source)
-                source = .poll
-                try? await Task.sleep(for: self.mailbox.pollInterval)
+                try? await Task.sleep(for: .seconds(1))
+                if self.checkInterval != interval {
+                    interval = self.checkInterval
+                    self.note("checks now every \(interval)\(interval == self.mailbox.pollInterval ? " (idle)" : " (active)")")
+                }
+                if Date.now.timeIntervalSince(self.lastCheck) >= Double(interval.components.seconds) {
+                    await self.sync(.poll)
+                }
             }
         }
     }
@@ -119,6 +134,7 @@ final class AppState {
 
     /// Counts the emoji locally right away; rapid taps are bundled into one save.
     func sendEmoji(_ char: String, mode: EmojiMode) {
+        lastActivity = .now
         myOutbox.emojisSent += 1
         myOutbox.lastEmoji = SentEmoji(char: char, mode: mode, sentAt: .now)
         store.myOutbox = myOutbox
@@ -136,6 +152,7 @@ final class AppState {
     @discardableResult
     func sendMessage(_ text: String, mode: BannerMode) -> Bool {
         guard case .valid(let clean) = MessageRules.check(text) else { return false }
+        lastActivity = .now
         myOutbox.message = Message(id: UUID(), text: clean, mode: mode, sentAt: .now)
         store.myOutbox = myOutbox
         note("tap: note (\(MessageRules.wordCount(clean)) words, \(mode.rawValue))")
@@ -146,6 +163,7 @@ final class AppState {
     /// Uploads the photo (encrypted) first, then points my outbox at it, so my partner never sees
     /// a photo id whose image isn't there yet. Returns false if the upload failed.
     func sendPhoto(_ jpeg: Data) async -> Bool {
+        lastActivity = .now
         note("tap: photo (\(jpeg.count / 1024) KB)")
         let started = Date.now
         do {
@@ -167,6 +185,7 @@ final class AppState {
 
     /// Sets (or clears, with nil) my mood and saves it right away.
     func setMood(_ emoji: String?) {
+        lastActivity = .now
         myOutbox.mood = emoji
         store.myOutbox = myOutbox
         note("tap: mood \(emoji ?? "cleared")")
@@ -182,7 +201,12 @@ final class AppState {
 
     /// Opening the notch dismisses an `untilOpened` banner; the message stays readable inside.
     func notchOpened() {
+        isNotchOpen = true
         if banner?.mode == .untilOpened { setBanner(nil) }
+    }
+
+    func notchClosed() {
+        isNotchOpen = false
     }
 
     private func setBanner(_ message: Message?) {
@@ -195,6 +219,7 @@ final class AppState {
     /// Reads the partner's row, shows anything new, and retries an outbox that didn't save.
     func sync(_ source: SyncSource = .poll) async {
         isSyncing = true
+        lastCheck = .now
         defer {
             isSyncing = false
             if let next = queuedSync {
@@ -253,6 +278,7 @@ final class AppState {
 
         // Quiet polls aren't measured: Debug checks every 3 s.
         if !found.isEmpty {
+            if source != .launch { lastActivity = .now } // what was waiting at launch isn't a conversation
             note("[\(source.rawValue)] found \(found.joined(separator: ", ")); fetch \(fetchTime)", metric: fetchMetric)
         } else if source != .poll {
             note("[\(source.rawValue)] no change found; fetch \(fetchTime)", metric: fetchMetric)
@@ -339,6 +365,15 @@ final class AppState {
     private static func ms(since date: Date) -> String {
         let seconds = Date.now.timeIntervalSince(date)
         return seconds < 10 ? "\(Int(seconds * 1000)) ms" : "\(Int(seconds)) s"
+    }
+}
+
+/// How often to check the partner's row, kept pure for tests.
+enum CheckPace {
+    /// Fast while the notch is open or soon after sending or receiving, when a reply is likely; otherwise `idle`.
+    static func interval(notchOpen: Bool, lastActivity: Date?, idle: Duration, now: Date = .now) -> Duration {
+        let recent = lastActivity.map { now.timeIntervalSince($0) < Config.Cloud.activeWindow } ?? false
+        return notchOpen || recent ? min(idle, Config.Cloud.activePollInterval) : idle
     }
 }
 

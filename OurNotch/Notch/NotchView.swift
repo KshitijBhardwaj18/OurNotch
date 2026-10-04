@@ -67,7 +67,7 @@ struct NotchView: View {
         .sensoryFeedback(.alignment, trigger: isOpen)
         .onChange(of: isOpen) { _, open in
             PerfMonitor.shared.track(open ? "notch open" : "notch close", seconds: 0.7)
-            if open { state.notchOpened() } else { showsSettings = false }
+            if open { state.notchOpened() } else { state.notchClosed(); showsSettings = false }
         }
         .onChange(of: tab) { _, tab in PerfMonitor.shared.track("\(tab) tab", seconds: 0.5) }
         .onChange(of: isEditing) { _, editing in

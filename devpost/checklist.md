@@ -88,7 +88,7 @@ Workflow (learner decision, `spec.md > Decisions and Open Issues`): each slice i
 
 ## Final Review
 
-- [ ] Lag between two Macs (two-Mac test, 17:30–17:40): pings rarely arrive (one at 17:23, none during the session), so delivery waits for the 60 s check — her → me 10–60 s, me → her 15–170 s (her Mac was likely still on an older build). Proposed, not yet agreed: adaptive checks — every 10 s while the notch is open or within ~3 min of sending/receiving, 60 s when idle (≈ 25 requests/s at 1,000 users with ~10 % active).
+- [ ] Lag between two Macs (two-Mac test, 17:30–17:40): pings rarely arrive (one at 17:23, none during the session), so delivery waits for the 60 s check — her → me 10–60 s, me → her 15–170 s (her Mac was likely still on an older build). Adaptive checks built (learner agreed): every 10 s while the notch is open or within 3 min of sending/receiving, 60 s when idle (≈ 25 requests/s at 1,000 users with ~10 % active). Confirm in the next two-Mac test via `metrics.csv` (`arrival` ms and its ping/poll source).
 - [ ] Collect the edge cases the learner and partner hit in the two-Mac test (not yet described) — ask: what happened, what was expected, which matters most.
 - [ ] Partner's Mac: install the newest `build/OurNotch.zip` (60 s checks + diagnostics + `[perf]` logging) so her log uploads; then ♡ → Save Diagnostics reads both logs.
 - [ ] Performance review from the next two-Mac test: `~/Library/Logs/OurNotch/metrics.csv` (both Macs' measurements from CloudKit, refreshed every 2 min: frames, hangs, arrival/delivered times, CloudKit request times, pings) plus `this-mac.log` / `partner-mac.log` for context.

@@ -21,10 +21,14 @@ enum Config {
         #if DEBUG
         static let pollInterval: Duration = .seconds(3)
         #else
-        // Pings deliver within seconds; this only catches a lost one. One request per check, so
-        // 1,000 users ≈ 17 requests/s — under half of CloudKit's ~40/s free starting allowance.
+        // Pings should deliver within seconds; this catches lost ones. One request per check.
         static let pollInterval: Duration = .seconds(60)
         #endif
+        /// Checks while the notch is open or within `activeWindow` of sending or receiving, because pings
+        /// often don't arrive. At 1,000 users with ~10 % active: 900/60 + 100/10 ≈ 25 requests/s,
+        /// under CloudKit's ~40/s free starting allowance.
+        static let activePollInterval: Duration = .seconds(10)
+        static let activeWindow: TimeInterval = 180
     }
 
     enum Diagnostics {
