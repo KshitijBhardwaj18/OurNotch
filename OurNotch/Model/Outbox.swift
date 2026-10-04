@@ -44,8 +44,8 @@ enum EmojiMode: String, Codable, CaseIterable {
 
     var label: String {
         switch self {
-        case .notch: "Out of the notch"
-        case .fullScreen: "Full screen"
+        case .notch: String(localized: "Out of the notch")
+        case .fullScreen: String(localized: "Full screen")
         }
     }
 
@@ -73,8 +73,8 @@ enum BannerMode: String, Codable, CaseIterable {
 
     var label: String {
         switch self {
-        case .three: "3 times"
-        case .untilOpened: "Until opened"
+        case .three: String(localized: "3 times")
+        case .untilOpened: String(localized: "Until opened")
         }
     }
 }
@@ -124,9 +124,9 @@ enum DeliveryStatus: Equatable {
     var label: String {
         switch self {
         case .none: ""
-        case .sending: "Sending…"
-        case .sent: "Sent ♡"
-        case .delivered: "Delivered ♡"
+        case .sending: String(localized: "Sending…")
+        case .sent: String(localized: "Sent ♡")
+        case .delivered: String(localized: "Delivered ♡")
         }
     }
 }

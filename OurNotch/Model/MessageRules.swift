@@ -16,10 +16,10 @@ enum MessageRules {
         if text.isEmpty { return .empty }
 
         let words = text.split(whereSeparator: \.isWhitespace)
-        if text.count > Config.Message.maxCharacters { return .invalid(hint: "A little shorter ♡") }
-        if words.count > Config.Message.maxWords { return .invalid(hint: "\(Config.Message.maxWords) words max ♡") }
+        if text.count > Config.Message.maxCharacters { return .invalid(hint: String(localized: "A little shorter ♡")) }
+        if words.count > Config.Message.maxWords { return .invalid(hint: String(localized: "\(Config.Message.maxWords) words max ♡")) }
         if words.contains(where: { $0.count > Config.Message.maxWordLength }) {
-            return .invalid(hint: "One word is too long ♡")
+            return .invalid(hint: String(localized: "One word is too long ♡"))
         }
         return .valid(text)
     }

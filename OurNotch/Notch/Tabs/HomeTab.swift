@@ -33,7 +33,13 @@ struct HomeTab: View {
                         .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
                 .overlay(alignment: .bottomLeading) {
-                    Text("from \(state.partnerName.lowercased())" + (state.partnerOutbox.photo.map { " · \(shortAgo($0.sentAt, now: now, suffix: false))" } ?? ""))
+                    Group {
+                        if let photo = state.partnerOutbox.photo {
+                            Text("from \(state.partnerName.lowercased()) · \(shortAgo(photo.sentAt, now: now, suffix: false))")
+                        } else {
+                            Text("from \(state.partnerName.lowercased())")
+                        }
+                    }
                         .font(.system(size: 11.5, weight: .medium))
                         .foregroundStyle(.white.opacity(0.9))
                         .padding(.horizontal, 12)
@@ -108,7 +114,7 @@ struct HomeTab: View {
     }
 
     /// A big centered number with its label underneath.
-    private func statTile(_ label: String, _ value: String, highlighted: Bool = false, withHeart: Bool = false) -> some View {
+    private func statTile(_ label: LocalizedStringKey, _ value: String, highlighted: Bool = false, withHeart: Bool = false) -> some View {
         VStack(spacing: 4) {
             Text(value)
                 .font(.system(size: 22, weight: .semibold).monospacedDigit())
@@ -125,6 +131,7 @@ struct HomeTab: View {
             .font(.system(size: 11, weight: .medium))
             .foregroundStyle(Color.secondaryLabel)
             .lineLimit(1)
+            .minimumScaleFactor(0.7) // "Wochenenden", "Week-ends"
         }
         .padding(.horizontal, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

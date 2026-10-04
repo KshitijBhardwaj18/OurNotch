@@ -34,10 +34,10 @@ enum LicenceError: LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .notFound: "That key doesn't look right. Check your receipt email and try again."
-        case .inUse: "This key is already in use on another Mac. Choose Remove from This Mac there, or write to us at \(Config.Licence.supportEmail)."
-        case .revoked: "This key is no longer active. Get a new one, or write to us at \(Config.Licence.supportEmail) if you think this is a mistake."
-        case .unreachable: "Can't reach the shop right now. Check your internet and try again."
+        case .notFound: String(localized: "That key doesn't look right. Check your receipt email and try again.")
+        case .inUse: String(localized: "This key is already in use on another Mac. Choose Remove from This Mac there, or write to us at \(Config.Licence.supportEmail).")
+        case .revoked: String(localized: "This key is no longer active. Get a new one, or write to us at \(Config.Licence.supportEmail) if you think this is a mistake.")
+        case .unreachable: String(localized: "Can't reach the shop right now. Check your internet and try again.")
         }
     }
 }
