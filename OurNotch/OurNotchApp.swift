@@ -1,5 +1,6 @@
 import CloudKit
 import os
+import Sparkle
 import SwiftUI
 
 @main
@@ -25,6 +26,9 @@ struct OurNotchApp: App {
             Button("Reset Everything (test)") { appDelegate.resetForTesting() }
             Divider()
             #endif
+            if appDelegate.updates.canCheck {
+                Button("Check for Updates…") { appDelegate.updates.check() }
+            }
             Button("Save Diagnostics") { appDelegate.saveDiagnostics() }
             Divider()
             Button("Quit OurNotch") { NSApp.terminate(nil) }
@@ -45,6 +49,7 @@ final class MenuState {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let menu = MenuState()
+    let updates = Updates()
     let effects = EmojiEffect()
     #if DEBUG
     let partnerSimulator = PartnerSimulator()
@@ -339,6 +344,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.terminate(nil)
     }
     #endif
+}
+
+/// Sparkle updates (`spec-m2.md > Packaging and Updates`): checks the feed daily and offers a new version.
+/// Off until the release key exists (slice 11 sets `SPARKLE_PUBLIC_KEY`), and in Debug builds.
+@MainActor
+final class Updates {
+    private let controller: SPUStandardUpdaterController?
+
+    init() {
+        let key = Bundle.main.object(forInfoDictionaryKey: "SUPublicEDKey") as? String ?? ""
+        #if DEBUG
+        let enabled = false
+        #else
+        let enabled = !key.isEmpty
+        #endif
+        controller = enabled ? SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil) : nil
+        Diagnostics.shared.record(enabled ? "updates: checking \(Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") as? String ?? "?")" : "updates: off (no release key yet, or a Debug build)")
+    }
+
+    var canCheck: Bool { controller != nil }
+    func check() { controller?.checkForUpdates(nil) }
 }
 
 extension NSWindow {
