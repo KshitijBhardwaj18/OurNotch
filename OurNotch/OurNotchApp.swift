@@ -40,6 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Unit tests run inside the app; they don't need a notch on screen.
         guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
         Diagnostics.shared.record(Self.launchSummary)
+        PerfMonitor.shared.startWatchdog()
 
         if !startNotch() { showOnboarding() }
         NotificationCenter.default.addObserver(
@@ -64,7 +65,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// CloudKit's silent ping: the partner's row changed.
     func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String: Any]) {
         let subscription = CKNotification(fromRemoteNotificationDictionary: userInfo)?.subscriptionID ?? "unknown"
-        Diagnostics.shared.record("ping received (subscription \(subscription))")
+        Diagnostics.shared.record("ping received (subscription \(subscription))", metric: Metric(kind: .ping, name: "ping", detail: subscription))
         syncEveryone(.ping)
     }
 
@@ -87,36 +88,55 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: Diagnostics
 
-    /// "OurNotch 0.1 (1) Release · macOS 26.6.2 · Mac16,12 · notch 179×32 · checks every 10 s"
+    /// "launched OurNotch · Mac16,12 · macOS 26.6.2 · 0.1 (1) Release · notch 179×32 · checks every 60 s"
     private static var launchSummary: String {
-        let info = Bundle.main.infoDictionary
-        let version = "\(info?["CFBundleShortVersionString"] ?? "?") (\(info?["CFBundleVersion"] ?? "?"))"
-        #if DEBUG
-        let build = "Debug"
-        #else
-        let build = "Release"
-        #endif
-        var size = 0
-        sysctlbyname("hw.model", nil, &size, nil, 0)
-        var model = [CChar](repeating: 0, count: size)
-        sysctlbyname("hw.model", &model, &size, nil, 0)
         let geometry = NotchGeometry.current()
         let screen = geometry.map { "\($0.hasNotch ? "notch" : "no notch, pill") \(Int($0.notchSize.width))×\(Int($0.notchSize.height))" } ?? "no screen"
-        return "launched OurNotch \(version) \(build) · macOS \(ProcessInfo.processInfo.operatingSystemVersionString) · \(String(cString: model)) · \(screen) · checks every \(Config.Cloud.pollInterval)"
+        return "launched OurNotch · \(Metric.device) · \(screen) · checks every \(Config.Cloud.pollInterval)"
     }
 
-    /// Downloads both Macs' logs into ~/Library/Logs/OurNotch/ and shows them in Finder.
+    /// Exports now and shows the folder in Finder.
     func saveDiagnostics() {
         Task {
-            let folder = FileManager.default.homeDirectoryForCurrentUser.appending(path: "Library/Logs/OurNotch")
-            try? FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-            try? Data(Diagnostics.shared.text.utf8).write(to: folder.appending(path: "this-mac.log"))
-            if let partnerId = state?.pairing.partnerId {
-                let partnerLog = (try? await mailbox.fetchDiagnostics(owner: partnerId)) ?? "(no log uploaded yet)"
-                try? Data(partnerLog.utf8).write(to: folder.appending(path: "partner-mac.log"))
-            }
-            NSWorkspace.shared.activateFileViewerSelecting([folder.appending(path: "this-mac.log")])
+            await exportDiagnostics()
+            NSWorkspace.shared.activateFileViewerSelecting([Diagnostics.folder.appending(path: "metrics.csv")])
         }
+    }
+
+    /// Re-exports every few minutes, so after a test session the files are already there.
+    private func startAutoExport() {
+        guard Config.Diagnostics.uploads else { return }
+        Task {
+            while true {
+                try? await Task.sleep(for: Config.Diagnostics.exportInterval)
+                await exportDiagnostics()
+            }
+        }
+    }
+
+    /// Writes into ~/Library/Logs/OurNotch/, next to this Mac's own log (written as it happens):
+    /// `partner-mac.log` (their latest lines) and `metrics.csv` (both Macs' measurements from CloudKit).
+    private func exportDiagnostics() async {
+        guard let pairing = state?.pairing else { return }
+        let folder = Diagnostics.folder
+        let partnerLog = (try? await mailbox.fetchDiagnostics(owner: pairing.partnerId)) ?? "(no log uploaded yet)"
+        try? Data(partnerLog.utf8).write(to: folder.appending(path: "partner-mac.log"))
+
+        var csv = "time,side,kind,name,ms,frames,dropped,detail,device\n"
+        do {
+            let mine = try await mailbox.fetchMetrics(owner: pairing.myId).map { ("me", $0) }
+            let theirs = try await mailbox.fetchMetrics(owner: pairing.partnerId).map { ("partner", $0) }
+            let time = ISO8601DateFormatter()
+            time.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            for (side, m) in (mine + theirs).sorted(by: { $0.1.at < $1.1.at }) {
+                let fields = [time.string(from: m.at), side, m.kind.rawValue, m.name, String(format: "%.0f", m.ms),
+                              m.frames.map(String.init) ?? "", m.dropped.map(String.init) ?? "", m.detail ?? "", m.device]
+                csv += fields.map { "\"" + $0.replacingOccurrences(of: "\"", with: "\"\"") + "\"" }.joined(separator: ",") + "\n"
+            }
+        } catch {
+            csv = "# export failed: \(error.diagnosticDescription) (is Metric.ownerId Queryable in CloudKit Console?)\n" + csv
+        }
+        try? Data(csv.utf8).write(to: folder.appending(path: "metrics.csv"))
     }
 
     /// Starts syncing and shows the notch. Returns false if this Mac isn't paired yet.
@@ -126,6 +146,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         state.onEmojisArrived = { [effects] count, emoji in effects.play(newCount: count, emoji: emoji) }
         state.start()
         Diagnostics.shared.startUploading(owner: state.pairing.myId, mailbox: mailbox)
+        startAutoExport()
         self.state = state
         placeNotch()
         return true

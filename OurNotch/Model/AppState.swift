@@ -82,8 +82,10 @@ final class AppState {
         }
     }
 
-    private func note(_ message: String) {
-        Diagnostics.shared.record(message, who: who)
+    private func note(_ message: String, metric: Metric? = nil) {
+        var metric = metric
+        metric?.owner = pairing.myId
+        Diagnostics.shared.record(message, who: who, metric: metric)
     }
 
     /// Starts checking the partner's row: right away (anything missed while the app was closed shows then),
@@ -118,7 +120,7 @@ final class AppState {
     /// Counts the emoji locally right away; rapid taps are bundled into one save.
     func sendEmoji(_ char: String, mode: EmojiMode) {
         myOutbox.emojisSent += 1
-        myOutbox.lastEmoji = SentEmoji(char: char, mode: mode)
+        myOutbox.lastEmoji = SentEmoji(char: char, mode: mode, sentAt: .now)
         store.myOutbox = myOutbox
         note("tap: emoji #\(myOutbox.emojisSent) \(char) (\(mode.rawValue))")
         saveTask?.cancel()
@@ -150,10 +152,12 @@ final class AppState {
             try await mailbox.savePhoto(Crypto.seal(jpeg, with: key), owner: pairing.myId)
             try photos.save(jpeg, .mine)
         } catch {
-            note("photo upload FAILED: \(error.diagnosticDescription)")
+            note("photo upload FAILED: \(error.diagnosticDescription)",
+                 metric: Metric(kind: .cloud, name: "photo upload", ms: Metric.ms(since: started), detail: "FAILED \(error.diagnosticDescription)"))
             return false
         }
-        note("photo uploaded in \(Self.ms(since: started))")
+        note("photo uploaded in \(Self.ms(since: started))",
+             metric: Metric(kind: .cloud, name: "photo upload", ms: Metric.ms(since: started), detail: "\(jpeg.count / 1024) KB"))
         myPhoto = NSImage(data: jpeg)
         myOutbox.photo = SentPhoto(id: UUID(), sentAt: .now)
         store.myOutbox = myOutbox
@@ -209,13 +213,15 @@ final class AppState {
             }
             partner = try JSONDecoder().decode(Outbox.self, from: Crypto.open(sealed, with: key))
         } catch {
-            note("[\(source.rawValue)] fetch FAILED: \(error.diagnosticDescription)")
+            note("[\(source.rawValue)] fetch FAILED: \(error.diagnosticDescription)",
+                 metric: Metric(kind: .cloud, name: "fetch", ms: Metric.ms(since: started), detail: "\(source.rawValue) FAILED \(error.diagnosticDescription)"))
             return
         }
         let fetchTime = Self.ms(since: started)
+        let fetchMetric = Metric(kind: .cloud, name: "fetch", ms: Metric.ms(since: started), detail: source.rawValue)
         let previous = partnerOutbox
         partnerOutbox = partner
-        if hasFetchedPartner { logReceipts(old: previous, new: partner) }
+        if hasFetchedPartner { logReceipts(old: previous, new: partner, source: source) }
         hasFetchedPartner = true
         if pairing.role == .joiner, let date = partner.togetherSince, date != togetherSince {
             togetherSince = date
@@ -229,22 +235,27 @@ final class AppState {
         if newEmojis > 0, let emoji = partner.lastEmoji {
             myOutbox.seenEmojis = partner.emojisSent
             onEmojisArrived?(newEmojis, emoji)
-            found.append("\(newEmojis) emoji \(emoji.char) (\(emoji.mode.rawValue))")
+            let age = emoji.sentAt.map { ", sent \(Self.ms(since: $0)) ago" } ?? ""
+            found.append("\(newEmojis) emoji \(emoji.char) (\(emoji.mode.rawValue)\(age))")
+            if let sentAt = emoji.sentAt { arrived("emoji", sentAt: sentAt, source: source) }
         }
         if let message = partner.message, message.id != myOutbox.seenMessageId {
             myOutbox.seenMessageId = message.id
             setBanner(message)
             found.append("note (\(message.mode.rawValue), sent \(Self.ms(since: message.sentAt)) ago)")
+            arrived("note", sentAt: message.sentAt, source: source)
         }
         if let photo = partner.photo, photo.id != myOutbox.seenPhotoId, await downloadPartnerPhoto() {
             myOutbox.seenPhotoId = photo.id
             found.append("photo (sent \(Self.ms(since: photo.sentAt)) ago)")
+            arrived("photo", sentAt: photo.sentAt, source: source)
         }
 
+        // Quiet polls aren't measured: Debug checks every 3 s.
         if !found.isEmpty {
-            note("[\(source.rawValue)] found \(found.joined(separator: ", ")); fetch \(fetchTime)")
+            note("[\(source.rawValue)] found \(found.joined(separator: ", ")); fetch \(fetchTime)", metric: fetchMetric)
         } else if source != .poll {
-            note("[\(source.rawValue)] no change found; fetch \(fetchTime)")
+            note("[\(source.rawValue)] no change found; fetch \(fetchTime)", metric: fetchMetric)
         }
         let seenSomethingNew = myOutbox.seenEmojis != savedOutbox.seenEmojis
             || myOutbox.seenMessageId != savedOutbox.seenMessageId
@@ -254,14 +265,26 @@ final class AppState {
         await save() // tells the partner "delivered"
     }
 
+    /// The partner's tap → shown on this Mac.
+    /// Only a metric: the "found" line already says it in words.
+    private func arrived(_ name: String, sentAt: Date, source: SyncSource) {
+        Diagnostics.shared.measure(Metric(owner: pairing.myId, kind: .arrival, name: name, ms: Metric.ms(since: sentAt), detail: source.rawValue))
+    }
+
     /// Logs when my partner's Mac has shown what I sent: the "Delivered" moments.
-    private func logReceipts(old: Outbox, new: Outbox) {
-        if new.seenEmojis > old.seenEmojis { note("delivered: partner showed emojis up to #\(new.seenEmojis)") }
-        if new.seenMessageId != old.seenMessageId, new.seenMessageId == myOutbox.message?.id {
-            note("delivered: partner showed my note (sent \(Self.ms(since: myOutbox.message?.sentAt ?? .now)) ago)")
+    private func logReceipts(old: Outbox, new: Outbox, source: SyncSource) {
+        if new.seenEmojis > old.seenEmojis {
+            let sentAt = new.seenEmojis == myOutbox.emojisSent ? myOutbox.lastEmoji?.sentAt : nil
+            note("delivered: partner showed emojis up to #\(new.seenEmojis)\(sentAt.map { " (last sent \(Self.ms(since: $0)) ago)" } ?? "")",
+                 metric: sentAt.map { Metric(kind: .delivered, name: "emoji", ms: Metric.ms(since: $0), detail: source.rawValue) })
         }
-        if new.seenPhotoId != old.seenPhotoId, new.seenPhotoId == myOutbox.photo?.id {
-            note("delivered: partner downloaded my photo (sent \(Self.ms(since: myOutbox.photo?.sentAt ?? .now)) ago)")
+        if new.seenMessageId != old.seenMessageId, let sent = myOutbox.message, new.seenMessageId == sent.id {
+            note("delivered: partner showed my note (sent \(Self.ms(since: sent.sentAt)) ago)",
+                 metric: Metric(kind: .delivered, name: "note", ms: Metric.ms(since: sent.sentAt), detail: source.rawValue))
+        }
+        if new.seenPhotoId != old.seenPhotoId, let sent = myOutbox.photo, new.seenPhotoId == sent.id {
+            note("delivered: partner downloaded my photo (sent \(Self.ms(since: sent.sentAt)) ago)",
+                 metric: Metric(kind: .delivered, name: "photo", ms: Metric.ms(since: sent.sentAt), detail: source.rawValue))
         }
     }
 
@@ -272,10 +295,12 @@ final class AppState {
             let jpeg = try Crypto.open(sealed, with: key)
             try photos.save(jpeg, .partner)
             partnerPhoto = NSImage(data: jpeg)
-            note("photo downloaded (\(jpeg.count / 1024) KB) in \(Self.ms(since: started))")
+            note("photo downloaded (\(jpeg.count / 1024) KB) in \(Self.ms(since: started))",
+                 metric: Metric(kind: .cloud, name: "photo download", ms: Metric.ms(since: started), detail: "\(jpeg.count / 1024) KB"))
             return true
         } catch {
-            note("photo download FAILED: \(error.diagnosticDescription)")
+            note("photo download FAILED: \(error.diagnosticDescription)",
+                 metric: Metric(kind: .cloud, name: "photo download", ms: Metric.ms(since: started), detail: "FAILED \(error.diagnosticDescription)"))
             return false
         }
     }
@@ -289,9 +314,11 @@ final class AppState {
             try await mailbox.saveOutbox(sealed, owner: pairing.myId)
             savedOutbox = snapshot
             store.savedOutbox = snapshot
-            note("saved outbox (\(changes)) in \(Self.ms(since: started))")
+            note("saved outbox (\(changes)) in \(Self.ms(since: started))",
+                 metric: Metric(kind: .cloud, name: "save", ms: Metric.ms(since: started), detail: changes))
         } catch {
-            note("save FAILED (\(changes)), will retry: \(error.diagnosticDescription)")
+            note("save FAILED (\(changes)), will retry: \(error.diagnosticDescription)",
+                 metric: Metric(kind: .cloud, name: "save", ms: Metric.ms(since: started), detail: "FAILED \(error.diagnosticDescription)"))
         }
     }
 

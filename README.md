@@ -20,6 +20,8 @@ xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/D
 open build/DerivedData/Build/Products/Debug/OurNotch.app
 ```
 
+Performance and delivery logs: every event is appended to `~/Library/Logs/OurNotch/this-mac.log` as it happens (no note text, photos or keys). Lines tagged `[perf]` give each animation's dropped frames (notch open/close, tabs, pour, splash, banner) and any main-thread hang of 250 ms or more; `sent … ago` gives delivery time. Both Macs also save every measurement (animation frames, hangs, delivery delay on each side, CloudKit request times, pings) as `Metric` records in CloudKit; every 2 minutes the app downloads both sides into `metrics.csv` and the partner's latest log lines into `partner-mac.log` (♡ → *Save Diagnostics* does it now). Before shipping to Production, deploy the `Metric` schema with `ownerId` Queryable, or turn `Config.Diagnostics.uploads` off.
+
 Tests: `xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/DerivedData test`
 
 ## Project layout

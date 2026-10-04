@@ -30,6 +30,8 @@ struct SentPhoto: Codable, Equatable {
 struct SentEmoji: Codable, Equatable {
     let char: String
     let mode: EmojiMode
+    /// When it was tapped, so the log can show how long delivery took. Nil from older builds.
+    var sentAt: Date?
 }
 
 /// Where an emoji appears on the partner's screen. The sender chooses.

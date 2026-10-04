@@ -24,6 +24,7 @@ final class EmojiEffect {
     func pour(_ char: String) {
         let pour = Pour(floaters: Floater.pour(char))
         pours.append(pour)
+        PerfMonitor.shared.track("pour \(char)", seconds: Floater.longestPour)
         Task {
             try? await Task.sleep(for: .seconds(Floater.longestPour))
             pours.removeAll { $0.id == pour.id }
@@ -47,6 +48,7 @@ final class EmojiEffect {
         window.contentView = NSHostingView(rootView: SplashView(floaters: Floater.splash(char, in: screen.size)))
         window.orderFrontRegardless()
         splashWindow = window
+        PerfMonitor.shared.track("splash \(char)", seconds: Floater.longestSplash)
 
         Task {
             try? await Task.sleep(for: .seconds(Floater.longestSplash))
