@@ -29,6 +29,9 @@ protocol Mailbox: Sendable {
     /// The owner's latest diagnostics log (plain text, no message content). One per owner.
     func saveDiagnostics(_ text: String, owner: String) async throws
     func fetchDiagnostics(owner: String) async throws -> String?
+    /// Measurements for analysis; each is kept, never overwritten.
+    func saveMetrics(_ metrics: [Metric]) async throws
+    func fetchMetrics(owner: String) async throws -> [Metric]
 
     /// Whether the mailbox can be used right now (CloudKit needs an iCloud sign-in).
     func accountAvailable() async -> Bool
@@ -73,6 +76,17 @@ struct LocalFileMailbox: Mailbox {
 
     func fetchDiagnostics(owner: String) async throws -> String? {
         try read(name: "diag-\(owner)", ext: "log").map { String(decoding: $0, as: UTF8.self) }
+    }
+
+    func saveMetrics(_ metrics: [Metric]) async throws {
+        for (owner, new) in Dictionary(grouping: metrics, by: \.owner) {
+            let all = try await fetchMetrics(owner: owner) + new
+            try write(try JSONEncoder().encode(all), name: "metrics-\(owner)")
+        }
+    }
+
+    func fetchMetrics(owner: String) async throws -> [Metric] {
+        try decode(name: "metrics-\(owner)") ?? []
     }
 
     func createInvite(_ invite: Invite, code: String) async throws {

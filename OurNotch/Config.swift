@@ -30,8 +30,13 @@ enum Config {
     enum Diagnostics {
         /// Upload this Mac's event log to CloudKit so both partners' logs can be read from either Mac.
         static let uploads = true
-        static let maxLines = 400
+        /// Lines kept in memory and uploaded (~150 KB; a CloudKit record holds 1 MB).
+        static let maxLines = 1000
+        /// The on-disk log starts fresh past this size, keeping one previous file.
+        static let maxFileBytes = 5_000_000
         static let uploadInterval: Duration = .seconds(15)
+        /// How often both Macs' logs and metrics are downloaded into ~/Library/Logs/OurNotch/.
+        static let exportInterval: Duration = .seconds(120)
     }
 
     enum Pairing {

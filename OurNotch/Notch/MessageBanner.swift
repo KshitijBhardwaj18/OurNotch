@@ -22,8 +22,10 @@ struct MessageBanner: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .task(id: textWidth) {
-                guard message.mode == .three, textWidth > 0 else { return }
+                guard textWidth > 0 else { return }
                 let onePass = (strip.size.width + textWidth) / Config.Message.bannerSpeed
+                PerfMonitor.shared.track("banner scroll", seconds: onePass)
+                guard message.mode == .three else { return }
                 let remaining = onePass * 3 - Date.now.timeIntervalSince(start)
                 try? await Task.sleep(for: .seconds(max(0, remaining)))
                 if !Task.isCancelled { onFinished() }

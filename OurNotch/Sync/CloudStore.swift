@@ -11,6 +11,7 @@ import CloudKit
 /// | `Outbox`    | `outbox-<userId>` | ownerId (queryable), payload           |
 /// | `Photo`     | `photo-<userId>`  | ownerId, image (asset)                 |
 /// | `Diagnostics` | `diag-<userId>` | ownerId, text (event log, no content)  |
+/// | `Metric`    | random            | ownerId (queryable), measuredAt, kind, name, ms, frames, dropped, detail, device |
 struct CloudStore: Mailbox {
     let pollInterval: Duration
     private let container: CKContainer
@@ -68,6 +69,47 @@ struct CloudStore: Mailbox {
 
     func fetchDiagnostics(owner: String) async throws -> String? {
         try await fetch("diag-\(owner)")?["text"] as? String
+    }
+
+    /// Many records in one request (at most 400).
+    func saveMetrics(_ metrics: [Metric]) async throws {
+        let records = metrics.map { metric in
+            let record = CKRecord(recordType: "Metric")
+            record["ownerId"] = metric.owner
+            record["measuredAt"] = metric.at
+            record["kind"] = metric.kind.rawValue
+            record["name"] = metric.name
+            record["ms"] = metric.ms
+            record["frames"] = metric.frames
+            record["dropped"] = metric.dropped
+            record["detail"] = metric.detail
+            record["device"] = metric.device
+            return record
+        }
+        try await retrying {
+            let (saved, _) = try await database.modifyRecords(saving: records, deleting: [], atomically: false)
+            for result in saved.values { _ = try result.get() }
+        }
+    }
+
+    /// Needs `Metric.ownerId` marked Queryable in CloudKit Console.
+    func fetchMetrics(owner: String) async throws -> [Metric] {
+        let query = CKQuery(recordType: "Metric", predicate: NSPredicate(format: "ownerId == %@", owner))
+        var (results, cursor) = try await database.records(matching: query)
+        var metrics = results.compactMap { try? $0.1.get() }.compactMap(Self.metric)
+        while let next = cursor {
+            (results, cursor) = try await database.records(continuingMatchFrom: next)
+            metrics += results.compactMap { try? $0.1.get() }.compactMap(Self.metric)
+        }
+        return metrics.sorted { $0.at < $1.at }
+    }
+
+    private static func metric(_ record: CKRecord) -> Metric? {
+        guard let kind = (record["kind"] as? String).flatMap(Metric.Kind.init), let name = record["name"] as? String else { return nil }
+        return Metric(at: record["measuredAt"] as? Date ?? .distantPast, owner: record["ownerId"] as? String ?? "",
+                      kind: kind, name: name, ms: record["ms"] as? Double ?? 0,
+                      frames: record["frames"] as? Int, dropped: record["dropped"] as? Int,
+                      detail: record["detail"] as? String, device: record["device"] as? String ?? "")
     }
 
     // MARK: Pairing

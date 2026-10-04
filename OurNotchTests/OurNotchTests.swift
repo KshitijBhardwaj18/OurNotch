@@ -217,7 +217,7 @@ struct PartnersTests {
         await partner.sync()
         #expect(arrived == 3)
         await you.sync()
-        #expect(latest == SentEmoji(char: "🌹", mode: .notch))
+        #expect(latest?.char == "🌹" && latest?.mode == .notch && latest?.sentAt != nil)
         #expect(you.emojiStatus == .delivered)
     }
 
@@ -292,5 +292,28 @@ struct MoodTests {
         try await Task.sleep(for: .milliseconds(100))
         await partner.sync()
         #expect(partner.partnerOutbox.mood == nil)
+    }
+}
+
+@MainActor
+struct MetricsTests {
+    @Test func deliveryIsMeasuredOnBothSidesAndStored() async throws {
+        let people = TwoPartners()
+        let (you, partner) = try await people.paired()
+        partner.setMood("😊") // gives the partner an outbox, so receipts are tracked from your first fetch
+        try await Task.sleep(for: .milliseconds(200))
+        await you.sync()
+        you.sendMessage("hi", mode: .three)
+        try await Task.sleep(for: .milliseconds(200))
+        await partner.sync()
+        await you.sync()
+
+        let queued = Diagnostics.shared.pendingMetrics
+        #expect(queued.contains { $0.owner == partner.pairing.myId && $0.kind == .arrival && $0.name == "note" })
+        #expect(queued.contains { $0.owner == you.pairing.myId && $0.kind == .delivered && $0.name == "note" })
+
+        let mine = queued.filter { $0.owner == you.pairing.myId }
+        try await people.mailbox.saveMetrics(mine)
+        #expect(try await people.mailbox.fetchMetrics(owner: you.pairing.myId) == mine)
     }
 }
