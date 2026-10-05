@@ -8,7 +8,7 @@ struct OurNotchApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
 
     var body: some Scene {
-        MenuBarExtra("OurNotch", systemImage: "heart") {
+        MenuBarExtra("OurNotch", systemImage: "heart.fill") {
             if appDelegate.menu.isPaired {
                 if appDelegate.menu.isHidden {
                     Button("Show OurNotch") { appDelegate.state?.show() }

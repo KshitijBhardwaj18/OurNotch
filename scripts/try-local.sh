@@ -19,6 +19,7 @@ fi
 echo "▸ Building OurNotch (Debug)"
 xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/DerivedData -allowProvisioningUpdates -quiet build
 
+pkill -f "Debug/OurNotch.app/Contents/MacOS/OurNotch" && sleep 1 || true   # an older test copy (never your real one)
 echo "▸ Opening OurNotch as profile \"$PROFILE\""
 open -n --env OURNOTCH_PROFILE="$PROFILE" build/DerivedData/Build/Products/Debug/OurNotch.app
 echo "✓ Website: http://localhost:3000   ·   Partner Simulator: ♡ menu → Partner Simulator…"
