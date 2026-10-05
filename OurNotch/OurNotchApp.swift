@@ -56,14 +56,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     #endif
     static let keychainService = "OurNotch"
     private let store: LocalStore = {
-        #if DEBUG
-        // `OURNOTCH_PROFILE=<name>` runs a separate, fresh identity next to the real one, so fresh-install
-        // checks don't touch your pairing. (Display settings like the emoji mode stay shared.)
-        if let profile = ProcessInfo.processInfo.environment["OURNOTCH_PROFILE"] {
-            let name = "OurNotch.profile.\(profile)"
+        if let name = Profile.storageName {
             return LocalStore(defaults: UserDefaults(suiteName: name)!, keychainService: name)
         }
-        #endif
         return LocalStore(defaults: .standard, keychainService: AppDelegate.keychainService)
     }()
     private let mailbox = CloudStore()
@@ -333,14 +328,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     #if DEBUG
     /// Forgets both identities (settings, keys, cached photos), then quits, so the next launch is a fresh
     /// install. Old records stay in CloudKit; new identities never read them.
+    /// Under `OURNOTCH_PROFILE` it forgets only that profile, never your real pairing.
     func resetForTesting() {
-        if let bundleId = Bundle.main.bundleIdentifier {
-            UserDefaults.standard.removePersistentDomain(forName: bundleId)
+        if let name = Profile.storageName {
+            UserDefaults.standard.removePersistentDomain(forName: name)
+            Keychain.delete(service: name)
+        } else {
+            if let bundleId = Bundle.main.bundleIdentifier {
+                UserDefaults.standard.removePersistentDomain(forName: bundleId)
+            }
+            Keychain.delete(service: AppDelegate.keychainService)
+            try? FileManager.default.removeItem(at: PhotoCache.defaultRoot) // per-person folders; a profile's are left
         }
         UserDefaults.standard.removePersistentDomain(forName: PartnerSimulator.suiteName)
-        Keychain.delete(service: AppDelegate.keychainService)
         Keychain.delete(service: PartnerSimulator.suiteName)
-        try? FileManager.default.removeItem(at: PhotoCache.defaultRoot)
         NSApp.terminate(nil)
     }
     #endif
@@ -365,6 +366,19 @@ final class Updates {
 
     var canCheck: Bool { controller != nil }
     func check() { controller?.checkForUpdates(nil) }
+}
+
+/// `OURNOTCH_PROFILE=<name>` (Debug builds) runs a separate, fresh identity next to the real one, with its own
+/// Partner Simulator, so testing never touches your real pairing. Display settings (emoji mode, photo style,
+/// language) stay shared with the real app.
+enum Profile {
+    #if DEBUG
+    static let name = ProcessInfo.processInfo.environment["OURNOTCH_PROFILE"]
+    #else
+    static let name: String? = nil
+    #endif
+    /// Where this profile's settings and keys live; nil for the real identity.
+    static var storageName: String? { name.map { "OurNotch.profile.\($0)" } }
 }
 
 extension NSWindow {

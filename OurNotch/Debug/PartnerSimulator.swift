@@ -5,7 +5,7 @@ import SwiftUI
 /// It is a separate person: its own id, keys, and storage, talking through the same mailbox as the notch.
 @MainActor
 final class PartnerSimulator {
-    static let suiteName = "OurNotch.PartnerSimulator"
+    static let suiteName = "OurNotch.PartnerSimulator" + (Profile.name.map { ".\($0)" } ?? "")
 
     private let model = SimulatorModel(store: LocalStore(defaults: UserDefaults(suiteName: suiteName)!, keychainService: suiteName),
                                        mailbox: CloudStore())
