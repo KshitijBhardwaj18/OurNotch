@@ -68,6 +68,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var onboardingWindow: NSWindow?
     private var onboarding: OnboardingModel?
     private var licenceWindow: NSWindow?
+    private var lastLicenceCheck = Date.distantPast
     private var isLocked: Bool { store.licence?.isLocked == true }
     /// The notch shows unless the licence is locked or OurNotch is hidden for a while.
     private var notchVisible: Bool { !isLocked && state?.isHidden != true }
@@ -202,6 +203,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         state.onLicenceChanged = { [weak self] in self?.checkLicence() }
         state.onHiddenChanged = { [weak self] in self?.updateNotchVisibility() }
+        state.onOpened = { [weak self] in
+            guard let self, Date.now.timeIntervalSince(self.lastLicenceCheck) > Config.Licence.openCheckGap else { return }
+            self.checkLicence()
+        }
         state.start()
         Diagnostics.shared.startUploading(owner: state.pairing.myId, mailbox: mailbox)
         startAutoExport()
@@ -216,7 +221,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // MARK: Licence
 
-    /// On launch and then daily (`Config.Licence.checkInterval`); wake and a newly received key check too.
+    /// On launch and then hourly (`Config.Licence.checkInterval`); waking, opening the notch and a newly received
+    /// key check too.
     private func startLicenceChecks() {
         Task {
             while true {
@@ -232,6 +238,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func runLicenceCheck() async {
         guard state != nil else { return }
+        lastLicenceCheck = .now
         await LicenceService(store: store).check()
         Diagnostics.shared.record("licence check: \(store.licence?.status.rawValue ?? "none")")
         applyLicence()

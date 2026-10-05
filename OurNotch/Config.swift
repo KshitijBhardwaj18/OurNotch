@@ -65,8 +65,20 @@ enum Config {
         static let priceLabel = "$4.50"
         /// Dodo's customer portal: the buyer enters their purchase email and sees their key.
         static let portalURL = URL(string: "https://test.customer.dodopayments.com/login/bus_0Np1laPQgg48PHzDsmzgI")!
-        /// How often each Mac asks Dodo "still valid?" (also on launch and wake). Revocation lands within a day.
-        static let checkInterval: Duration = .seconds(24 * 60 * 60)
+        /// How often each Mac asks Dodo "still valid?" (also on launch, wake, and opening the notch), so a revoke
+        /// lands within the hour. One small request per Mac per hour; Dodo's validate call is free.
+        static let checkInterval: Duration = .seconds(60 * 60)
+        /// Opening the notch checks too, at most this often.
+        #if DEBUG
+        static let openCheckGap: TimeInterval = 10
+        #else
+        static let openCheckGap: TimeInterval = 5 * 60
+        #endif
+        /// The terms (why a licence can be revoked), in the app's language.
+        static var termsURL: URL {
+            let lang = Bundle.main.preferredLocalizations.first ?? "en"
+            return URL(string: "\(website)\(["fr", "de"].contains(lang) ? "/\(lang)" : "")/terms")!
+        }
         /// Placeholder until the learner picks the support address.
         static let supportEmail = "hello@ournotch.app"
     }

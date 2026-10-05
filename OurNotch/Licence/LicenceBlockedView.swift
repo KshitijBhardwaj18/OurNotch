@@ -31,6 +31,8 @@ final class LicenceBlockedModel {
 
     func getOurNotch() { NSWorkspace.shared.open(Config.Licence.checkoutURL) }
 
+    func readTerms() { NSWorkspace.shared.open(Config.Licence.termsURL) }
+
     func writeToUs() {
         var mail = URLComponents()
         mail.scheme = "mailto"
@@ -65,10 +67,10 @@ struct LicenceBlockedView: View {
     var body: some View {
         VStack(spacing: 0) {
             Screen(symbol: model.status == .removed ? "laptopcomputer" : "key",
-                   title: model.status == .removed ? "OurNotch was removed from this Mac" : "Your licence is no longer active",
+                   title: model.status == .removed ? "OurNotch was removed from this Mac" : "Your licence was revoked",
                    message: model.status == .removed
                        ? "Paste your licence key to use OurNotch here again."
-                       : "Get a new one, or write to us at \(Config.Licence.supportEmail) if you think this is a mistake.") {
+                       : "This happens when a purchase is refunded, or when a licence is misused — shared publicly or used with a modified copy — as our terms explain. If you think this is a mistake, write to us at \(Config.Licence.supportEmail).") {
                 TextField("Licence key", text: $model.typedKey)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 13, design: .monospaced))
@@ -89,6 +91,7 @@ struct LicenceBlockedView: View {
             HStack {
                 if model.status == .revoked {
                     Button("Check Again", action: model.checkAgain).buttonStyle(.link).disabled(model.isWorking)
+                    Button("Read Our Terms", action: model.readTerms).buttonStyle(.link).padding(.leading, 12)
                 }
                 Spacer()
                 if model.isWorking { ProgressView().controlSize(.small) }

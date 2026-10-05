@@ -36,7 +36,7 @@ enum LicenceError: LocalizedError, Equatable {
         switch self {
         case .notFound: String(localized: "That key doesn't look right. Check your receipt email and try again.")
         case .inUse: String(localized: "This key is already in use on another Mac. Choose Remove from This Mac there, or write to us at \(Config.Licence.supportEmail).")
-        case .revoked: String(localized: "This key is no longer active. Get a new one, or write to us at \(Config.Licence.supportEmail) if you think this is a mistake.")
+        case .revoked: String(localized: "This key was revoked: the purchase was refunded, or the licence was misused, as our terms explain. Get a new one, or write to us at \(Config.Licence.supportEmail) if you think this is a mistake.")
         case .unreachable: String(localized: "Can't reach the shop right now. Check your internet and try again.")
         }
     }

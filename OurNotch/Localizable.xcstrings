@@ -378,6 +378,22 @@
         }
       }
     },
+    "Check for Updates…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher les mises à jour…"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Updates suchen …"
+          }
+        }
+      }
+    },
     "Choose Photo…" : {
       "localizations" : {
         "fr" : {
@@ -726,22 +742,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Los geht’s"
-          }
-        }
-      }
-    },
-    "Get a new one, or write to us at %@ if you think this is a mistake." : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Achètes-en une nouvelle, ou écris-nous à %@ si tu penses que c'est une erreur."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hol dir eine neue oder schreib uns an %@, wenn du denkst, dass das ein Fehler ist."
           }
         }
       }
@@ -1539,6 +1539,22 @@
         }
       }
     },
+    "Read Our Terms" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lire nos conditions"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unsere AGB lesen"
+          }
+        }
+      }
+    },
     "Remove from This Mac" : {
       "localizations" : {
         "fr" : {
@@ -2054,6 +2070,22 @@
         }
       }
     },
+    "This happens when a purchase is refunded, or when a licence is misused — shared publicly or used with a modified copy — as our terms explain. If you think this is a mistake, write to us at %@." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cela arrive quand un achat est remboursé, ou quand une licence est utilisée de façon abusive — partagée publiquement ou utilisée avec une copie modifiée — comme l’expliquent nos conditions. Si tu penses que c’est une erreur, écris-nous à %@."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das passiert, wenn ein Kauf erstattet wurde oder eine Lizenz missbraucht wird – öffentlich geteilt oder mit einer veränderten Kopie genutzt –, wie unsere AGB erklären. Wenn du denkst, dass das ein Fehler ist, schreib uns an %@."
+          }
+        }
+      }
+    },
     "This key is already in use on another Mac. Choose Remove from This Mac there, or write to us at %@." : {
       "localizations" : {
         "fr" : {
@@ -2070,18 +2102,18 @@
         }
       }
     },
-    "This key is no longer active. Get a new one, or write to us at %@ if you think this is a mistake." : {
+    "This key was revoked: the purchase was refunded, or the licence was misused, as our terms explain. Get a new one, or write to us at %@ if you think this is a mistake." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette clé n'est plus active. Achètes-en une nouvelle, ou écris-nous à %@ si tu penses que c'est une erreur."
+            "value" : "Cette clé a été révoquée : l’achat a été remboursé, ou la licence a été utilisée de façon abusive, comme l’expliquent nos conditions. Achètes-en une nouvelle, ou écris-nous à %@ si tu penses que c’est une erreur."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dieser Schlüssel ist nicht mehr aktiv. Hol dir einen neuen oder schreib uns an %@, wenn du denkst, dass das ein Fehler ist."
+            "value" : "Dieser Schlüssel wurde entzogen: Der Kauf wurde erstattet oder die Lizenz missbraucht, wie unsere AGB erklären. Hol dir einen neuen oder schreib uns an %@, wenn du denkst, dass das ein Fehler ist."
           }
         }
       }
@@ -2358,18 +2390,18 @@
         }
       }
     },
-    "Your licence is no longer active" : {
+    "Your licence was revoked" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ta licence n'est plus active"
+            "value" : "Ta licence a été révoquée"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deine Lizenz ist nicht mehr aktiv"
+            "value" : "Deine Lizenz wurde entzogen"
           }
         }
       }

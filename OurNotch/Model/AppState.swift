@@ -54,6 +54,8 @@ final class AppState {
     @ObservationIgnored var onEmojisArrived: ((Int, SentEmoji) -> Void)?
     /// Called when this Mac's licence changed here (received from the partner, or removed), so it gets checked.
     @ObservationIgnored var onLicenceChanged: (() -> Void)?
+    /// Called when the notch opens, so the licence gets re-checked if it's been a while.
+    @ObservationIgnored var onOpened: (() -> Void)?
     /// Called when OurNotch is hidden or shown, so the notch window follows.
     @ObservationIgnored var onHiddenChanged: (() -> Void)?
     /// Emojis that arrived while hidden: they play once, together, when OurNotch comes back.
@@ -284,6 +286,7 @@ final class AppState {
     /// Opening the notch dismisses an `untilOpened` banner; the message stays readable inside.
     func notchOpened() {
         isNotchOpen = true
+        onOpened?()
         if banner?.mode == .untilOpened { setBanner(nil) }
     }
 
