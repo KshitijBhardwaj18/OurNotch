@@ -113,13 +113,27 @@ struct LicenceService {
         }
     }
 
-    /// Nil status means the request never got an answer.
+    /// Nil status means the request never got an answer, even after one retry (a first request can stall
+    /// on a flaky connection; the learner's first activation hit the 15 s timeout, the next one took 0.1 s).
     private func post(_ path: String, _ json: [String: String]) async -> (Int?, Data) {
-        var request = URLRequest(url: baseURL.appending(path: path), timeoutInterval: 15)
+        let first = await send(path, json)
+        return first.0 == nil ? await send(path, json) : first
+    }
+
+    private func send(_ path: String, _ json: [String: String]) async -> (Int?, Data) {
+        var request = URLRequest(url: baseURL.appending(path: path), timeoutInterval: 10)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try? JSONSerialization.data(withJSONObject: json)
-        guard let (data, response) = try? await URLSession.shared.data(for: request) else { return (nil, Data()) }
-        return ((response as? HTTPURLResponse)?.statusCode, data)
+        let started = Date.now
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            let status = (response as? HTTPURLResponse)?.statusCode
+            await Diagnostics.shared.record("licence \(path): HTTP \(status.map(String.init) ?? "?") in \(Int(Date.now.timeIntervalSince(started) * 1000)) ms")
+            return (status, data)
+        } catch {
+            await Diagnostics.shared.record("licence \(path) FAILED after \(Int(Date.now.timeIntervalSince(started) * 1000)) ms: \(error.diagnosticDescription)")
+            return (nil, Data())
+        }
     }
 }

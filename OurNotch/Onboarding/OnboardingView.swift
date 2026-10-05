@@ -446,6 +446,10 @@ struct OnboardingView: View {
         HStack(spacing: 8) {
             footerLeading
             Spacer()
+            // Waiting on the network (activating, checking iCloud, pairing): show it, so a click never looks ignored.
+            if model.isWorking {
+                ProgressView().controlSize(.small)
+            }
             if let back = backAction {
                 Button("Back", action: back).controlSize(.large)
             }

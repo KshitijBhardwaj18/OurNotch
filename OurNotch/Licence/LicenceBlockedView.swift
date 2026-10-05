@@ -91,6 +91,7 @@ struct LicenceBlockedView: View {
                     Button("Check Again", action: model.checkAgain).buttonStyle(.link).disabled(model.isWorking)
                 }
                 Spacer()
+                if model.isWorking { ProgressView().controlSize(.small) }
                 Button("Activate", action: model.activate)
                     .buttonStyle(PinkProminentButtonStyle())
                     .disabled(model.typedKey.trimmingCharacters(in: .whitespaces).isEmpty || model.isWorking)
