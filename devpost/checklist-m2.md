@@ -140,7 +140,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
 ## Final Review
 
 - [x] ~~Learner action: `Join.code` Queryable index~~ — no longer needed: join requests use named slots (see Revisions).
-- [ ] **Learner action, admin page with real data:** put your Dodo **test-mode** API key in `website/.env.local` as `DODO_API_KEY=…` (ignored by git), restart the dev server, open http://localhost:3000/admin, and confirm the ₹200 test purchase and its key show. Revoke / Restore / Free slot were verified against a stand-in with Dodo's real response shapes, not yet against Dodo with your key.
+- [x] **Admin page with real data:** learner added a test-mode key to `website/.env.local`; `/admin` lists the ₹200 sale from India and both test keys (active, 0 of 1 Macs) live from Dodo.
 - [ ] **Review the privacy policy and terms** (`website/lib/i18n.ts > privacy, terms`): drafted by the agent from the PRD's decisions (no refunds except where the law requires, revocation for abuse, Dodo as seller of record, what's stored where); not legal advice — have them checked before selling.
 - [ ] **Native-speaker check** of the French and German (`OurNotch/Localizable.xcstrings`; drafted by the agent with informal *tu* / *du*) before launch — who checks them is still an open question.
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
