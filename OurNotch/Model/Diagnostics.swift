@@ -7,7 +7,7 @@ import os
 /// `diag-<userId>` record every 15 s, so either partner can download both logs (♡ menu → Save Diagnostics).
 /// Measurements (frames, hangs, delivery times, request times) are also saved as one CloudKit `Metric`
 /// record each, from both Macs, so a test session can be queried and compared side by side.
-/// Never records note text, photos, or keys — only events, counts, timings, and errors.
+/// Never records note text, photos, or keys: only events, counts, timings, and errors.
 // ponytail: diagnostics records sit in the public database, readable by any install of the app.
 // Only Debug and Beta builds upload (`Config.Diagnostics.uploads`); the sold Release build never does.
 @MainActor

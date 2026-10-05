@@ -70,9 +70,9 @@ export function HeroDemo({ t, tour }: { t: Copy['demo']; tour: Copy['tour'] }) {
                         <span className="txt">{t.favorite}</span>
                       </div>
                       <div className="stats">
-                        <div className="tile stat"><span className="l">{t.hours}</span><span className="v s-hours">—</span></div>
-                        <div className="tile stat"><span className="l">{t.weekends}</span><span className="v s-weekends">—</span></div>
-                        <div className="tile stat"><span className="l">{t.seconds} <Heart /></span><span className="v pk s-secs">—</span></div>
+                        <div className="tile stat"><span className="l">{t.hours}</span><span className="v s-hours">…</span></div>
+                        <div className="tile stat"><span className="l">{t.weekends}</span><span className="v s-weekends">…</span></div>
+                        <div className="tile stat"><span className="l">{t.seconds} <Heart /></span><span className="v pk s-secs">…</span></div>
                       </div>
                     </div>
                   </div>

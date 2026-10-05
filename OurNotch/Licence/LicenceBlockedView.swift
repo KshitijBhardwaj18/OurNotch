@@ -70,14 +70,14 @@ struct LicenceBlockedView: View {
                    title: model.status == .removed ? "OurNotch was removed from this Mac" : "Your licence was revoked",
                    message: model.status == .removed
                        ? "Paste your licence key to use OurNotch here again."
-                       : "This happens when a purchase is refunded, or when a licence is misused — shared publicly or used with a modified copy — as our terms explain. If you think this is a mistake, write to us at \(Config.Licence.supportEmail).") {
+                       : "This happens when a purchase is refunded, or when a licence is misused (shared publicly or used with a modified copy), as our terms explain. If you think this is a mistake, write to us at \(Config.Licence.supportEmail).") {
                 TextField("Licence key", text: $model.typedKey)
                     .textFieldStyle(.roundedBorder)
                     .font(.system(size: 13, design: .monospaced))
                     .frame(width: 300)
                     .onSubmit { if !model.typedKey.isEmpty { model.activate() } }
                 HStack {
-                    Button("Get OurNotch — \(Config.Licence.priceLabel)", action: model.getOurNotch)
+                    Button("Get OurNotch for \(Config.Licence.priceLabel)", action: model.getOurNotch)
                     Button("Write to Us", action: model.writeToUs)
                 }
             }

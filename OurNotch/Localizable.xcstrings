@@ -714,18 +714,18 @@
         }
       }
     },
-    "Get OurNotch — %@" : {
+    "Get OurNotch for %@" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Obtenir OurNotch — %@"
+            "value" : "Obtenir OurNotch pour %@"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OurNotch holen – %@"
+            "value" : "OurNotch für %@ holen"
           }
         }
       }
@@ -1766,18 +1766,18 @@
         }
       }
     },
-    "Share this code — it's just for the two of you, and works for 24 hours." : {
+    "Share this code. It's just for the two of you, and works for 24 hours." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Partage ce code — il n'est que pour vous deux et reste valable 24 heures."
+            "value" : "Partage ce code. Il n'est que pour vous deux et reste valable 24 heures."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Teile diesen Code – er ist nur für euch zwei und gilt 24 Stunden."
+            "value" : "Teile diesen Code. Er ist nur für euch zwei und gilt 24 Stunden."
           }
         }
       }
@@ -1958,6 +1958,22 @@
         }
       }
     },
+    "Tap one and it pops up on %@'s screen ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis-en un : il apparaît sur l'écran de %@ ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähl eins, dann erscheint es auf dem Bildschirm von %@ ♡"
+          }
+        }
+      }
+    },
     "Tap one to set" : {
       "localizations" : {
         "fr" : {
@@ -1970,22 +1986,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wähl eine aus"
-          }
-        }
-      }
-    },
-    "Tap one — it pops up on %@'s screen ♡" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choisis-en un — il apparaît sur l'écran de %@ ♡"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wähl eins – es erscheint auf dem Bildschirm von %@ ♡"
           }
         }
       }
@@ -2070,18 +2070,18 @@
         }
       }
     },
-    "This happens when a purchase is refunded, or when a licence is misused — shared publicly or used with a modified copy — as our terms explain. If you think this is a mistake, write to us at %@." : {
+    "This happens when a purchase is refunded, or when a licence is misused (shared publicly or used with a modified copy), as our terms explain. If you think this is a mistake, write to us at %@." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cela arrive quand un achat est remboursé, ou quand une licence est utilisée de façon abusive — partagée publiquement ou utilisée avec une copie modifiée — comme l’expliquent nos conditions. Si tu penses que c’est une erreur, écris-nous à %@."
+            "value" : "Cela arrive quand un achat est remboursé, ou quand une licence est utilisée de façon abusive (partagée publiquement ou utilisée avec une copie modifiée), comme l’expliquent nos conditions. Si tu penses que c’est une erreur, écris-nous à %@."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Das passiert, wenn ein Kauf erstattet wurde oder eine Lizenz missbraucht wird – öffentlich geteilt oder mit einer veränderten Kopie genutzt –, wie unsere AGB erklären. Wenn du denkst, dass das ein Fehler ist, schreib uns an %@."
+            "value" : "Das passiert, wenn ein Kauf erstattet wurde oder eine Lizenz missbraucht wird (öffentlich geteilt oder mit einer veränderten Kopie genutzt), wie unsere AGB erklären. Wenn du denkst, dass das ein Fehler ist, schreib uns an %@."
           }
         }
       }

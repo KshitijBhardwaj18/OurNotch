@@ -443,7 +443,7 @@ final class AppState {
         }
     }
 
-    /// What differs between two outboxes, for the log — never the note's text.
+    /// What differs between two outboxes, for the log, never the note's text.
     private static func changes(from old: Outbox, to new: Outbox) -> String {
         var parts: [String] = []
         if new.emojisSent != old.emojisSent { parts.append("emojis \(old.emojisSent)→\(new.emojisSent)") }

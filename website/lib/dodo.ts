@@ -30,7 +30,7 @@ export async function sales(): Promise<Sale[]> {
   const { items } = await dodo<Page<DodoPayment>>('/payments?page_size=50');
   const full = await Promise.all(items.map(p => dodo<DodoPayment>(`/payments/${p.payment_id}`)));
   return full.map(p => ({
-    id: p.payment_id, date: p.created_at, country: p.billing?.country ?? '—',
+    id: p.payment_id, date: p.created_at, country: p.billing?.country ?? '?',
     amount: p.total_amount, currency: p.currency, status: p.status, refund: p.refund_status,
   }));
 }

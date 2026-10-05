@@ -38,7 +38,7 @@ struct EmojiTab: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Send an emoji").font(.system(size: 15, weight: .semibold)).foregroundStyle(.white)
-                Text("Tap one — it pops up on \(state.partnerName.lowercased())'s screen ♡")
+                Text("Tap one and it pops up on \(state.partnerName.lowercased())'s screen ♡")
                     .font(.system(size: 11.5))
                     .foregroundStyle(Color.secondaryLabel)
             }

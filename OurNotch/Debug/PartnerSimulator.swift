@@ -131,7 +131,7 @@ private struct PartnerSimulatorView: View {
                     TextField("Code", text: $model.typedCode)
                     Button("Join") { Task { await model.join() } }
                 }
-                if model.waitingForYes { Text("Asked — waiting for the notch to say yes…").foregroundStyle(.secondary) }
+                if model.waitingForYes { Text("Asked. Waiting for the notch to say yes…").foregroundStyle(.secondary) }
             }
 
             GroupBox("Or invite the notch") {
@@ -144,7 +144,7 @@ private struct PartnerSimulatorView: View {
                             Button("Yes") { Task { await model.answer(true) } }
                         }
                     } else if let code = model.inviteCode {
-                        Text("Code: \(code) — waiting…").textSelection(.enabled).monospaced()
+                        Text("Code: \(code), waiting…").textSelection(.enabled).monospaced()
                     } else {
                         Button("Invite") { Task { await model.invite() } }
                     }

@@ -17,7 +17,7 @@ type Section = { h: string; p: string[] };
 
 const en = {
   meta: {
-    title: 'OurNotch — send love, notch to notch',
+    title: 'OurNotch: send love, notch to notch',
     description: 'OurNotch puts your person in your MacBook notch: their face, their mood, their notes, emoji and photos. One license works for you both.',
     ogDescription: 'Notes, emoji and photos that appear in your person’s MacBook notch. One license works for you both.',
   },
@@ -122,7 +122,7 @@ const en = {
       { h: 'Where is my key?', p: ['Your licence key is in the receipt email from Dodo Payments, sent right after you paid. It was also shown on the thank-you page.', "Can't find it? Use **Find my licence** below: enter the email you paid with, and Dodo sends you a sign-in link to see your key."] },
       { h: 'Who needs a key?', p: ['Only the person who bought OurNotch. Your love downloads OurNotch for free, chooses **I Have an Invite Code**, and types the six-letter code from your invite. Their Mac is covered by your licence while you are paired.'] },
       { h: 'Moving to a new Mac', p: ['Your key works on one Mac at a time: yours. On the old Mac, open the notch, tap the gear, and choose **Remove from This Mac**. Then install OurNotch on the new Mac and paste your key under **I Have a Licence Key**.', 'Lost or sold the old Mac? Write to us and we free it for you.'] },
-      { h: 'Something went wrong', p: ['**"That key doesn\'t look right"** — check for missing characters; copying it from the email works best.', '**"Already in use on another Mac"** — remove it from your old Mac first, or write to us.', "**\"Can't reach the shop\"** — check your internet and try again. Once OurNotch is switched on, it keeps working offline."] },
+      { h: 'Something went wrong', p: ['**"That key doesn\'t look right"**: check for missing characters; copying it from the email works best.', '**"Already in use on another Mac"**: remove it from your old Mac first, or write to us.', "**\"Can't reach the shop\"**: check your internet and try again. Once OurNotch is switched on, it keeps working offline."] },
     ] as Section[],
     find: 'Find my licence', write: 'Write to us',
   },
@@ -130,7 +130,7 @@ const en = {
     title: 'Privacy · OurNotch', kicker: 'Privacy policy', h1: 'Your notes are yours.', updated: 'Last updated: October 2026',
     sections: [
       { h: 'What we can read', p: ['Nothing you send. Notes, emoji, moods and photos are end-to-end encrypted on your Mac with a key only your two Macs share. They travel through Apple\'s iCloud (CloudKit), where they are stored as unreadable bytes. We have no copy of the key.'] },
-      { h: 'What is stored, and where', p: ['**In iCloud (Apple\'s CloudKit public database):** your encrypted outbox (your latest note, emoji count, mood, photo), the pairing records with the names you chose and your public keys, and short-lived invite codes.', '**On your Mac:** your private key and your licence key (in the Keychain), your settings, and a local log of app events, without any message content.', '**With Dodo Payments:** your purchase — name, email, country, payment details, receipt and licence key. Dodo is the seller of record and handles payment and tax. See Dodo Payments\' privacy policy.'] },
+      { h: 'What is stored, and where', p: ['**In iCloud (Apple\'s CloudKit public database):** your encrypted outbox (your latest note, emoji count, mood, photo), the pairing records with the names you chose and your public keys, and short-lived invite codes.', '**On your Mac:** your private key and your licence key (in the Keychain), your settings, and a local log of app events, without any message content.', '**With Dodo Payments:** your purchase: name, email, country, payment details, receipt and licence key. Dodo is the seller of record and handles payment and tax. See Dodo Payments\' privacy policy.'] },
       { h: 'Licence checks', p: ['About once a day, OurNotch asks Dodo whether your licence key is still valid. The request carries the key and, for the buyer\'s Mac, the Mac\'s name. Nothing else.'] },
       { h: 'Diagnostics', p: ['Test builds given to beta testers upload an event log and performance measurements (no message content) so we can find bugs. The OurNotch you buy uploads nothing: its log stays on your Mac.'] },
       { h: 'This website', p: ['ournotch.app is hosted by Cloudflare, which sees your IP address and country to serve the page and show your local price. We use no analytics, ads or tracking cookies.'] },
@@ -158,7 +158,7 @@ export type Copy = typeof en;
 
 const fr: Copy = {
   meta: {
-    title: 'OurNotch — de l’amour, d’encoche à encoche',
+    title: 'OurNotch : de l’amour, d’encoche à encoche',
     description: 'OurNotch met ta personne dans l’encoche de ton MacBook : son visage, son humeur, ses mots, emojis et photos. Une seule licence pour vous deux.',
     ogDescription: 'Des mots, emojis et photos qui apparaissent dans l’encoche du MacBook de ta personne. Une seule licence pour vous deux.',
   },
@@ -229,7 +229,7 @@ const fr: Copy = {
     you: 'toi', hours: 'Heures', weekends: 'Week-ends', seconds: 'Secondes',
     fromBun1h: 'de bun · 1 h', bun2m: 'bun · il y a 2 min', favorite: 'tu es ma notification préférée',
     from2m: 'De bun · il y a 2 min', placeholder: 'Dis quelque chose de doux…', scroll: 'Défilement', three: '3 fois', untilOpened: 'Jusqu’à ouverture',
-    upTo: 'Jusqu’à 10 mots', sendEmoji: 'Envoie un emoji', popsUp: 'Choisis-en un — il apparaît sur l’écran de bun ♡', tapToSend: 'Clique pour envoyer',
+    upTo: 'Jusqu’à 10 mots', sendEmoji: 'Envoie un emoji', popsUp: 'Choisis-en un : il apparaît sur l’écran de bun ♡', tapToSend: 'Clique pour envoyer',
     appears: 'Apparaît', outOfNotch: 'Hors de l’encoche', fullScreen: 'Plein écran',
     us: 'nous ♡', sunday: 'dimanche ♡', ticker: 'déj à 13 h ? j’apporte des raviolis 🥟',
     photo: 'Photo', sendPhoto: 'Envoie une photo à bun', showsUp: 'Elle apparaîtra dans son Accueil à sa prochaine ouverture de l’encoche ♡', choose: 'Choisir une photo…',
@@ -263,7 +263,7 @@ const fr: Copy = {
       { h: 'Où est ma clé ?', p: ['Ta clé de licence est dans le reçu envoyé par Dodo Payments juste après le paiement. Elle était aussi affichée sur la page de remerciement.', 'Introuvable ? Utilise **Retrouver ma licence** ci-dessous : saisis l’e-mail utilisé pour payer, et Dodo t’envoie un lien de connexion pour voir ta clé.'] },
       { h: 'Qui a besoin d’une clé ?', p: ['Seulement la personne qui a acheté OurNotch. Ton amour télécharge OurNotch gratuitement, choisit **J’ai un code d’invitation** et tape le code de six caractères de ton invitation. Son Mac est couvert par ta licence tant que vous êtes associés.'] },
       { h: 'Passer à un nouveau Mac', p: ['Ta clé fonctionne sur un Mac à la fois : le tien. Sur l’ancien Mac, ouvre l’encoche, touche la roue dentée et choisis **Retirer de ce Mac**. Installe ensuite OurNotch sur le nouveau Mac et colle ta clé sous **J’ai une clé de licence**.', 'Ancien Mac perdu ou vendu ? Écris-nous et nous le libérons pour toi.'] },
-      { h: 'Un problème ?', p: ['**« Cette clé ne semble pas correcte »** — vérifie qu’il ne manque rien ; le plus simple est de la copier depuis l’e-mail.', '**« Déjà utilisée sur un autre Mac »** — retire-la d’abord de ton ancien Mac, ou écris-nous.', '**« Impossible de joindre la boutique »** — vérifie ta connexion et réessaie. Une fois activé, OurNotch fonctionne aussi hors ligne.'] },
+      { h: 'Un problème ?', p: ['**« Cette clé ne semble pas correcte »** : vérifie qu’il ne manque rien ; le plus simple est de la copier depuis l’e-mail.', '**« Déjà utilisée sur un autre Mac »** : retire-la d’abord de ton ancien Mac, ou écris-nous.', '**« Impossible de joindre la boutique »** : vérifie ta connexion et réessaie. Une fois activé, OurNotch fonctionne aussi hors ligne.'] },
     ],
     find: 'Retrouver ma licence', write: 'Nous écrire',
   },
@@ -271,7 +271,7 @@ const fr: Copy = {
     title: 'Confidentialité · OurNotch', kicker: 'Politique de confidentialité', h1: 'Tes mots t’appartiennent.', updated: 'Dernière mise à jour : octobre 2026',
     sections: [
       { h: 'Ce que nous pouvons lire', p: ['Rien de ce que tu envoies. Mots, emojis, humeurs et photos sont chiffrés de bout en bout sur ton Mac avec une clé que seuls vos deux Mac partagent. Ils passent par iCloud d’Apple (CloudKit), où ils sont stockés sous forme d’octets illisibles. Nous n’avons aucune copie de la clé.'] },
-      { h: 'Ce qui est stocké, et où', p: ['**Dans iCloud (base de données publique CloudKit d’Apple) :** ta boîte d’envoi chiffrée (ton dernier mot, le nombre d’emojis, ton humeur, ta photo), les enregistrements d’association avec les prénoms choisis et vos clés publiques, et des codes d’invitation de courte durée.', '**Sur ton Mac :** ta clé privée et ta clé de licence (dans le Trousseau), tes réglages et un journal local des événements de l’app, sans aucun contenu de message.', '**Chez Dodo Payments :** ton achat — nom, e-mail, pays, données de paiement, reçu et clé de licence. Dodo est le vendeur officiel et gère le paiement et les taxes. Voir la politique de confidentialité de Dodo Payments.'] },
+      { h: 'Ce qui est stocké, et où', p: ['**Dans iCloud (base de données publique CloudKit d’Apple) :** ta boîte d’envoi chiffrée (ton dernier mot, le nombre d’emojis, ton humeur, ta photo), les enregistrements d’association avec les prénoms choisis et vos clés publiques, et des codes d’invitation de courte durée.', '**Sur ton Mac :** ta clé privée et ta clé de licence (dans le Trousseau), tes réglages et un journal local des événements de l’app, sans aucun contenu de message.', '**Chez Dodo Payments :** ton achat : nom, e-mail, pays, données de paiement, reçu et clé de licence. Dodo est le vendeur officiel et gère le paiement et les taxes. Voir la politique de confidentialité de Dodo Payments.'] },
       { h: 'Vérifications de licence', p: ['Environ une fois par jour, OurNotch demande à Dodo si ta clé de licence est toujours valide. La requête contient la clé et, pour le Mac de l’acheteur, le nom du Mac. Rien d’autre.'] },
       { h: 'Diagnostics', p: ['Les versions de test données aux bêta-testeurs envoient un journal d’événements et des mesures de performance (sans contenu de message) pour nous aider à trouver les bugs. L’OurNotch que tu achètes n’envoie rien : son journal reste sur ton Mac.'] },
       { h: 'Ce site', p: ['ournotch.app est hébergé par Cloudflare, qui voit ton adresse IP et ton pays pour servir la page et afficher ton prix local. Nous n’utilisons ni outil d’analyse, ni publicité, ni cookies de suivi.'] },
@@ -297,7 +297,7 @@ const fr: Copy = {
 
 const de: Copy = {
   meta: {
-    title: 'OurNotch — Liebe, von Notch zu Notch',
+    title: 'OurNotch: Liebe, von Notch zu Notch',
     description: 'OurNotch holt deinen Menschen in die Notch deines MacBooks: Gesicht, Stimmung, Notizen, Emojis und Fotos. Eine Lizenz für euch beide.',
     ogDescription: 'Notizen, Emojis und Fotos, die in der MacBook-Notch deines Menschen erscheinen. Eine Lizenz für euch beide.',
   },

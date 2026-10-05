@@ -97,7 +97,7 @@ struct HomeTab: View {
     /// Hours · Weekends · Seconds at a width ratio of 1.2 : 1 : 1.9, sized so each big number fits.
     private func stats(now: Date) -> some View {
         let since = state.togetherSince
-        func value(_ compute: (Date) -> Int) -> String { since.map { compute($0).formatted() } ?? "—" }
+        func value(_ compute: (Date) -> Int) -> String { since.map { compute($0).formatted() } ?? "…" }
 
         return GeometryReader { row in
             let unit = (row.size.width - 20) / 4.1

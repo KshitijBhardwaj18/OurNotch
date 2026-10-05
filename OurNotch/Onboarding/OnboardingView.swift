@@ -336,7 +336,7 @@ struct OnboardingView: View {
                 }
             } else {
                 Screen(symbol: "envelope", title: "Invite your love",
-                       message: "Share this code — it's just for the two of you, and works for 24 hours.") { inviteCode }
+                       message: "Share this code. It's just for the two of you, and works for 24 hours.") { inviteCode }
             }
         case .join:
             joinScreen
@@ -375,7 +375,7 @@ struct OnboardingView: View {
         Screen(icon: AnyView(AppIcon()), title: "Welcome to OurNotch",
                message: "A little place in your notch where things from both of you arrive.") {
             VStack(spacing: 10) {
-                Button("Get OurNotch — \(Config.Licence.priceLabel)", action: model.getOurNotch)
+                Button("Get OurNotch for \(Config.Licence.priceLabel)", action: model.getOurNotch)
                     .buttonStyle(PinkProminentButtonStyle())
                 Text("One purchase for the two of you · local price shown at checkout")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
@@ -591,6 +591,6 @@ struct PinkProminentButtonStyle: ButtonStyle {
 }
 
 extension Color {
-    /// systemPink: `#FF2D55` in light mode, `#FF375F` in dark — follows the window's appearance.
+    /// systemPink: `#FF2D55` in light mode, `#FF375F` in dark; follows the window's appearance.
     static let accentPink = Color(nsColor: .systemPink)
 }

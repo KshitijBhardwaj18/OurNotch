@@ -34,7 +34,7 @@ function Card({ color, wide, art, title, children }: { color: string; wide?: boo
 export function Bento({ t: c }: { t: Copy['bento'] }) {
   const [mood, setMood] = useState('🥰');
   const t = useTogether();
-  const n = (k: keyof ReturnType<typeof together>) => (t ? fmt(t[k]) : '—');
+  const n = (k: keyof ReturnType<typeof together>) => (t ? fmt(t[k]) : '…');
 
   return (
     <div className="b-grid">

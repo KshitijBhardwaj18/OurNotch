@@ -132,7 +132,7 @@ struct CloudStore: Mailbox {
         return Invite(inviterId: id, inviterName: name, inviterKey: key, createdAt: record.creationDate ?? .now)
     }
 
-    /// Join requests sit in a few numbered slots per code, so the inviter reads them by name — no query, so no
+    /// Join requests sit in a few numbered slots per code, so the inviter reads them by name: no query, so no
     /// Queryable index to set up in CloudKit Console. A joiner takes the first free slot.
     private static func joinIDs(_ code: String) -> [CKRecord.ID] {
         (0..<Config.Pairing.joinSlots).map { CKRecord.ID(recordName: "join-\(code)-\($0)") }

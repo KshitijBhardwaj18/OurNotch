@@ -130,7 +130,7 @@ extension View {
     }
 }
 
-/// "now", "2m ago", "1h ago", "3d ago" — or "2m", "1h", "3d" without the suffix.
+/// "now", "2m ago", "1h ago", "3d ago", or "2m", "1h", "3d" without the suffix.
 func shortAgo(_ date: Date, now: Date = .now, suffix: Bool = true) -> String {
     let seconds = max(0, Int(now.timeIntervalSince(date)))
     switch (seconds, suffix) {
