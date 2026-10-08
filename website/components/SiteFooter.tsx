@@ -1,7 +1,7 @@
-import { copy, href, LANG_NAMES, LANGS, type Lang } from '@/lib/i18n';
+import { copy, href, LANG_NAMES, LANGS, SUPPORT, type Lang } from '@/lib/i18n';
 import { Heart } from './Char';
 
-// On every page: help and legal links (the PRD asks for privacy and terms everywhere) and the language switch.
+// On every page: help, legal and contact links (Dodo's review and the PRD ask for them everywhere) and the language switch.
 export function SiteFooter({ lang, path = '/' }: { lang: Lang; path?: string }) {
   const t = copy[lang].footer;
   return (
@@ -12,6 +12,8 @@ export function SiteFooter({ lang, path = '/' }: { lang: Lang; path?: string }) 
           <a href={href(lang, '/licence')}>{t.licence}</a>
           <a href={href(lang, '/privacy')}>{t.privacy}</a>
           <a href={href(lang, '/terms')}>{t.terms}</a>
+          <a href={href(lang, '/refunds')}>{t.refunds}</a>
+          <a href={`mailto:${SUPPORT}`}>{t.contact}: {SUPPORT}</a>
         </span>
         <span className="y-foot-links">
           {LANGS.map(l => l === lang

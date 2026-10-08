@@ -80,7 +80,7 @@ const en = {
     ] as [string, string][],
   },
   end: { h2: 'Give your notch someone to love.', cta: 'Get it for {price}' },
-  footer: { made: 'OurNotch · made for two', apple: 'Not affiliated with Apple.', licence: 'My licence', privacy: 'Privacy', terms: 'Terms' },
+  footer: { made: 'OurNotch · made for two', apple: 'Not affiliated with Apple.', licence: 'My licence', privacy: 'Privacy', terms: 'Terms', refunds: 'Refunds', contact: 'Contact' },
   demo: {
     aria: 'Demo: Bun sends Pip a note, hearts and a photo through the MacBook notch, and Pip writes back',
     menus: ['File', 'Edit', 'View', 'Window'], event: 'Date night', eventWhen: '8:00 PM · our spot',
@@ -125,6 +125,16 @@ const en = {
       { h: 'Something went wrong', p: ['**"That key doesn\'t look right"**: check for missing characters; copying it from the email works best.', '**"Already in use on another Mac"**: remove it from your old Mac first, or write to us.', "**\"Can't reach the shop\"**: check your internet and try again. Once OurNotch is switched on, it keeps working offline."] },
     ] as Section[],
     find: 'Find my licence', write: 'Write to us',
+  },
+  refunds: {
+    title: 'Refunds · OurNotch', kicker: 'Refund policy', h1: 'Refunds and cancellations.', updated: 'Last updated: October 2026',
+    sections: [
+      { h: 'Nothing to cancel', p: ['OurNotch is a one-time purchase, not a subscription. There is nothing to cancel, and you are never charged again.'] },
+      { h: 'Refunds', p: ['Because OurNotch is a digital product you can use right away, sales are final and we don\'t offer refunds, except where the law where you live gives you a right to one (for example consumer rules in the EU or the UK).'] },
+      { h: 'Something not working?', p: ['Write to us first. Most problems (activating, moving to a new Mac, pairing with your love) are quick to fix, and **My licence** covers the common ones.'] },
+      { h: 'Asking for a refund', p: ['If the law gives you a right to a refund, write to us from the email you paid with and include your receipt. Refunds are made by Dodo Payments, our seller of record, to the payment method you used. A refunded licence stops working on both Macs of the pair.'] },
+    ] as Section[],
+    contact: 'Questions? Write to us at {email}.',
   },
   privacy: {
     title: 'Privacy · OurNotch', kicker: 'Privacy policy', h1: 'Your notes are yours.', updated: 'Last updated: October 2026',
@@ -221,7 +231,7 @@ const fr: Copy = {
     ],
   },
   end: { h2: 'Donne à ton encoche quelqu’un à aimer.', cta: 'Obtenir pour {price}' },
-  footer: { made: 'OurNotch · fait pour deux', apple: 'Non affilié à Apple.', licence: 'Ma licence', privacy: 'Confidentialité', terms: 'Conditions' },
+  footer: { made: 'OurNotch · fait pour deux', apple: 'Non affilié à Apple.', licence: 'Ma licence', privacy: 'Confidentialité', terms: 'Conditions', refunds: 'Remboursements', contact: 'Contact' },
   demo: {
     aria: 'Démo : Bun envoie à Pip un mot, des cœurs et une photo via l’encoche du MacBook, et Pip répond',
     menus: ['Fichier', 'Édition', 'Présentation', 'Fenêtre'], event: 'Soirée en amoureux', eventWhen: '20 h · notre resto',
@@ -266,6 +276,16 @@ const fr: Copy = {
       { h: 'Un problème ?', p: ['**« Cette clé ne semble pas correcte »** : vérifie qu’il ne manque rien ; le plus simple est de la copier depuis l’e-mail.', '**« Déjà utilisée sur un autre Mac »** : retire-la d’abord de ton ancien Mac, ou écris-nous.', '**« Impossible de joindre la boutique »** : vérifie ta connexion et réessaie. Une fois activé, OurNotch fonctionne aussi hors ligne.'] },
     ],
     find: 'Retrouver ma licence', write: 'Nous écrire',
+  },
+  refunds: {
+    title: 'Remboursements · OurNotch', kicker: 'Politique de remboursement', h1: 'Remboursements et annulations.', updated: 'Dernière mise à jour : octobre 2026',
+    sections: [
+      { h: 'Rien à annuler', p: ['OurNotch est un achat unique, pas un abonnement. Il n’y a rien à annuler, et tu n’es jamais débité à nouveau.'] },
+      { h: 'Remboursements', p: ['OurNotch étant un produit numérique utilisable immédiatement, les ventes sont définitives et nous ne remboursons pas, sauf lorsque la loi de ton pays te donne droit à un remboursement (par exemple les règles de consommation de l’UE ou du Royaume-Uni).'] },
+      { h: 'Un problème ?', p: ['Écris-nous d’abord. La plupart des soucis (activation, passage à un nouveau Mac, association avec ton amour) se règlent vite, et **Ma licence** explique les plus courants.'] },
+      { h: 'Demander un remboursement', p: ['Si la loi te donne droit à un remboursement, écris-nous depuis l’e-mail utilisé pour payer, avec ton reçu. Les remboursements sont effectués par Dodo Payments, notre vendeur officiel, sur le moyen de paiement utilisé. Une licence remboursée cesse de fonctionner sur les deux Mac du couple.'] },
+    ],
+    contact: 'Des questions ? Écris-nous à {email}.',
   },
   privacy: {
     title: 'Confidentialité · OurNotch', kicker: 'Politique de confidentialité', h1: 'Tes mots t’appartiennent.', updated: 'Dernière mise à jour : octobre 2026',
@@ -360,7 +380,7 @@ const de: Copy = {
     ],
   },
   end: { h2: 'Gib deiner Notch jemanden zum Liebhaben.', cta: 'Für {price} holen' },
-  footer: { made: 'OurNotch · für zwei gemacht', apple: 'Nicht mit Apple verbunden.', licence: 'Meine Lizenz', privacy: 'Datenschutz', terms: 'AGB' },
+  footer: { made: 'OurNotch · für zwei gemacht', apple: 'Nicht mit Apple verbunden.', licence: 'Meine Lizenz', privacy: 'Datenschutz', terms: 'AGB', refunds: 'Erstattungen', contact: 'Kontakt' },
   demo: {
     aria: 'Demo: Bun schickt Pip über die MacBook-Notch eine Notiz, Herzen und ein Foto, und Pip schreibt zurück',
     menus: ['Ablage', 'Bearbeiten', 'Darstellung', 'Fenster'], event: 'Date-Abend', eventWhen: '20:00 · unser Platz',
@@ -405,6 +425,16 @@ const de: Copy = {
       { h: 'Etwas ist schiefgelaufen', p: ['**„Dieser Schlüssel scheint nicht zu stimmen“** – prüf, ob Zeichen fehlen; am besten kopierst du ihn aus der E-Mail.', '**„Schon auf einem anderen Mac genutzt“** – entferne ihn zuerst von deinem alten Mac oder schreib uns.', '**„Der Shop ist gerade nicht erreichbar“** – prüf deine Internetverbindung und versuch es noch mal. Einmal aktiviert, funktioniert OurNotch auch offline.'] },
     ],
     find: 'Meine Lizenz finden', write: 'Schreib uns',
+  },
+  refunds: {
+    title: 'Erstattungen · OurNotch', kicker: 'Erstattungsrichtlinie', h1: 'Erstattungen und Kündigungen.', updated: 'Zuletzt aktualisiert: Oktober 2026',
+    sections: [
+      { h: 'Nichts zu kündigen', p: ['OurNotch ist ein einmaliger Kauf, kein Abo. Es gibt nichts zu kündigen, und es wird nie wieder etwas abgebucht.'] },
+      { h: 'Erstattungen', p: ['Da OurNotch ein digitales Produkt ist, das du sofort nutzen kannst, sind Käufe endgültig und wir erstatten nicht, außer wenn dir das Recht deines Landes einen Anspruch gibt (zum Beispiel Verbraucherregeln in der EU oder im Vereinigten Königreich).'] },
+      { h: 'Klappt etwas nicht?', p: ['Schreib uns zuerst. Die meisten Probleme (Aktivieren, Umzug auf einen neuen Mac, Verbinden mit deiner Liebe) sind schnell gelöst, und **Meine Lizenz** erklärt die häufigsten.'] },
+      { h: 'Eine Erstattung anfragen', p: ['Wenn dir das Gesetz eine Erstattung zusteht, schreib uns von der E-Mail-Adresse, mit der du bezahlt hast, und schick deinen Beleg mit. Erstattungen macht Dodo Payments, unser Verkäufer (Merchant of Record), auf die Zahlungsart, die du genutzt hast. Eine erstattete Lizenz funktioniert auf beiden Macs des Paares nicht mehr.'] },
+    ],
+    contact: 'Fragen? Schreib uns an {email}.',
   },
   privacy: {
     title: 'Datenschutz · OurNotch', kicker: 'Datenschutzerklärung', h1: 'Deine Notizen gehören dir.', updated: 'Zuletzt aktualisiert: Oktober 2026',
