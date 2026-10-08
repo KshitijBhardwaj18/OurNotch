@@ -18,7 +18,6 @@
   <!-- the notch, hanging from the top edge, with its curved "ears" -->
   <path d="M300 100 Q330 100 330 130 V170 Q330 222 382 222 H642 Q694 222 694 170 V130 Q694 100 724 100 Z" fill="#16141A"/>
   <circle cx="512" cy="160" r="13" fill="#2E2A36"/>
-  <!-- a small heart on its way out, then the big one -->
-  <path transform="translate(512 300) scale(4.2)" d="M0 7 C -11 -1 -11 -10 -4.5 -10 C -1.5 -10 0 -7.5 0 -6 C 0 -7.5 1.5 -10 4.5 -10 C 11 -10 11 -1 0 7 Z" fill="#FFD3DC"/>
+  <!-- one heart, in the middle -->
   <path transform="translate(512 600) scale(17)" d="M0 7 C -11 -1 -11 -10 -4.5 -10 C -1.5 -10 0 -7.5 0 -6 C 0 -7.5 1.5 -10 4.5 -10 C 11 -10 11 -1 0 7 Z" fill="#FFFFFF" filter="url(#soft)"/>
 </svg>
