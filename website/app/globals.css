@@ -37,6 +37,8 @@ button{font-family:inherit}
 .y-nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 .y-nav .y-wrap{height:68px;display:flex;align-items:center;justify-content:space-between}
 .y-logo{display:flex;align-items:center;gap:10px;font:800 22px var(--disp);letter-spacing:-.04em}
+.y-logo-mark{width:34px;height:34px;display:block}
+/* the old notch mark, still used by the social cards */
 .y-logo-notch{width:34px;height:14px;background:#000;border-radius:0 0 7px 7px;display:grid;place-items:center;position:relative;top:-4px}
 .y-logo-notch svg{width:8px;fill:var(--pink);animation:beat 2.6s infinite}
 .y-links{display:flex;gap:28px;align-items:center;font-size:15px;font-weight:500}

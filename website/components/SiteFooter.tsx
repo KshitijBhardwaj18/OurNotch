@@ -1,5 +1,4 @@
 import { copy, href, LANG_NAMES, LANGS, SUPPORT, type Lang } from '@/lib/i18n';
-import { Heart } from './Char';
 
 // On every page: help, legal and contact links (Dodo's review and the PRD ask for them everywhere) and the language switch.
 export function SiteFooter({ lang, path = '/' }: { lang: Lang; path?: string }) {
@@ -31,7 +30,7 @@ export function SimpleNav({ lang }: { lang: Lang }) {
   return (
     <nav className="y-nav">
       <div className="y-wrap">
-        <a className="y-logo" href={href(lang)}><span className="y-logo-notch"><Heart /></span>OurNotch</a>
+        <a className="y-logo" href={href(lang)}><img className="y-logo-mark" src="/logo.svg" alt="" />OurNotch</a>
       </div>
     </nav>
   );

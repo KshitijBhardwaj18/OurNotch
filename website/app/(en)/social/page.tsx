@@ -95,6 +95,17 @@ const CARDS: Record<string, () => React.ReactNode> = {
       <div className="s-pals s-big"><Char kind="pip" className="is-love" /><Char kind="bun" className="is-happy" /></div>
     </Frame>
   ),
+  og: () => (
+    <div className="s-og y-blush">
+      <img src="/logo.svg" alt="" />
+      <div>
+        <div className="s-og-name">OurNotch</div>
+        <div className="s-og-line">Send love, <em>notch to notch.</em></div>
+        <div className="s-og-sub">One purchase, both Macs · ournotch.app</div>
+      </div>
+      <div className="s-og-pals"><Char kind="pip" className="is-love" /><Char kind="bun" className="is-happy" /></div>
+    </div>
+  ),
   'demo-feed': () => (
     <Frame size="feed" bg="s-white" title={<>Send love,<br /><em>notch to notch.</em></>}>
       <div className="s-demo"><HeroDemo t={t.demo} tour={t.tour} /></div>
@@ -153,6 +164,13 @@ export default async function Social({ searchParams }: { searchParams: Promise<{
         .s-hero .s-title{font-size:88px;margin-top:40px}.s-hero .s-art{gap:36px;padding-top:20px}
         .s-small{bottom:-60px}.s-small .char{width:170px}
         .s-story .s-title{font-size:132px;margin-top:90px}.s-story .s-body{font-size:42px}.s-story .s-kicker{font-size:26px}
+        .s-og{position:relative;width:1200px;height:630px;box-sizing:border-box;padding:80px 90px;display:flex;align-items:center;gap:56px;overflow:hidden}
+        .s-og img{width:250px;height:250px;flex:none}
+        .s-og-name{font:800 112px/1 var(--disp);letter-spacing:-.05em}
+        .s-og-line{margin-top:18px;font:800 54px/1.05 var(--disp);letter-spacing:-.04em}
+        .s-og-line em{font-style:normal;background:var(--butter);border-radius:.16em;padding:0 .12em}
+        .s-og-sub{margin-top:22px;font:500 28px var(--body);color:var(--ink3)}
+        .s-og-pals{position:absolute;right:50px;bottom:-34px;display:flex;gap:14px}.s-og-pals .char{width:120px}
         .s-foot{text-align:center;font:800 40px var(--disp);letter-spacing:-.03em;margin-top:28px}
       `}</style>
       {CARDS[card]()}

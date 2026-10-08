@@ -31,7 +31,7 @@ export async function Landing({ lang, country }: { lang: Lang; country?: string 
 
       <nav className="y-nav">
         <div className="y-wrap">
-          <a className="y-logo" href="#top"><span className="y-logo-notch"><Heart /></span>OurNotch</a>
+          <a className="y-logo" href="#top"><img className="y-logo-mark" src="/logo.svg" alt="" />OurNotch</a>
           <div className="y-links">
             <a href="#fits">{t.nav.features}</a><a href="#buy">{t.nav.pricing}</a><a href="#faq">{t.nav.faq}</a>
             <a className="y-btn" href="#buy">{t.nav.get}</a>

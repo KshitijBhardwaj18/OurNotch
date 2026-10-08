@@ -11,7 +11,11 @@ export function siteMetadata(lang: Lang): Metadata {
   return {
     title: t.title,
     description: t.description,
-    openGraph: { title: t.title, description: t.ogDescription, type: 'website' },
+    metadataBase: new URL('https://ournotch.app'),
+    icons: { icon: [{ url: '/logo.svg', type: 'image/svg+xml' }], apple: '/apple-touch-icon.png' },
+    // The preview shown when a link to ournotch.app is shared (WhatsApp, X, LinkedIn...).
+    openGraph: { title: t.title, description: t.ogDescription, type: 'website', images: [{ url: '/og.png', width: 1200, height: 630 }] },
+    twitter: { card: 'summary_large_image', images: ['/og.png'] },
     alternates: { languages: { en: '/', fr: '/fr', de: '/de' } },
   };
 }
