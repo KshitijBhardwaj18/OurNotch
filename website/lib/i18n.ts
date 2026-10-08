@@ -136,6 +136,14 @@ const en = {
     ] as Section[],
     contact: 'Questions? Write to us at {email}.',
   },
+  launching: {
+    title: 'Almost ready · OurNotch', kicker: 'Download', h1: 'Launching this week.',
+    sections: [
+      { h: 'Almost there', p: ['OurNotch is in beta with its first couples and opens to everyone this week, as soon as the signed Mac app is ready.'] },
+      { h: 'Bought it already?', p: ['Your licence key is safe in your receipt email. We email you the download link the moment it is live, and your love can download it free then too.'] },
+    ] as Section[],
+    contact: 'Questions? Write to us at {email}.', back: 'Back to OurNotch',
+  },
   privacy: {
     title: 'Privacy · OurNotch', kicker: 'Privacy policy', h1: 'Your notes are yours.', updated: 'Last updated: October 2026',
     sections: [
@@ -287,6 +295,14 @@ const fr: Copy = {
     ],
     contact: 'Des questions ? Écris-nous à {email}.',
   },
+  launching: {
+    title: 'Presque prêt · OurNotch', kicker: 'Téléchargement', h1: 'Lancement cette semaine.',
+    sections: [
+      { h: 'Presque prêt', p: ['OurNotch est en bêta avec ses premiers couples et ouvre à tout le monde cette semaine, dès que l’app Mac signée est prête.'] },
+      { h: 'Tu l’as déjà acheté ?', p: ['Ta clé de licence est bien au chaud dans ton reçu par e-mail. Nous t’envoyons le lien de téléchargement dès qu’il est en ligne, et ton amour pourra alors le télécharger gratuitement.'] },
+    ],
+    contact: 'Des questions ? Écris-nous à {email}.', back: 'Retour à OurNotch',
+  },
   privacy: {
     title: 'Confidentialité · OurNotch', kicker: 'Politique de confidentialité', h1: 'Tes mots t’appartiennent.', updated: 'Dernière mise à jour : octobre 2026',
     sections: [
@@ -435,6 +451,14 @@ const de: Copy = {
       { h: 'Eine Erstattung anfragen', p: ['Wenn dir das Gesetz eine Erstattung zusteht, schreib uns von der E-Mail-Adresse, mit der du bezahlt hast, und schick deinen Beleg mit. Erstattungen macht Dodo Payments, unser Verkäufer (Merchant of Record), auf die Zahlungsart, die du genutzt hast. Eine erstattete Lizenz funktioniert auf beiden Macs des Paares nicht mehr.'] },
     ],
     contact: 'Fragen? Schreib uns an {email}.',
+  },
+  launching: {
+    title: 'Fast fertig · OurNotch', kicker: 'Download', h1: 'Start diese Woche.',
+    sections: [
+      { h: 'Fast geschafft', p: ['OurNotch ist in der Beta mit den ersten Paaren und öffnet diese Woche für alle, sobald die signierte Mac-App fertig ist.'] },
+      { h: 'Schon gekauft?', p: ['Dein Lizenzschlüssel ist sicher in deiner Beleg-E-Mail. Wir schicken dir den Download-Link, sobald er live ist, und deine Liebe kann es dann kostenlos laden.'] },
+    ],
+    contact: 'Fragen? Schreib uns an {email}.', back: 'Zurück zu OurNotch',
   },
   privacy: {
     title: 'Datenschutz · OurNotch', kicker: 'Datenschutzerklärung', h1: 'Deine Notizen gehören dir.', updated: 'Zuletzt aktualisiert: Oktober 2026',
