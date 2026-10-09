@@ -5,21 +5,25 @@ export function SiteFooter({ lang, path = '/' }: { lang: Lang; path?: string }) 
   const t = copy[lang].footer;
   return (
     <footer className="y-wrap">
-      <div className="y-small">
-        <span>{t.made}</span>
-        <span className="y-foot-links">
-          <a href={href(lang, '/licence')}>{t.licence}</a>
-          <a href={href(lang, '/privacy')}>{t.privacy}</a>
-          <a href={href(lang, '/terms')}>{t.terms}</a>
-          <a href={href(lang, '/refunds')}>{t.refunds}</a>
-          <a href={`mailto:${SUPPORT}`}>{t.contact}: {SUPPORT}</a>
-        </span>
-        <span className="y-foot-links">
-          {LANGS.map(l => l === lang
-            ? <b key={l}>{LANG_NAMES[l]}</b>
-            : <a key={l} href={href(l, path)} hrefLang={l} lang={l}>{LANG_NAMES[l]}</a>)}
-        </span>
-        <span>{t.apple}</span>
+      <div className="y-foot">
+        <div className="y-foot-top">
+          <a className="y-foot-brand" href={href(lang)}><img src="/logo.svg" alt="" />OurNotch<small>{t.madeForTwo}</small></a>
+          <nav className="y-foot-links" aria-label={t.legal}>
+            <a href={href(lang, '/licence')}>{t.licence}</a>
+            <a href={href(lang, '/privacy')}>{t.privacy}</a>
+            <a href={href(lang, '/terms')}>{t.terms}</a>
+            <a href={href(lang, '/refunds')}>{t.refunds}</a>
+          </nav>
+          <a className="y-foot-mail" href={`mailto:${SUPPORT}`}>{t.contact}: <b>{SUPPORT}</b></a>
+        </div>
+        <div className="y-foot-bottom">
+          <span className="y-foot-links">
+            {LANGS.map(l => l === lang
+              ? <b key={l}>{LANG_NAMES[l]}</b>
+              : <a key={l} href={href(l, path)} hrefLang={l} lang={l}>{LANG_NAMES[l]}</a>)}
+          </span>
+          <span>{t.apple}</span>
+        </div>
       </div>
     </footer>
   );

@@ -81,7 +81,7 @@ const en = {
     ] as [string, string][],
   },
   end: { h2: 'Give your notch someone to love.', cta: 'Get it for {price}' },
-  footer: { made: 'OurNotch · made for two', apple: 'Not affiliated with Apple.', licence: 'My licence', privacy: 'Privacy', terms: 'Terms', refunds: 'Refunds', contact: 'Contact' },
+  footer: { made: 'OurNotch · made for two', madeForTwo: 'made for two', legal: 'Help and legal', apple: 'Not affiliated with Apple.', licence: 'My licence', privacy: 'Privacy', terms: 'Terms', refunds: 'Refunds', contact: 'Contact' },
   demo: {
     aria: 'Demo: Bun sends Pip a note, hearts and a photo through the MacBook notch, and Pip writes back',
     menus: ['File', 'Edit', 'View', 'Window'], event: 'Date night', eventWhen: '8:00 PM · our spot',
@@ -152,9 +152,9 @@ const en = {
   privacy: {
     title: 'Privacy · OurNotch', kicker: 'Privacy policy', h1: 'Your notes are yours.', updated: 'Last updated: October 2026',
     sections: [
-      { h: 'What we can read', p: ['Nothing you send. Notes, emoji, moods and photos are end-to-end encrypted on your Mac with a key only your two Macs share. They travel through Apple\'s iCloud (CloudKit), where they are stored as unreadable bytes. We have no copy of the key.'] },
-      { h: 'What is stored, and where', p: ['**In iCloud (Apple\'s CloudKit public database):** your encrypted outbox (your latest note, emoji count, mood, photo), the pairing records with the names you chose and your public keys, and short-lived invite codes.', '**On your Mac:** your private key and your licence key (in the Keychain), your settings, and a local log of app events, without any message content.', '**With Dodo Payments:** your purchase: name, email, country, payment details, receipt and licence key. Dodo is the seller of record and handles payment and tax. See Dodo Payments\' privacy policy.'] },
-      { h: 'Licence checks', p: ['About once a day, OurNotch asks Dodo whether your licence key is still valid. The request carries the key and, for the buyer\'s Mac, the Mac\'s name. Nothing else.'] },
+      { h: 'What we can read', p: ['Nothing you send. Whispers, emoji, moods and photos are end-to-end encrypted on your Mac with a key only your two Macs share. They travel through Apple\'s iCloud (CloudKit), where they are stored as unreadable bytes. We have no copy of the key.'] },
+      { h: 'What is stored, and where', p: ['**In iCloud (Apple\'s CloudKit public database):** your encrypted outbox (your last ten whispers, emoji count, mood, photo), the pairing records with the names you chose and your public keys, and short-lived invite codes.', '**On your Mac:** your private key and your licence key (in the Keychain), your settings, and a local log of app events, without any message content.', '**With Dodo Payments:** your purchase: name, email, country, payment details, receipt and licence key. Dodo is the seller of record and handles payment and tax. See Dodo Payments\' privacy policy.'] },
+      { h: 'Licence checks', p: ['About once an hour while OurNotch runs, and when you open the notch after a few minutes away, OurNotch asks Dodo whether your licence key is still valid. The request carries the key and, for the buyer\'s Mac, the Mac\'s name. Nothing else.'] },
       { h: 'Diagnostics', p: ['Test builds given to beta testers upload an event log and performance measurements (no message content) so we can find bugs. The OurNotch you buy uploads nothing: its log stays on your Mac.'] },
       { h: 'This website', p: ['ournotch.app is hosted by Cloudflare, which sees your IP address and country to serve the page and show your local price. We use no analytics, ads or tracking cookies.'] },
       { h: 'Revoking a licence', p: ['If we notice a licence being abused (for example shared publicly or used with a cracked copy), we may revoke it. OurNotch then stops on both Macs of the pair.'] },
@@ -245,7 +245,7 @@ const fr: Copy = {
     ],
   },
   end: { h2: 'Donne à ton encoche quelqu’un à aimer.', cta: 'Obtenir pour {price}' },
-  footer: { made: 'OurNotch · fait pour deux', apple: 'Non affilié à Apple.', licence: 'Ma licence', privacy: 'Confidentialité', terms: 'Conditions', refunds: 'Remboursements', contact: 'Contact' },
+  footer: { made: 'OurNotch · fait pour deux', madeForTwo: 'fait pour deux', legal: 'Aide et mentions légales', apple: 'Non affilié à Apple.', licence: 'Ma licence', privacy: 'Confidentialité', terms: 'Conditions', refunds: 'Remboursements', contact: 'Contact' },
   demo: {
     aria: 'Démo : Bun envoie à Pip un mot, des cœurs et une photo via l’encoche du MacBook, et Pip répond',
     menus: ['Fichier', 'Édition', 'Présentation', 'Fenêtre'], event: 'Soirée en amoureux', eventWhen: '20 h · notre resto',
@@ -316,9 +316,9 @@ const fr: Copy = {
   privacy: {
     title: 'Confidentialité · OurNotch', kicker: 'Politique de confidentialité', h1: 'Tes mots t’appartiennent.', updated: 'Dernière mise à jour : octobre 2026',
     sections: [
-      { h: 'Ce que nous pouvons lire', p: ['Rien de ce que tu envoies. Mots, emojis, humeurs et photos sont chiffrés de bout en bout sur ton Mac avec une clé que seuls vos deux Mac partagent. Ils passent par iCloud d’Apple (CloudKit), où ils sont stockés sous forme d’octets illisibles. Nous n’avons aucune copie de la clé.'] },
-      { h: 'Ce qui est stocké, et où', p: ['**Dans iCloud (base de données publique CloudKit d’Apple) :** ta boîte d’envoi chiffrée (ton dernier mot, le nombre d’emojis, ton humeur, ta photo), les enregistrements d’association avec les prénoms choisis et vos clés publiques, et des codes d’invitation de courte durée.', '**Sur ton Mac :** ta clé privée et ta clé de licence (dans le Trousseau), tes réglages et un journal local des événements de l’app, sans aucun contenu de message.', '**Chez Dodo Payments :** ton achat : nom, e-mail, pays, données de paiement, reçu et clé de licence. Dodo est le vendeur officiel et gère le paiement et les taxes. Voir la politique de confidentialité de Dodo Payments.'] },
-      { h: 'Vérifications de licence', p: ['Environ une fois par jour, OurNotch demande à Dodo si ta clé de licence est toujours valide. La requête contient la clé et, pour le Mac de l’acheteur, le nom du Mac. Rien d’autre.'] },
+      { h: 'Ce que nous pouvons lire', p: ['Rien de ce que tu envoies. Murmures, emojis, humeurs et photos sont chiffrés de bout en bout sur ton Mac avec une clé que seuls vos deux Mac partagent. Ils passent par iCloud d’Apple (CloudKit), où ils sont stockés sous forme d’octets illisibles. Nous n’avons aucune copie de la clé.'] },
+      { h: 'Ce qui est stocké, et où', p: ['**Dans iCloud (base de données publique CloudKit d’Apple) :** ta boîte d’envoi chiffrée (tes dix derniers murmures, le nombre d’emojis, ton humeur, ta photo), les enregistrements d’association avec les prénoms choisis et vos clés publiques, et des codes d’invitation de courte durée.', '**Sur ton Mac :** ta clé privée et ta clé de licence (dans le Trousseau), tes réglages et un journal local des événements de l’app, sans aucun contenu de message.', '**Chez Dodo Payments :** ton achat : nom, e-mail, pays, données de paiement, reçu et clé de licence. Dodo est le vendeur officiel et gère le paiement et les taxes. Voir la politique de confidentialité de Dodo Payments.'] },
+      { h: 'Vérifications de licence', p: ['Environ une fois par heure tant qu’OurNotch tourne, et quand tu ouvres l’encoche après quelques minutes d’absence, OurNotch demande à Dodo si ta clé de licence est toujours valide. La requête contient la clé et, pour le Mac de l’acheteur, le nom du Mac. Rien d’autre.'] },
       { h: 'Diagnostics', p: ['Les versions de test données aux bêta-testeurs envoient un journal d’événements et des mesures de performance (sans contenu de message) pour nous aider à trouver les bugs. L’OurNotch que tu achètes n’envoie rien : son journal reste sur ton Mac.'] },
       { h: 'Ce site', p: ['ournotch.app est hébergé par Cloudflare, qui voit ton adresse IP et ton pays pour servir la page et afficher ton prix local. Nous n’utilisons ni outil d’analyse, ni publicité, ni cookies de suivi.'] },
       { h: 'Révocation d’une licence', p: ['Si nous constatons un abus de licence (par exemple partagée publiquement ou utilisée avec une copie piratée), nous pouvons la révoquer. OurNotch s’arrête alors sur les deux Mac du couple.'] },
@@ -407,7 +407,7 @@ const de: Copy = {
     ],
   },
   end: { h2: 'Gib deiner Notch jemanden zum Liebhaben.', cta: 'Für {price} holen' },
-  footer: { made: 'OurNotch · für zwei gemacht', apple: 'Nicht mit Apple verbunden.', licence: 'Meine Lizenz', privacy: 'Datenschutz', terms: 'AGB', refunds: 'Erstattungen', contact: 'Kontakt' },
+  footer: { made: 'OurNotch · für zwei gemacht', madeForTwo: 'für zwei gemacht', legal: 'Hilfe und Rechtliches', apple: 'Nicht mit Apple verbunden.', licence: 'Meine Lizenz', privacy: 'Datenschutz', terms: 'AGB', refunds: 'Erstattungen', contact: 'Kontakt' },
   demo: {
     aria: 'Demo: Bun schickt Pip über die MacBook-Notch eine Notiz, Herzen und ein Foto, und Pip schreibt zurück',
     menus: ['Ablage', 'Bearbeiten', 'Darstellung', 'Fenster'], event: 'Date-Abend', eventWhen: '20:00 · unser Platz',
@@ -478,9 +478,9 @@ const de: Copy = {
   privacy: {
     title: 'Datenschutz · OurNotch', kicker: 'Datenschutzerklärung', h1: 'Deine Notizen gehören dir.', updated: 'Zuletzt aktualisiert: Oktober 2026',
     sections: [
-      { h: 'Was wir lesen können', p: ['Nichts von dem, was du schickst. Notizen, Emojis, Launen und Fotos werden auf deinem Mac Ende-zu-Ende verschlüsselt, mit einem Schlüssel, den nur eure zwei Macs teilen. Sie reisen über Apples iCloud (CloudKit) und liegen dort als unlesbare Bytes. Wir haben keine Kopie des Schlüssels.'] },
-      { h: 'Was wo gespeichert wird', p: ['**In iCloud (Apples öffentliche CloudKit-Datenbank):** dein verschlüsselter Postausgang (deine letzte Notiz, die Zahl der Emojis, deine Laune, dein Foto), die Verbindungsdaten mit den gewählten Namen und euren öffentlichen Schlüsseln sowie kurzlebige Einladungscodes.', '**Auf deinem Mac:** dein privater Schlüssel und dein Lizenzschlüssel (im Schlüsselbund), deine Einstellungen und ein lokales Protokoll der App-Ereignisse, ohne Nachrichteninhalte.', '**Bei Dodo Payments:** dein Kauf – Name, E-Mail, Land, Zahlungsdaten, Beleg und Lizenzschlüssel. Dodo ist der Verkäufer (Merchant of Record) und kümmert sich um Zahlung und Steuern. Siehe die Datenschutzerklärung von Dodo Payments.'] },
-      { h: 'Lizenzprüfungen', p: ['Etwa einmal am Tag fragt OurNotch bei Dodo nach, ob dein Lizenzschlüssel noch gültig ist. Die Anfrage enthält den Schlüssel und beim Mac des Käufers den Namen des Macs. Sonst nichts.'] },
+      { h: 'Was wir lesen können', p: ['Nichts von dem, was du schickst. Flüstern, Emojis, Launen und Fotos werden auf deinem Mac Ende-zu-Ende verschlüsselt, mit einem Schlüssel, den nur eure zwei Macs teilen. Sie reisen über Apples iCloud (CloudKit) und liegen dort als unlesbare Bytes. Wir haben keine Kopie des Schlüssels.'] },
+      { h: 'Was wo gespeichert wird', p: ['**In iCloud (Apples öffentliche CloudKit-Datenbank):** dein verschlüsselter Postausgang (deine letzten zehn Flüster-Nachrichten, die Zahl der Emojis, deine Laune, dein Foto), die Verbindungsdaten mit den gewählten Namen und euren öffentlichen Schlüsseln sowie kurzlebige Einladungscodes.', '**Auf deinem Mac:** dein privater Schlüssel und dein Lizenzschlüssel (im Schlüsselbund), deine Einstellungen und ein lokales Protokoll der App-Ereignisse, ohne Nachrichteninhalte.', '**Bei Dodo Payments:** dein Kauf – Name, E-Mail, Land, Zahlungsdaten, Beleg und Lizenzschlüssel. Dodo ist der Verkäufer (Merchant of Record) und kümmert sich um Zahlung und Steuern. Siehe die Datenschutzerklärung von Dodo Payments.'] },
+      { h: 'Lizenzprüfungen', p: ['Etwa einmal pro Stunde, solange OurNotch läuft, und wenn du die Notch nach ein paar Minuten wieder öffnest, fragt OurNotch bei Dodo nach, ob dein Lizenzschlüssel noch gültig ist. Die Anfrage enthält den Schlüssel und beim Mac des Käufers den Namen des Macs. Sonst nichts.'] },
       { h: 'Diagnose', p: ['Testversionen für Beta-Tester laden ein Ereignisprotokoll und Leistungsmessungen hoch (ohne Nachrichteninhalte), damit wir Fehler finden. Das OurNotch, das du kaufst, lädt nichts hoch: Sein Protokoll bleibt auf deinem Mac.'] },
       { h: 'Diese Website', p: ['ournotch.app wird von Cloudflare gehostet, das deine IP-Adresse und dein Land sieht, um die Seite auszuliefern und deinen lokalen Preis zu zeigen. Wir nutzen keine Analyse-Tools, keine Werbung und keine Tracking-Cookies.'] },
       { h: 'Entzug einer Lizenz', p: ['Wenn wir Missbrauch einer Lizenz bemerken (zum Beispiel öffentlich geteilt oder mit einer gecrackten Kopie genutzt), können wir sie entziehen. OurNotch stoppt dann auf beiden Macs des Paares.'] },
