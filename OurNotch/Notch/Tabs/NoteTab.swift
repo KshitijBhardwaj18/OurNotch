@@ -16,7 +16,7 @@ struct NoteTab: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("our little notes ♡")
+            Text("our little notes ❤️")
                 .font(.system(size: 13, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.notchBlush)
                 .padding(.bottom, 4)

@@ -3448,18 +3448,18 @@
         }
       }
     },
-    "our little notes ♡" : {
+    "our little notes ❤️" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "nos petits mots ♡"
+            "value" : "nos petits mots ❤️"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "unsere kleinen Notizen ♡"
+            "value" : "unsere kleinen Notizen ❤️"
           }
         }
       }
