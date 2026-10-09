@@ -4,7 +4,7 @@ import SwiftUI
 struct HomeTab: View {
     let state: AppState
 
-    static let photoWidth: CGFloat = 160
+    static let photoWidth: CGFloat = 200
 
     var body: some View {
         // Ticks every second, only while the notch is open on Home.
@@ -17,6 +17,7 @@ struct HomeTab: View {
                     stats(now: context.date)
                 }
             }
+            .environment(\.colorScheme, .light)
         }
     }
 
@@ -25,12 +26,12 @@ struct HomeTab: View {
     /// A portrait tile as tall as the content area; people photos look best tall.
     @ViewBuilder private func photoTile(now: Date) -> some View {
         if let photo = state.partnerPhoto {
-            TreatedPhoto(image: photo, cornerRadius: 14)
+            TreatedPhoto(image: photo, cornerRadius: 20)
                 .overlay {
                     // Darkens the bottom half so the caption stays readable on any photo.
                     LinearGradient(stops: [.init(color: .clear, location: 0.5), .init(color: .black.opacity(0.55), location: 1)],
                                    startPoint: .top, endPoint: .bottom)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
                 }
                 .overlay(alignment: .bottomLeading) {
                     Group {
@@ -52,15 +53,16 @@ struct HomeTab: View {
 
     private var emptyPhotoTile: some View {
         VStack(spacing: 8) {
-            Image(systemName: "photo").font(.system(size: 30)).foregroundStyle(Color.tertiaryLabel)
+            Image(systemName: "photo").font(.system(size: 30)).foregroundStyle(Color.pastelInk3)
             Text("No photo from \(state.partnerName.lowercased()) yet")
                 .font(.system(size: 12))
-                .foregroundStyle(Color.secondaryLabel)
+                .foregroundStyle(Color.pastelInk2)
                 .multilineTextAlignment(.center)
         }
         .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 14))
+        .background(Color.pastelButter, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .environment(\.colorScheme, .light)
     }
 
     // MARK: Note
@@ -72,24 +74,25 @@ struct HomeTab: View {
                     Image(systemName: "bubble.left.fill").font(.system(size: 12)).foregroundStyle(Color.notchPink)
                     Text("\(state.partnerName.lowercased()) · \(shortAgo(note.sentAt, now: now))")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Color.secondaryLabel)
+                        .foregroundStyle(Color.pastelInk2)
                 }
                 Text(note.text)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
                     .tracking(-0.1)
                     .lineSpacing(2)
                     .lineLimit(2)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.pastelInk)
             } else {
                 Text("No notes from \(state.partnerName.lowercased()) yet ♡")
                     .font(.system(size: 13))
-                    .foregroundStyle(Color.secondaryLabel)
+                    .foregroundStyle(Color.pastelInk2)
             }
         }
         .padding(.vertical, 12)
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 12))
+        .background(LinearGradient(colors: [.pastelCream, .pastelBlush], startPoint: .topLeading, endPoint: .bottomTrailing),
+                    in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
     // MARK: Stats
@@ -102,11 +105,11 @@ struct HomeTab: View {
         return GeometryReader { row in
             let unit = (row.size.width - 20) / 4.1
             HStack(spacing: 10) {
-                statTile("Hours", value { Together.hours(since: $0, now: now) })
+                statTile("Hours", value { Together.hours(since: $0, now: now) }, color: .pastelButter)
                     .frame(width: unit * 1.2)
-                statTile("Weekends", value { Together.weekends(since: $0, now: now) })
+                statTile("Weekends", value { Together.weekends(since: $0, now: now) }, color: .pastelSky)
                     .frame(width: unit)
-                statTile("Seconds", value { Together.seconds(since: $0, now: now) },
+                statTile("Seconds", value { Together.seconds(since: $0, now: now) }, color: .pastelMint,
                          highlighted: since != nil, withHeart: true)
                     .frame(width: unit * 1.9)
             }
@@ -114,14 +117,14 @@ struct HomeTab: View {
     }
 
     /// A big centered number with its label underneath.
-    private func statTile(_ label: LocalizedStringKey, _ value: String, highlighted: Bool = false, withHeart: Bool = false) -> some View {
+    private func statTile(_ label: LocalizedStringKey, _ value: String, color: Color, highlighted: Bool = false, withHeart: Bool = false) -> some View {
         VStack(spacing: 4) {
             Text(value)
-                .font(.system(size: 22, weight: .semibold).monospacedDigit())
+                .font(.system(size: 24, weight: .heavy, design: .rounded).monospacedDigit())
                 .tracking(-0.4)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
-                .foregroundStyle(highlighted ? Color.notchPink : .white)
+                .foregroundStyle(highlighted ? Color.notchPink : .pastelInk)
             HStack(spacing: 4) {
                 Text(label)
                 if withHeart {
@@ -129,12 +132,12 @@ struct HomeTab: View {
                 }
             }
             .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(Color.secondaryLabel)
+            .foregroundStyle(Color.pastelInk2)
             .lineLimit(1)
             .minimumScaleFactor(0.7) // "Wochenenden", "Week-ends"
         }
         .padding(.horizontal, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 12))
+        .background(color, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }

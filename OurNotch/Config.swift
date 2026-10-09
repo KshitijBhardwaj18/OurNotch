@@ -112,20 +112,18 @@ enum Config {
 
     enum Notch {
         /// The tab content area inside the open notch.
-        static let contentSize = CGSize(width: 500, height: 200)
+        static let contentSize = CGSize(width: 500, height: 290)
         /// Space between the notch's black edge and its content, on every side.
         static let margin: CGFloat = 20
         /// The curved "ears" at the top corners of the open notch. They sit inside the frame,
         /// so the black body is this much narrower on each side.
         static let openEarRadius: CGFloat = 14
-        static let openSize = CGSize(width: contentSize.width + (margin + openEarRadius) * 2, height: 296)
-        /// The Note tab grows the open notch this much taller, so the conversation has room.
-        static let noteExtraHeight: CGFloat = 90
+        static let openSize = CGSize(width: contentSize.width + (margin + openEarRadius) * 2, height: 386)
         /// Width of the slots on each side of the camera in the closed notch: avatar + mood on the left, ♥ on the right.
         static let closedSideWidth: CGFloat = 60
-        /// The same slots while your love has a mood, so its word fits next to the emoji ("🥺 Missing you").
-        /// Both sides grow, so the notch stays centred on the camera.
-        static let closedSideWidthWithMood: CGFloat = 122
+        /// The same slots while your love has a mood: it sits on the right ("🥺 missing you"), and both
+        /// sides grow so the notch stays centred on the camera.
+        static let closedSideWidthWithMood: CGFloat = 104
         /// Space between the closed notch's curved edge and its content.
         static let closedInset: CGFloat = 10
         /// How far the closed shape reaches below the menu bar, so it fully covers the camera housing.
@@ -157,6 +155,17 @@ extension Color {
     static let separator = Color.white.opacity(0.08)
     static let secondaryLabel = Color(hex: 0xEBEBF5).opacity(0.6)
     static let tertiaryLabel = Color(hex: 0xEBEBF5).opacity(0.3)
+
+    // The open notch's pastel pages, in the website's colours (each tab has its own).
+    static let pastelInk = Color(hex: 0x16141A)
+    static let pastelInk2 = Color(hex: 0x5E5A66)
+    static let pastelInk3 = Color(hex: 0x5E5A66).opacity(0.6)
+    static let pastelCream = Color(hex: 0xFFF0E6)
+    static let pastelBlush = Color(hex: 0xFFD3DC)
+    static let pastelButter = Color(hex: 0xFFE9A6)
+    static let pastelSky = Color(hex: 0xCFE3FF)
+    static let pastelMint = Color(hex: 0xCFEFDF)
+    static let pastelMist = Color(hex: 0xF5F4F1)
 
     init(hex: UInt32) {
         self.init(red: Double(hex >> 16 & 0xFF) / 255, green: Double(hex >> 8 & 0xFF) / 255, blue: Double(hex & 0xFF) / 255)

@@ -17,29 +17,26 @@ struct NoteTab: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("our little notes ♡")
-                .font(.system(size: 13, weight: .heavy, design: .rounded))
-                .foregroundStyle(Ink.pink)
-                .padding(.bottom, 6)
+            HStack {
+                Text("our little notes ♡")
+                    .font(.system(size: 13, weight: .heavy, design: .rounded))
+                    .foregroundStyle(Ink.pink)
+                Spacer()
+                hearts.frame(width: 100, height: 22, alignment: .trailing)
+            }
+            .padding(.bottom, 6)
             conversation
             composer
             footer.padding(.top, 10)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(alignment: .topTrailing) { hearts }
-        .background(LinearGradient(colors: [Color(hex: 0xFFF0E6), Color(hex: 0xFFD6DF)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                    in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .environment(\.colorScheme, .light)
+        .pastelCard(.pastelBlush)
         .onChange(of: focused) { _, now in isEditing = now }
     }
 
     private enum Ink {
-        static let main = Color(hex: 0x16141A)
-        static let soft = Color(hex: 0x5E5A66)
-        static let pink = Color(hex: 0xFF375F)
+        static let main = Color.pastelInk
+        static let soft = Color.pastelInk2
+        static let pink = Color.notchPink
     }
 
     /// A few pastel hearts drifting in the corner, like the website's hero.
@@ -47,7 +44,7 @@ struct NoteTab: View {
         TimelineView(.animation(minimumInterval: 1 / 30)) { context in
             let t = context.date.timeIntervalSinceReferenceDate
             ZStack {
-                ForEach(Array([(0xFFB3C2, 20.0, -24.0, 12.0), (0xFFE9A6, 15.0, -58.0, 16.0), (0xCFE3FF, 13.0, -90.0, 9.0)].enumerated()), id: \.offset) { i, h in
+                ForEach(Array([(0xFFB3C2, 18.0, -6.0, 0.0), (0xFFE9A6, 14.0, -36.0, 3.0), (0xCFE3FF, 12.0, -62.0, -2.0)].enumerated()), id: \.offset) { i, h in
                     Image(systemName: "heart.fill")
                         .font(.system(size: h.1))
                         .foregroundStyle(Color(hex: UInt32(h.0)))

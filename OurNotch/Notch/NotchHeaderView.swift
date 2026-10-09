@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The row beside the camera. Closed: your love's little avatar and mood (emoji and word), and a heartbeat ♥. Open: the couple's names and the
+/// The row beside the camera. Closed: your love's little avatar, and their mood (or a heartbeat ♥). Open: the couple's names and the
 /// Settings gear. Both layouts sit in the same row and crossfade, so nothing reflows mid-animation.
 struct NotchHeaderView: View {
     let state: AppState
@@ -16,12 +16,19 @@ struct NotchHeaderView: View {
         .animation(.easeOut(duration: 0.2), value: isOpen)
     }
 
+    /// My love's avatar on the left; on the right their mood ("🥺 missing you"), "away", or a heartbeat.
     private var closed: some View {
         HStack(spacing: 0) {
-            HStack(spacing: 4) {
-                PartnerAvatar(state: state, size: 20)
-                // "away" while my love has hidden their OurNotch; re-checked each minute so it clears on time.
-                TimelineView(.everyMinute) { context in
+            PartnerAvatar(state: state, size: 20)
+                .padding(.leading, Config.Notch.closedInset)
+                .frame(width: state.closedSideWidth, alignment: .leading)
+
+            // Nothing drawn behind the camera is visible, so leave at least its width empty.
+            Spacer(minLength: notchSize.width)
+
+            // "away" while my love has hidden their OurNotch; re-checked each minute so it clears on time.
+            TimelineView(.everyMinute) { context in
+                Group {
                     if state.partnerIsAway(now: context.date) {
                         Text("away").font(.system(size: 10, weight: .medium)).foregroundStyle(Color.secondaryLabel)
                     } else if let mood = state.partnerOutbox.mood {
@@ -32,26 +39,21 @@ struct NotchHeaderView: View {
                                     .font(.system(size: 11, weight: .medium))
                                     .foregroundStyle(.white.opacity(0.85))
                                     .lineLimit(1)
-                                    .minimumScaleFactor(0.8)
+                                    .minimumScaleFactor(0.75)
                             }
                         }
                         .transition(.scale.combined(with: .opacity))
+                    } else {
+                        Image(systemName: "heart.fill")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.notchPink)
+                            .heartbeat()
                     }
                 }
             }
             .animation(.spring(response: 0.35, dampingFraction: 0.6), value: state.partnerOutbox.mood)
-            .padding(.leading, Config.Notch.closedInset)
-            .frame(width: state.closedSideWidth, alignment: .leading)
-
-            // Nothing drawn behind the camera is visible, so leave at least its width empty.
-            Spacer(minLength: notchSize.width)
-
-            Image(systemName: "heart.fill")
-                .font(.system(size: 14))
-                .foregroundStyle(Color.notchPink)
-                .heartbeat()
-                .padding(.trailing, Config.Notch.closedInset + 2)
-                .frame(width: state.closedSideWidth, alignment: .trailing)
+            .padding(.trailing, Config.Notch.closedInset + 2)
+            .frame(width: state.closedSideWidth, alignment: .trailing)
         }
     }
 
