@@ -734,18 +734,18 @@
         }
       }
     },
-    "End-to-end encrypted, no account, and none of your iCloud storage. One purchase for both Macs." : {
+    "End-to-end encrypted, no account, no sign-up. One purchase for both Macs." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chiffré de bout en bout, sans compte, sans utiliser ton stockage iCloud. Un seul achat pour vos deux Mac."
+            "value" : "Chiffré de bout en bout, sans compte ni inscription. Un seul achat pour vos deux Mac."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ende-zu-Ende-verschlüsselt, ohne Konto und ohne deinen iCloud-Speicher. Ein Kauf für eure beiden Macs."
+            "value" : "Ende-zu-Ende-verschlüsselt, ohne Konto und Anmeldung. Ein Kauf für eure beiden Macs."
           }
         }
       }
@@ -3534,22 +3534,6 @@
         }
       }
     },
-    "from pip" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "de pip"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "von pip"
-          }
-        }
-      }
-    },
     "just between us ❤️" : {
       "localizations" : {
         "fr" : {
@@ -3596,8 +3580,7 @@
             "value" : "mittag um 1? ich bring dumplings mit 🥟"
           }
         }
-      },
-      "extractionState" : "stale"
+      }
     },
     "lunch at 1? 🥟" : {
       "localizations" : {

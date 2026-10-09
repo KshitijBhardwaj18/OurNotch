@@ -88,7 +88,7 @@ struct OnboardingStory: View {
             case .emoji: "Tap a heart or a kiss, and it pours out of their notch."
             case .mood: "Pick a mood. It shows in their notch all day, right beside your face."
             case .seconds: "Your time together, ticking up in pink. Plus days, weekends and the countdown to your anniversary."
-            case .together: "End-to-end encrypted, no account, and none of your iCloud storage. One purchase for both Macs."
+            case .together: "End-to-end encrypted, no account, no sign-up. One purchase for both Macs."
             }
         }
 
@@ -125,11 +125,11 @@ private struct Scene: View {
             ZStack {
                 switch slide {
                 case .love: love(width: w, pip: pip, bun: bun)
-                case .whispers: notch(width: 236, height: 104) { whispers }.position(x: w / 2, y: 52)
-                case .emoji: pouring(width: w); notch(width: 150, height: 28) { EmptyView() }.position(x: w / 2, y: 14)
-                case .mood: notch(width: 226, height: 30) { mood }.position(x: w / 2, y: 15)
+                case .whispers: whispers(width: w)
+                case .emoji: pouring(width: w); closedNotch().position(x: w / 2, y: 14)
+                case .mood: closedNotch { mood }.position(x: w / 2, y: 14)
                 case .seconds: notch(width: 230, height: 62) { counter }.position(x: w / 2, y: 31)
-                case .together: notch(width: 180, height: 30) { locked }.position(x: w / 2, y: 15)
+                case .together: closedNotch { locked }.position(x: w / 2, y: 14)
                 }
                 buddy("pip", mood: slide == .mood || slide == .seconds ? "love" : "happy", phase: 0).position(pip)
                 buddy("bun", mood: slide == .whispers || slide == .together ? "happy" : "love", phase: 1.3).position(bun)
@@ -143,47 +143,89 @@ private struct Scene: View {
         UnevenRoundedRectangle(bottomLeadingRadius: height > 40 ? 18 : 13, bottomTrailingRadius: height > 40 ? 18 : 13)
             .fill(.black)
             .frame(width: width, height: height)
-            .overlay { content() }
+            .overlay(alignment: .top) { content() }
     }
 
-    // MARK: Love: a heart goes up into the notch, the notch says who it's from, hearts rain down on Bun.
+    /// The closed notch as it really looks: your love's avatar on the left, and on the right the beating
+    /// heart (or whatever the slide puts there).
+    private func closedNotch(width: CGFloat = 206, banner: Bool = false,
+                             @ViewBuilder right: () -> some View = { heart }) -> some View {
+        notch(width: width, height: banner ? 50 : 28) {
+            HStack(spacing: 0) {
+                Circle().fill(Color(hex: 0xFF8FAB)).frame(width: 17, height: 17)
+                    .overlay(Text(verbatim: "p").font(.system(size: 9.5, weight: .heavy, design: .rounded)).foregroundStyle(.white))
+                Spacer()
+                right()
+            }
+            .padding(.horizontal, 11)
+            .frame(height: 28)
+        }
+    }
+
+    private static var heart: some View {
+        TimelineView(.animation) { context in
+            Image(systemName: "heart.fill").font(.system(size: 12)).foregroundStyle(pink)
+                .scaleEffect(1 + 0.18 * max(0, sin(context.date.timeIntervalSinceReferenceDate * 4.8)))
+        }
+    }
+
+    // MARK: Love: a heart goes up into Pip's side of the notch, and pours out onto Bun.
 
     @ViewBuilder private func love(width w: CGFloat, pip: CGPoint, bun: CGPoint) -> some View {
         let p = (t / 3.4).truncatingRemainder(dividingBy: 1)
-        let opened = smooth(p, 0.30, 0.38) * (1 - smooth(p, 0.70, 0.78))
-        notch(width: 150 + 70 * opened, height: 28 + 4 * opened) {
-            HStack(spacing: 5) {
-                Image(systemName: "heart.fill").font(.system(size: 11)).foregroundStyle(Self.pink)
-                Text("from pip").font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(.white)
-            }
-            .opacity(opened)
-        }
-        .position(x: w / 2, y: 14 + 2 * opened)
+        closedNotch().position(x: w / 2, y: 14)
 
         // Up from Pip into the notch.
-        let up = min(1, p / 0.32)
+        let up = min(1, p / 0.34)
         Image(systemName: "heart.fill")
             .font(.system(size: 22))
             .foregroundStyle(Self.pink)
             .scaleEffect(1 - 0.5 * up)
-            .opacity(p < 0.32 ? 1 : 0)
+            .opacity(p < 0.34 ? 1 : 0)
             .position(x: pip.x + (w / 2 - pip.x) * up, y: pip.y - 40 - (pip.y - 40 - 16) * up + sin(up * .pi) * -20)
 
-        // Down from the notch onto Bun.
-        ForEach(0..<4, id: \.self) { i in
-            let q = max(0, (p - 0.55 - Double(i) * 0.06) / 0.35)
+        // Out of the notch, down onto Bun.
+        ForEach(0..<5, id: \.self) { i in
+            let q = max(0, (p - 0.42 - Double(i) * 0.06) / 0.4)
             Image(systemName: "heart.fill")
-                .font(.system(size: 12 + CGFloat(i % 2) * 6))
+                .font(.system(size: 11 + CGFloat(i % 3) * 5))
                 .foregroundStyle(i % 2 == 0 ? Self.pink : Color(hex: 0xFF8FAB))
-                .opacity(q > 0 && q < 1 ? 1 - q * 0.6 : 0)
-                .position(x: w / 2 + (bun.x - w / 2) * q.squareRoot() + CGFloat(i - 2) * 8, y: 30 + (bun.y - 70) * q * q) // out sideways first, then down onto Bun
+                .rotationEffect(.degrees(Double(i - 2) * 12))
+                .opacity(q > 0 && q < 1 ? 1 - q * 0.5 : 0)
+                .position(x: w / 2 + (bun.x - w / 2) * q.squareRoot() + CGFloat(i - 2) * 9, y: 30 + (bun.y - 70) * q * q)
         }
     }
 
-    // MARK: Whispers: the open notch, the bubbles popping in one by one.
+    // MARK: Whispers: one arrives scrolling under the notch, then the notch opens on your little conversation.
 
-    private var whispers: some View {
-        let step = (t / 1.3).truncatingRemainder(dividingBy: 5) // 0 empty, then one bubble per step
+    @ViewBuilder private func whispers(width w: CGFloat) -> some View {
+        let p = (t / 7.6).truncatingRemainder(dividingBy: 1)
+        let open = smooth(p, 0.55, 0.62)
+        ZStack(alignment: .top) {
+            closedNotch(banner: true) { Self.heart }
+                .overlay(alignment: .bottom) { banner.frame(width: 180).padding(.bottom, 5) }
+                .opacity(1 - open)
+            notch(width: 236, height: 104) { conversation }
+                .opacity(open)
+        }
+        .position(x: w / 2, y: 52)
+    }
+
+    /// The whisper scrolling under the closed notch, the sender's name in pink, like the real banner.
+    private var banner: some View {
+        let x = 190 - (t * 34).truncatingRemainder(dividingBy: 400)
+        return (Text(verbatim: "pip").foregroundColor(Self.pink) + Text(verbatim: "  ") + Text("lunch at 1? i'll bring dumplings 🥟").foregroundColor(.white))
+            .font(.system(size: 10.5, weight: .semibold, design: .rounded))
+            .fixedSize()
+            .offset(x: x)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(height: 14)
+            .clipped()
+    }
+
+    /// The open notch's conversation, the bubbles popping in one by one.
+    private var conversation: some View {
+        let step = ((t / 7.6).truncatingRemainder(dividingBy: 1) - 0.6) / 0.1 // after the notch opens, one bubble per step
         let lines: [(LocalizedStringKey, Bool)] = [("lunch at 1? 🥟", false), ("yes please!! ❤️", true), ("see you soon 😘", false)]
         return VStack(spacing: 5) {
             ForEach(lines.indices, id: \.self) { i in
@@ -228,10 +270,7 @@ private struct Scene: View {
     private var mood: some View {
         let moods = ["🥺", "🍕", "😴"]
         let current = moods[Int(t / 1.8) % moods.count]
-        return HStack(spacing: 5) {
-            Circle().fill(Color(hex: 0xFF8FAB)).frame(width: 18, height: 18)
-                .overlay(Text(verbatim: "p").font(.system(size: 10, weight: .heavy, design: .rounded)).foregroundStyle(.white))
-            Spacer()
+        return HStack(spacing: 0) {
             HStack(spacing: 4) {
                 Text(verbatim: current).font(.system(size: 13))
                 Text((Config.moodLabel(current) ?? "").lowercased())
@@ -241,7 +280,6 @@ private struct Scene: View {
             .id(current)
             .transition(.scale.combined(with: .opacity))
         }
-        .padding(.horizontal, 12)
         .animation(.spring(response: 0.35, dampingFraction: 0.6), value: current)
     }
 
@@ -267,9 +305,9 @@ private struct Scene: View {
     // MARK: Together: locked, just you two.
 
     private var locked: some View {
-        HStack(spacing: 5) {
-            Image(systemName: "lock.fill").font(.system(size: 10)).foregroundStyle(Self.pink)
-            Text("just you two").font(.system(size: 11, weight: .semibold, design: .rounded)).foregroundStyle(.white)
+        HStack(spacing: 4) {
+            Image(systemName: "lock.fill").font(.system(size: 9.5)).foregroundStyle(.white.opacity(0.85))
+            Text("just you two").font(.system(size: 10.5, weight: .semibold, design: .rounded)).foregroundStyle(.white)
         }
     }
 
