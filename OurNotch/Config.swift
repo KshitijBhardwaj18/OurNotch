@@ -112,13 +112,13 @@ enum Config {
 
     enum Notch {
         /// The tab content area inside the open notch.
-        static let contentSize = CGSize(width: 500, height: 290)
+        static let contentSize = CGSize(width: 580, height: 240)
         /// Space between the notch's black edge and its content, on every side.
         static let margin: CGFloat = 20
         /// The curved "ears" at the top corners of the open notch. They sit inside the frame,
         /// so the black body is this much narrower on each side.
         static let openEarRadius: CGFloat = 14
-        static let openSize = CGSize(width: contentSize.width + (margin + openEarRadius) * 2, height: 386)
+        static let openSize = CGSize(width: contentSize.width + (margin + openEarRadius) * 2, height: 336)
         /// Width of the slots on each side of the camera in the closed notch: avatar + mood on the left, ♥ on the right.
         static let closedSideWidth: CGFloat = 60
         /// The same slots while your love has a mood: it sits on the right ("🥺 missing you"), and both

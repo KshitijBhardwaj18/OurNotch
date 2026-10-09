@@ -13,17 +13,19 @@ struct EmojiTab: View {
     @State private var taps: [String: Int] = [:]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            header
-            Spacer(minLength: 8)
-            emojiRow
-            Spacer(minLength: 8)
-            HStack(spacing: 8) {
-                Text("Appears").font(.system(size: 12)).foregroundStyle(Color.secondaryLabel)
-                SmallSegmented(options: EmojiMode.allCases, selection: $mode, label: \.label, symbol: \.symbol)
+        // The row sits in the middle of the card, with the title above and the choice below.
+        ZStack {
+            VStack(alignment: .leading, spacing: 0) {
+                header
+                Spacer(minLength: 0)
+                HStack(spacing: 8) {
+                    Text("Appears").font(.system(size: 12)).foregroundStyle(Color.secondaryLabel)
+                    SmallSegmented(options: EmojiMode.allCases, selection: $mode, label: \.label, symbol: \.symbol)
+                }
             }
+            emojiRow
         }
-        .cardStyle(tint: .pastelSky)
+        .cardStyle()
         .onChange(of: state.emojiStatus) { _, status in
             guard status == .delivered else { return }
             clearTask?.cancel()
@@ -79,7 +81,7 @@ struct EmojiTab: View {
     }
 }
 
-/// `#2C2C2E` tile that dims and shrinks while pressed; tinted pink for the last one sent.
+/// `#2C2C2E` tile that dims and shrinks while pressed; outlined in pink for the last one sent.
 private struct EmojiButtonStyle: ButtonStyle {
     let isLastSent: Bool
 
@@ -99,7 +101,7 @@ private struct EmojiButtonStyle: ButtonStyle {
 
     private func fill(pressed: Bool) -> Color {
         if pressed { return .notchPressed }
-        return isLastSent ? Color.notchPink.opacity(0.16) : .notchField
+        return isLastSent ? .notchPressed : .notchField
     }
 }
 

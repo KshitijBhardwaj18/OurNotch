@@ -24,7 +24,7 @@ struct NoteTab: View {
             composer
             footer.padding(.top, 10)
         }
-        .cardStyle(tint: .pastelBlush)
+        .cardStyle()
         .onChange(of: focused) { _, now in isEditing = now }
     }
 

@@ -122,12 +122,11 @@ struct Heartbeat: ViewModifier {
 extension View {
     func heartbeat() -> some View { modifier(Heartbeat()) }
 
-    /// The dark `#1C1C1E` card that holds a tab, with a faint wash of one of the website's pastels.
-    /// Dark first, so it's easy on the eyes in a dark room; the colour is only a hint.
-    func cardStyle(tint: Color = .clear) -> some View {
+    /// The dark `#1C1C1E` card that holds a tab. Neutral, so it's easy on the eyes in a dark room;
+    /// pink is kept for what matters (your notes, the send heart, the counter, a selection).
+    func cardStyle() -> some View {
         padding(14)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(tint.opacity(0.07), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }

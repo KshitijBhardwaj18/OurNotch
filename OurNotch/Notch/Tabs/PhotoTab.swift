@@ -29,7 +29,7 @@ struct PhotoTab: View {
             }
         }
         .frame(maxHeight: .infinity)
-        .cardStyle(tint: .pastelButter)
+        .cardStyle()
     }
 
     private var partner: String { state.partnerName.lowercased() }

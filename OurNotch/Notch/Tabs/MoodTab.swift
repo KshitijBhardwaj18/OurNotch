@@ -27,7 +27,7 @@ struct MoodTab: View {
                         }
                         .frame(maxWidth: .infinity)
                         .frame(height: 68)
-                        .background(selected ? Color.notchPink.opacity(0.16) : .notchField, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .background(selected ? Color.notchPressed : .notchField, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                         .overlay {
                             if selected {
                                 RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Color.notchPink.opacity(0.6), lineWidth: 1)
@@ -39,7 +39,7 @@ struct MoodTab: View {
                 }
             }
         }
-        .cardStyle(tint: .pastelMint)
+        .cardStyle()
         .animation(.snappy(duration: 0.2), value: state.myOutbox.mood)
     }
 

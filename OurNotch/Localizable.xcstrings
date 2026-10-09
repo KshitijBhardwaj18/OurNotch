@@ -1278,6 +1278,22 @@
         }
       }
     },
+    "No mood" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas d’humeur"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine Laune"
+          }
+        }
+      }
+    },
     "No notes from %@ yet ♡" : {
       "localizations" : {
         "fr" : {
