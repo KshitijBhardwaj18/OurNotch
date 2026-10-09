@@ -94,8 +94,12 @@ enum Config {
         static let codeLifetime: TimeInterval = 24 * 60 * 60
         /// Join requests one code can hold, so a wrong person can't use up a code (spare slots for the right one).
         static let joinSlots = 5
-        /// Linked from the invite email.
+        /// Linked from the invite email. Beta partners get the Beta DMG; the site's /download serves the sold build.
+        #if BETA
+        static let downloadURL = "https://downloads.ournotch.app/beta/OurNotch.dmg"
+        #else
         static let downloadURL = "\(Licence.website)/download"
+        #endif
     }
 
     enum Message {
