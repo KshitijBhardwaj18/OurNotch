@@ -69,7 +69,7 @@ struct EmojiTab: View {
                 }
                 .buttonStyle(EmojiButtonStyle(isLastSent: char == lastSent))
                 .overlay { TapBurst(char: char, trigger: taps[char, default: 0]) }
-                .help(String(localized: "Send \(state.partnerName.lowercased()) a \(char)"))
+                .notchHint(String(localized: "Send \(state.partnerName.lowercased()) a \(char)"))
             }
         }
     }

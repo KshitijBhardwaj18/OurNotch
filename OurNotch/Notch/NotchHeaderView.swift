@@ -81,7 +81,7 @@ struct NotchHeaderView: View {
                     .contentShape(Rectangle()) // the gear's center is a hole; make the whole square clickable
             }
             .buttonStyle(.plain)
-            .help("Settings")
+            .notchHint(String(localized: "Settings"))
         }
         .padding(.horizontal, Config.Notch.margin) // the notch view already insets past the ears
     }

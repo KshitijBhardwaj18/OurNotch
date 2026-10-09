@@ -68,7 +68,7 @@ struct NotchTabBar: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help(tab.hint)
+                .notchHint(tab.hint)
             }
         }
         .padding(2)
@@ -134,8 +134,51 @@ struct Heartbeat: ViewModifier {
     }
 }
 
+/// A small tooltip pill above a view, shown after a short hover. The notch belongs to a background app,
+/// and macOS only shows its own tooltips (`.help`) for the app in front, so the notch draws its own.
+struct NotchHint: ViewModifier {
+    let text: String
+    /// Which edge the pill lines up with; views at the notch's sides keep theirs inside it.
+    var edge: HorizontalAlignment = .center
+    @State private var shown = false
+    @State private var wait: Task<Void, Never>?
+
+    func body(content: Content) -> some View {
+        content
+            .onHover { inside in
+                wait?.cancel()
+                guard inside else { withAnimation(.easeOut(duration: 0.12)) { shown = false }; return }
+                wait = Task {
+                    try? await Task.sleep(for: .milliseconds(550))
+                    guard !Task.isCancelled else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) { shown = true }
+                }
+            }
+            .overlay(alignment: Alignment(horizontal: edge, vertical: .top)) {
+                if shown {
+                    Text(text)
+                        .font(.system(size: 11.5, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(Color.notchPressed, in: Capsule())
+                        .overlay(Capsule().strokeBorder(.white.opacity(0.08), lineWidth: 0.5))
+                        .shadow(color: .black.opacity(0.4), radius: 6, y: 2)
+                        .fixedSize()
+                        .offset(y: -30)
+                        .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottom)))
+                        .allowsHitTesting(false)
+                }
+            }
+            .zIndex(shown ? 10 : 0)
+    }
+}
+
 extension View {
     func heartbeat() -> some View { modifier(Heartbeat()) }
+
+    /// A cute tooltip for anything in the notch (see `NotchHint`).
+    func notchHint(_ text: String, edge: HorizontalAlignment = .center) -> some View { modifier(NotchHint(text: text, edge: edge)) }
 
     /// The dark `#1C1C1E` card that holds a tab. Neutral, so it's easy on the eyes in a dark room;
     /// pink is kept for what matters (your notes, the send heart, the counter, a selection).

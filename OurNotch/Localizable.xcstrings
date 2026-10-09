@@ -23,6 +23,22 @@
         }
       }
     },
+    "%@ is" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Humeur de %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@s Laune"
+          }
+        }
+      }
+    },
     "%@ planned a surprise for you, sweetheart ♡\n\nA little place in your Mac's notch where things from both of us arrive.\n\n1. Download OurNotch (free for you): %@\n2. Open it, choose \"I Have an Invite Code\" and type: %@\n\nThe code works for 24 hours.\n\nlove, %@" : {
       "localizations" : {
         "fr" : {
@@ -35,22 +51,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ hat eine Überraschung für dich geplant, Schatz ♡\n\nEin kleiner Ort in der Notch deines Macs, an dem Dinge von uns beiden ankommen.\n\n1. Lade OurNotch herunter (für dich kostenlos): %2$@\n2. Öffne es, wähle „Ich habe einen Einladungscode“ und gib ein: %3$@\n\nDer Code gilt 24 Stunden.\n\nIn Liebe, %4$@"
-          }
-        }
-      }
-    },
-    "%@ right now" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ en ce moment"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ gerade"
           }
         }
       }
@@ -808,6 +808,23 @@
             "value" : "Jede Sekunde zählt ♡ Klick für all eure Zahlen"
           }
         }
+      },
+      "extractionState" : "stale"
+    },
+    "Every second counts ♡ Click for more" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque seconde compte ♡ Clique pour plus"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jede Sekunde zählt ♡ Klick für mehr"
+          }
+        }
       }
     },
     "Every single one of them with you ♡" : {
@@ -1532,7 +1549,8 @@
             "value" : "Keine Laune"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "No notes from %@ yet ♡" : {
       "localizations" : {
@@ -2104,7 +2122,8 @@
             "value" : "Sieh, wie es %@ geht, und teil deine Laune"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Send" : {
       "localizations" : {
@@ -2343,6 +2362,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Teile diesen Code. Er ist nur für euch zwei und gilt 24 Stunden."
+          }
+        }
+      }
+    },
+    "Share your mood too ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partage ton humeur aussi ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teil auch deine Laune ♡"
           }
         }
       }
@@ -3240,6 +3275,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "mittag um 1? ich bring dumplings mit 🥟"
+          }
+        }
+      }
+    },
+    "no mood yet" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pas encore d’humeur"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "noch keine Laune"
           }
         }
       }

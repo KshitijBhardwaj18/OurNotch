@@ -14,10 +14,10 @@ struct StatsTab: View {
             let value = { (compute: (Date) -> Int) in since.map { compute($0).formatted() } ?? "…" }
 
             LazyVGrid(columns: columns, spacing: 10) {
-                card(value { Together.days(since: $0, now: context.date) }, "Days together", hint: String(localized: "Every single one of them with you ♡")).frame(height: height)
+                card(value { Together.days(since: $0, now: context.date) }, "Days together", edge: .leading, hint: String(localized: "Every single one of them with you ♡")).frame(height: height)
                 card(value { Together.weekends(since: $0, now: context.date) }, "Weekends", hint: String(localized: "Lazy Sundays included ♡")).frame(height: height)
-                card(value { Together.hours(since: $0, now: context.date) }, "Hours", hint: String(localized: "And not one of them wasted ♡")).frame(height: height)
-                card(value { Together.seconds(since: $0, now: context.date) }, "Seconds", hint: String(localized: "Tick, tick, love ♡"), pink: since != nil, heart: true)
+                card(value { Together.hours(since: $0, now: context.date) }, "Hours", edge: .trailing, hint: String(localized: "And not one of them wasted ♡")).frame(height: height)
+                card(value { Together.seconds(since: $0, now: context.date) }, "Seconds", edge: .leading, hint: String(localized: "Tick, tick, love ♡"), pink: since != nil, heart: true)
                     .frame(height: height)
                 card((state.myOutbox.emojisSent + state.partnerOutbox.emojisSent).formatted(), "Emojis between you",
                      detail: String(localized: "you \(state.myOutbox.emojisSent) · \(state.partnerName.lowercased()) \(state.partnerOutbox.emojisSent)"),
@@ -32,18 +32,19 @@ struct StatsTab: View {
         if let since {
             let days = Together.daysToAnniversary(since: since, now: now)
             if days == 0 {
-                card("♡", "Happy anniversary!", hint: String(localized: "Today's your day ♡"), pink: true)
+                card("♡", "Happy anniversary!", edge: .trailing, hint: String(localized: "Today's your day ♡"), pink: true)
             } else {
-                card(days.formatted(), days == 1 ? "Day to your anniversary" : "Days to your anniversary",
+                card(days.formatted(), days == 1 ? "Day to your anniversary" : "Days to your anniversary", edge: .trailing,
                      hint: String(localized: "Start planning something sweet ♡"))
             }
         } else {
-            card("…", "Days to your anniversary", hint: String(localized: "Start planning something sweet ♡"))
+            card("…", "Days to your anniversary", edge: .trailing, hint: String(localized: "Start planning something sweet ♡"))
         }
     }
 
     /// A number, its label underneath, and an optional small line below.
-    private func card(_ value: String, _ label: LocalizedStringKey, detail: String? = nil, hint: String, pink: Bool = false, heart: Bool = false) -> some View {
+    private func card(_ value: String, _ label: LocalizedStringKey, detail: String? = nil, edge: HorizontalAlignment = .center,
+                      hint: String, pink: Bool = false, heart: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(value)
                 .font(.system(size: 26, weight: .bold, design: .rounded).monospacedDigit())
@@ -67,6 +68,6 @@ struct StatsTab: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .contentShape(Rectangle())
-        .help(hint)
+        .notchHint(hint, edge: edge)
     }
 }

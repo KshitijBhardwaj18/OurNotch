@@ -12,22 +12,22 @@ struct HomeTab: View {
         // Ticks every second, only while the notch is open on Home.
         TimelineView(.periodic(from: .now, by: 1)) { context in
             HStack(spacing: 10) {
-                card(.photo, hint: String(localized: "Send \(state.partnerName.lowercased()) a photo back ♡")) { photoTile(now: context.date) }.frame(width: side, height: side)
+                card(.photo, hint: String(localized: "Send \(state.partnerName.lowercased()) a photo back ♡"), edge: .leading) { photoTile(now: context.date) }.frame(width: side, height: side)
                 VStack(spacing: 10) {
-                    card(.note, hint: String(localized: "Read all your notes and write back ♡")) { noteTile(now: context.date) }.frame(height: (side - 10) * 0.56)
+                    card(.note, hint: String(localized: "Read all your notes and write back ♡"), edge: .trailing) { noteTile(now: context.date) }.frame(height: (side - 10) * 0.56)
                     HStack(spacing: 10) {
-                        card(.stats, hint: String(localized: "Every second counts ♡ Click for all your numbers together")) { togetherTile(now: context.date) }
-                        card(.mood, hint: String(localized: "See how \(state.partnerName.lowercased()) feels, and share yours")) { moodTile }.frame(width: 110)
+                        card(.stats, hint: String(localized: "Every second counts ♡ Click for more")) { togetherTile(now: context.date) }
+                        card(.mood, hint: String(localized: "Share your mood too ♡"), edge: .trailing) { moodTile }.frame(width: 116)
                     }
                 }
             }
         }
     }
 
-    private func card(_ tab: NotchTab, hint: String, @ViewBuilder _ content: () -> some View) -> some View {
+    private func card(_ tab: NotchTab, hint: String, edge: HorizontalAlignment = .center, @ViewBuilder _ content: () -> some View) -> some View {
         Button { go(tab) } label: { content() }
             .buttonStyle(CardButtonStyle())
-            .help(hint)
+            .notchHint(hint, edge: edge)
     }
 
     // MARK: Photo
@@ -123,6 +123,8 @@ struct HomeTab: View {
             }
             .font(.system(size: 11.5, weight: .medium))
             .foregroundStyle(Color.secondaryLabel)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
         }
         .padding(.horizontal, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
@@ -131,27 +133,27 @@ struct HomeTab: View {
 
     // MARK: Mood
 
-    /// Their mood, big, under "manya right now": the emoji with its word, or a quiet heart when they haven't set one.
+    /// Reads as a sentence: "manya is" · 🍕 · "hungry" (or a quiet heart when they haven't set one).
     private var moodTile: some View {
-        VStack(spacing: 3) {
-            Text("\(state.partnerName.lowercased()) right now")
-                .font(.system(size: 10.5, weight: .medium))
+        VStack(spacing: 2) {
+            Text("\(state.partnerName.lowercased()) is")
+                .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.secondaryLabel)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             if let mood = state.partnerOutbox.mood {
-                Text(mood).font(.system(size: 28))
+                Text(mood).font(.system(size: 30)).frame(height: 38)
                 Text((Config.moodLabel(mood) ?? "").lowercased())
-                    .font(.system(size: 12.5, weight: .semibold, design: .rounded))
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             } else {
-                Image(systemName: "heart").font(.system(size: 22)).foregroundStyle(Color.notchBlush).padding(.vertical, 3)
-                Text("No mood").font(.system(size: 11, weight: .medium)).foregroundStyle(Color.secondaryLabel)
+                Image(systemName: "heart").font(.system(size: 24)).foregroundStyle(Color.notchBlush).frame(height: 38)
+                Text("no mood yet").font(.system(size: 12, weight: .medium, design: .rounded)).foregroundStyle(Color.secondaryLabel)
             }
         }
-        .padding(8)
+        .padding(10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .tile()
         .animation(.spring(response: 0.35, dampingFraction: 0.6), value: state.partnerOutbox.mood)
