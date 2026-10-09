@@ -300,7 +300,7 @@ struct OnboardingView: View {
         .frame(height: 480)
         .environment(\.colorScheme, .light)
         .animation(.smooth(duration: 0.25), value: model.step)
-        .animation(.smooth(duration: 0.6), value: slide)
+        .animation(.smooth(duration: 0.9), value: slide)
     }
 
     // MARK: Screens

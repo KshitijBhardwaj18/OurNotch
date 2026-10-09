@@ -2,7 +2,7 @@ import SwiftUI
 
 /// The left half of onboarding: a slow carousel of what OurNotch does, starring Pip and Bun from the
 /// website. Each slide is a little scene under a notch that hangs from the window's top edge (the window
-/// has no visible title bar). It moves on every 5 s; the dots or a swipe pick a slide and restart the clock.
+/// has no visible title bar). It moves on every 8 s; a swipe picks a slide and restarts the clock.
 /// The onboarding window owns `index` so the steps side can take on the slide's colour.
 struct OnboardingStory: View {
     @Binding var index: Int
@@ -10,21 +10,10 @@ struct OnboardingStory: View {
     @State private var forward = true
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
+        ZStack {
             page(Slide.allCases[index])
                 .id(index)
                 .transition(.push(from: forward ? .trailing : .leading))
-            HStack(spacing: 7) {
-                ForEach(Slide.allCases.indices, id: \.self) { i in
-                    Capsule()
-                        .fill(i == index ? Ink.main : Ink.main.opacity(0.18))
-                        .frame(width: i == index ? 20 : 7, height: 7)
-                        .contentShape(Rectangle())
-                        .onTapGesture { show(i) }
-                }
-            }
-            .padding(.horizontal, 28)
-            .padding(.bottom, 22)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipped()
@@ -33,7 +22,7 @@ struct OnboardingStory: View {
             if drag.translation.width < -30 { show(index + 1) } else if drag.translation.width > 30 { show(index - 1) }
         })
         .task(id: index) {
-            try? await Task.sleep(for: .seconds(5))
+            try? await Task.sleep(for: .seconds(8))
             guard !Task.isCancelled else { return }
             show(index + 1)
         }
@@ -68,7 +57,7 @@ struct OnboardingStory: View {
     private func show(_ i: Int) {
         let count = Slide.allCases.count
         forward = i >= index
-        withAnimation(.smooth(duration: 0.55)) { index = (i + count) % count }
+        withAnimation(.smooth(duration: 0.9)) { index = (i + count) % count }
     }
 
     enum Slide: CaseIterable {
