@@ -6,7 +6,7 @@ const EURO = new Set('AT BE BG HR CY EE FI FR DE GR IE IT LV LT LU MT NL PT SK S
 
 export function priceFor(country?: string | null): string {
   const c = country?.toUpperCase();
-  if (c === 'IN') return '₹200';
+  if (c === 'IN') return '₹499';
   if (c && EURO.has(c)) return '€3';
   return '$4.50';
 }

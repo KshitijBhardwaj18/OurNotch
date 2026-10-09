@@ -63,7 +63,7 @@ const en = {
   buy: {
     tag: '1 license · 2 Macs', kicker: 'Pricing', h2: 'One license for both of you.',
     p: "Buy it once and install it on your Mac and your person's. No subscription.", once: 'one time',
-    points: ["Your Mac and your person's", 'Notes, emoji, moods and photos', 'Your time together, counted live'],
+    points: ["Your Mac and your person's", 'Whispers, kisses, moods and photos', 'Your time together, counted live'],
     cta: 'Get OurNotch',
     fine: 'Needs macOS 14 Sonoma or later on both Macs. Your love can {download} and join with your invite.',
     downloadFree: 'download it free',
@@ -226,7 +226,7 @@ const fr: Copy = {
   buy: {
     tag: '1 licence · 2 Mac', kicker: 'Prix', h2: 'Une licence pour vous deux.',
     p: 'Achète-le une fois et installe-le sur ton Mac et celui de ta personne. Pas d’abonnement.', once: 'une fois',
-    points: ['Ton Mac et celui de ta personne', 'Mots, emojis, humeurs et photos', 'Votre temps ensemble, compté en direct'],
+    points: ['Ton Mac et celui de ta personne', 'Murmures, bisous, humeurs et photos', 'Votre temps ensemble, compté en direct'],
     cta: 'Obtenir OurNotch',
     fine: 'Nécessite macOS 14 Sonoma ou plus récent sur les deux Mac. Ton amour peut {download} et te rejoindre avec ton invitation.',
     downloadFree: 'le télécharger gratuitement',
@@ -387,7 +387,7 @@ const de: Copy = {
   buy: {
     tag: '1 Lizenz · 2 Macs', kicker: 'Preis', h2: 'Eine Lizenz für euch beide.',
     p: 'Einmal kaufen und auf deinem Mac und dem deines Menschen installieren. Kein Abo.', once: 'einmalig',
-    points: ['Dein Mac und der deines Menschen', 'Notizen, Emojis, Launen und Fotos', 'Eure gemeinsame Zeit, live gezählt'],
+    points: ['Dein Mac und der deines Menschen', 'Flüstern, Küsse, Launen und Fotos', 'Eure gemeinsame Zeit, live gezählt'],
     cta: 'OurNotch holen',
     fine: 'Benötigt macOS 14 Sonoma oder neuer auf beiden Macs. Deine Liebe kann {download} und mit deiner Einladung beitreten.',
     downloadFree: 'es kostenlos laden',

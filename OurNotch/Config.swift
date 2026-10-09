@@ -61,7 +61,7 @@ enum Config {
         #else
         static let website = "https://ournotch.app"
         #endif
-        /// Dodo's hosted checkout; it picks $4.50 / ₹200 / €3 from the buyer's currency, then returns to the
+        /// Dodo's hosted checkout; it picks $4.50 / ₹499 / €3 from the buyer's currency, then returns to the
         /// thank-you page with `license_key`, whose Open OurNotch button activates this app.
         static let checkoutURL = URL(string: "https://test.checkout.dodopayments.com/buy/\(productId)?quantity=1&redirect_url=\(website)/thanks")!
         /// The price on the gate. The Mac doesn't know the buyer's country, so checkout shows the local price.

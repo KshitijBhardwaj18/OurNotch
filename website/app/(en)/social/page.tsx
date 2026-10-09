@@ -83,7 +83,7 @@ const CARDS: Record<string, () => React.ReactNode> = {
   ),
   price: () => (
     <Frame size="feed" bg="y-mint" kicker="Pricing" title={<>One purchase.<br /><em>Both Macs.</em></>}>
-      <div className="s-prices"><span>$4.50</span><span>₹200</span><span>€3</span></div>
+      <div className="s-prices"><span>$4.50</span><span>₹499</span><span>€3</span></div>
       <p className="s-body">One time, no subscription. Your love downloads it free and joins with your invite code.</p>
       <div className="s-pals"><Char kind="pip" className="is-happy" /><Char kind="bun" className="is-love" /></div>
     </Frame>
