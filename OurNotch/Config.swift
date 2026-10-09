@@ -33,6 +33,9 @@ enum Config {
         // starting allowance (it grows with users, and busy replies are retried). Raise this if CloudKit throttles.
         static let activePollInterval: Duration = .seconds(3)
         static let activeWindow: TimeInterval = 180
+        /// A read that gets no data for this long fails, so the next check retries instead of waiting.
+        /// CloudKit's default is 60 s: Beta 1.0 logged a check stuck 64 s on a dropped connection.
+        static let requestTimeout: TimeInterval = 10
     }
 
     enum Diagnostics {

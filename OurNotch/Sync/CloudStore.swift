@@ -225,8 +225,12 @@ struct CloudStore: Mailbox {
     }
 
     private func fetch(_ name: String) async throws -> CKRecord? {
+        let config = CKOperation.Configuration()
+        config.timeoutIntervalForRequest = Config.Cloud.requestTimeout
         do {
-            return try await retrying { try await database.record(for: .init(recordName: name)) }
+            return try await retrying {
+                try await database.configuredWith(configuration: config) { try await $0.record(for: .init(recordName: name)) }
+            }
         } catch let error as CKError where error.code == .unknownItem {
             return nil
         }
