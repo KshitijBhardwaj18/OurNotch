@@ -131,18 +131,23 @@ struct HomeTab: View {
 
     // MARK: Mood
 
-    /// Their mood, big: the emoji with its word, or a quiet heart when they haven't set one.
+    /// Their mood, big, under "manya right now": the emoji with its word, or a quiet heart when they haven't set one.
     private var moodTile: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 3) {
+            Text("\(state.partnerName.lowercased()) right now")
+                .font(.system(size: 10.5, weight: .medium))
+                .foregroundStyle(Color.secondaryLabel)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             if let mood = state.partnerOutbox.mood {
-                Text(mood).font(.system(size: 30))
+                Text(mood).font(.system(size: 28))
                 Text((Config.moodLabel(mood) ?? "").lowercased())
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.system(size: 12.5, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             } else {
-                Image(systemName: "heart").font(.system(size: 22)).foregroundStyle(Color.notchBlush)
+                Image(systemName: "heart").font(.system(size: 22)).foregroundStyle(Color.notchBlush).padding(.vertical, 3)
                 Text("No mood").font(.system(size: 11, weight: .medium)).foregroundStyle(Color.secondaryLabel)
             }
         }

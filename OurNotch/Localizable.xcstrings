@@ -39,6 +39,22 @@
         }
       }
     },
+    "%@ right now" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ en ce moment"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ gerade"
+          }
+        }
+      }
+    },
     "%@ wants to join" : {
       "localizations" : {
         "fr" : {
