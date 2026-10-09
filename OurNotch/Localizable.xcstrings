@@ -849,6 +849,22 @@
         }
       }
     },
+    "Every second, counted." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque seconde compte."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jede Sekunde zählt."
+          }
+        }
+      }
+    },
     "Every single one of them with you ♡" : {
       "localizations" : {
         "fr" : {
@@ -1447,7 +1463,8 @@
             "value" : "Kleine Notizen, große Gefühle."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Low" : {
       "localizations" : {
@@ -1956,6 +1973,22 @@
         }
       }
     },
+    "Pick a mood. It shows in their notch all day, right beside your face." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis une humeur. Elle s’affiche toute la journée dans son encoche, à côté de ton visage."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähl eine Laune. Sie steht den ganzen Tag in der Notch, direkt neben deinem Gesicht."
+          }
+        }
+      }
+    },
     "Pick a mood. It sits next to your face in their notch." : {
       "localizations" : {
         "fr" : {
@@ -1970,7 +2003,8 @@
             "value" : "Wähl eine Laune. Sie erscheint neben deinem Gesicht in der Notch."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Pick a photo of you two ♡" : {
       "localizations" : {
@@ -2103,7 +2137,8 @@
             "value" : "Schreib etwas Süßes. Es läuft durch die Notch, bis es geöffnet wird."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Say something sweet…" : {
       "localizations" : {
@@ -2657,6 +2692,22 @@
         }
       }
     },
+    "Sweet little notes scroll across their notch, and your last few stay as a tiny conversation." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De petits mots doux défilent dans son encoche, et vos derniers restent comme une mini conversation."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Süße kleine Notizen laufen durch die Notch, und eure letzten bleiben als kleine Unterhaltung."
+          }
+        }
+      }
+    },
     "System" : {
       "localizations" : {
         "fr" : {
@@ -2669,6 +2720,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "System"
+          }
+        }
+      }
+    },
+    "Tap a heart or a kiss, and it pours out of their notch." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touche un cœur ou un bisou, et il coule de son encoche."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp ein Herz oder einen Kuss an, und es fließt aus der Notch."
           }
         }
       }
@@ -2704,7 +2771,8 @@
             "value" : "Wähl ein Emoji: Es fließt aus der Notch."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Tap one and it pops up on %@'s screen ♡" : {
       "localizations" : {
@@ -3191,6 +3259,22 @@
         }
       }
     },
+    "Whispers, just between you." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Des murmures, rien qu’entre vous."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flüstern, nur zwischen euch."
+          }
+        }
+      }
+    },
     "Write to Us" : {
       "localizations" : {
         "fr" : {
@@ -3369,6 +3453,22 @@
         }
       }
     },
+    "Your time together, ticking up in pink. Plus days, weekends and the countdown to your anniversary." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre temps à deux, qui défile en rose. Avec les jours, les week-ends et le compte à rebours jusqu’à votre anniversaire."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eure gemeinsame Zeit, in Pink tickend. Dazu Tage, Wochenenden und der Countdown bis zum Jahrestag."
+          }
+        }
+      }
+    },
     "away" : {
       "localizations" : {
         "fr" : {
@@ -3434,6 +3534,22 @@
         }
       }
     },
+    "from pip" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "de pip"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "von pip"
+          }
+        }
+      }
+    },
     "just between us ❤️" : {
       "localizations" : {
         "fr" : {
@@ -3450,6 +3566,22 @@
         }
       }
     },
+    "just you two" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rien que vous deux"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nur ihr zwei"
+          }
+        }
+      }
+    },
     "lunch at 1? i'll bring dumplings 🥟" : {
       "localizations" : {
         "fr" : {
@@ -3462,6 +3594,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "mittag um 1? ich bring dumplings mit 🥟"
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
+    "lunch at 1? 🥟" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "déj à 13 h ? 🥟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mittag um 1? 🥟"
           }
         }
       }
@@ -3531,6 +3680,22 @@
         }
       }
     },
+    "see you soon 😘" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "à tout à l’heure 😘"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "bis gleich 😘"
+          }
+        }
+      }
+    },
     "that code doesn't look right ♡ check it and try again" : {
       "localizations" : {
         "fr" : {
@@ -3591,6 +3756,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "dieser Code ist abgelaufen ♡ bitte deine Liebe um einen neuen"
+          }
+        }
+      }
+    },
+    "yes please!! ❤️" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "oh oui !! ❤️"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ja bitte!! ❤️"
           }
         }
       }
