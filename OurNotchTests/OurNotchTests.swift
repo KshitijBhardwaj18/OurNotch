@@ -327,6 +327,16 @@ struct PartnersTests {
         #expect(partner.banner == nil)
     }
 
+    @Test func openingTheNotchEndsAThreePassBanner() async throws {
+        let (you, partner) = try await TwoPartners().paired()
+        #expect(you.sendMessage("miss you", mode: .three))
+        try await Task.sleep(for: .milliseconds(100))
+        await partner.sync()
+        #expect(partner.banner?.text == "miss you")
+        partner.notchOpened()
+        #expect(partner.banner == nil) // read: closing the notch doesn't scroll it 3 more times
+    }
+
     @Test func emojisArriveAndAreDelivered() async throws {
         let (you, partner) = try await TwoPartners().paired()
         var arrived = 0

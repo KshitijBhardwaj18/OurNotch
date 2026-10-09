@@ -288,11 +288,12 @@ final class AppState {
         setBanner(nil)
     }
 
-    /// Opening the notch dismisses an `untilOpened` banner; the message stays readable inside.
+    /// Opening the notch dismisses the banner, whichever mode: the whisper is read, and stays readable inside.
+    /// (Left up, a `.three` banner would start its 3 passes over when the notch closes.)
     func notchOpened() {
         isNotchOpen = true
         onOpened?()
-        if banner?.mode == .untilOpened { setBanner(nil) }
+        setBanner(nil)
     }
 
     func notchClosed() {

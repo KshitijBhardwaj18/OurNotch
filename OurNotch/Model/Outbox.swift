@@ -97,7 +97,7 @@ struct Message: Codable, Equatable {
 
 /// How the note scrolls on the partner's notch. The sender chooses.
 enum BannerMode: String, Codable, CaseIterable {
-    /// Scrolls 3 times, then disappears.
+    /// Scrolls 3 times, then disappears (sooner if the partner opens the notch).
     case three
     /// Keeps scrolling until the partner opens the notch.
     case untilOpened
