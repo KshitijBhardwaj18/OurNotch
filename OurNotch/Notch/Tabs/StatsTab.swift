@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Your life together in numbers: six equal cards, the seconds counting up live in pink.
+/// The Together tab: your life together in numbers, as six equal cards, the seconds counting up live in pink.
 struct StatsTab: View {
     let state: AppState
 

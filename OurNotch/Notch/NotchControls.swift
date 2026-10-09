@@ -10,7 +10,7 @@ enum NotchTab: CaseIterable {
         case .emoji: String(localized: "Emoji")
         case .mood: String(localized: "Mood")
         case .photo: String(localized: "Photo")
-        case .stats: String(localized: "Stats")
+        case .stats: String(localized: "Together")
         }
     }
 
@@ -21,7 +21,7 @@ enum NotchTab: CaseIterable {
         case .emoji: "face.smiling"
         case .mood: "cloud.sun"
         case .photo: "photo"
-        case .stats: "chart.bar"
+        case .stats: "infinity.circle"
         }
     }
 

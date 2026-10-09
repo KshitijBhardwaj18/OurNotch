@@ -2641,22 +2641,6 @@
       },
       "extractionState" : "stale"
     },
-    "Stats" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stats"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Statistik"
-          }
-        }
-      }
-    },
     "Still not active. If you think this is a mistake, write to us." : {
       "localizations" : {
         "fr" : {
@@ -2966,6 +2950,22 @@
         }
       },
       "extractionState" : "stale"
+    },
+    "Together" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ensemble"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zusammen"
+          }
+        }
+      }
     },
     "Together since" : {
       "localizations" : {
