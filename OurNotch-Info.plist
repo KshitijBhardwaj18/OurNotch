@@ -11,6 +11,9 @@
 	<string>$(SPARKLE_PUBLIC_KEY)</string>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
+	<!-- Hourly, the most often Sparkle allows: fixes reach both partners the same day. One tiny feed request each. -->
+	<key>SUScheduledCheckInterval</key>
+	<integer>3600</integer>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

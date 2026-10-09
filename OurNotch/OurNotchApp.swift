@@ -360,7 +360,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     #endif
 }
 
-/// Sparkle updates (`spec-m2.md > Packaging and Updates`): checks the feed daily and offers a new version.
+/// Sparkle updates (`spec-m2.md > Packaging and Updates`): checks the feed hourly and offers a new version.
 /// Off until the release key exists (slice 11 sets `SPARKLE_PUBLIC_KEY`), and in Debug builds.
 @MainActor
 final class Updates {
