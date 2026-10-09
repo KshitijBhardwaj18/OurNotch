@@ -22,6 +22,8 @@ struct Outbox: Codable, Equatable {
     var mood: String?
     /// The buyer's licence key, so the partner's Mac can ask Dodo whether it's still valid (no slot used).
     var licenceKey: String?
+    /// While I've hidden OurNotch: my partner's notch shows "away" until then, or until I'm back.
+    var awayUntil: Date?
 }
 
 struct SentPhoto: Codable, Equatable {

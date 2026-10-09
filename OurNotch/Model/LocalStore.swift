@@ -71,6 +71,11 @@ struct LocalStore {
         get { decode("savedOutbox") }
         nonmutating set { encode(newValue, "savedOutbox") }
     }
+    /// Hide OurNotch: when it comes back by itself (`Date.distantFuture` for "until I'm back").
+    var hiddenUntil: Date? {
+        get { defaults.object(forKey: "hiddenUntil") as? Date }
+        nonmutating set { defaults.set(newValue, forKey: "hiddenUntil") }
+    }
     var banner: Message? {
         get { decode("banner") }
         nonmutating set { encode(newValue, "banner") }
