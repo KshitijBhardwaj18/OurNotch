@@ -100,24 +100,25 @@ struct HomeTab: View {
 
     // MARK: Together
 
-    /// The seconds you've been together, counting up in pink, with hours and weekends underneath.
+    /// The seconds you've been together, counting up in pink and labelled underneath, then hours and weekends.
     private func togetherTile(now: Date) -> some View {
         let since = state.togetherSince
         func value(_ compute: (Date) -> Int) -> String { since.map { compute($0).formatted() } ?? "…" }
 
-        return VStack(alignment: .leading, spacing: 3) {
-            HStack(spacing: 4) {
-                Text("Seconds")
-                Image(systemName: "heart.fill").font(.system(size: 9)).foregroundStyle(Color.notchPink).heartbeat()
-            }
-            .font(.system(size: 11, weight: .medium))
-            .foregroundStyle(Color.secondaryLabel)
+        return VStack(alignment: .leading, spacing: 2) {
             Text(value { Together.seconds(since: $0, now: now) })
                 .font(.system(size: 24, weight: .bold, design: .rounded).monospacedDigit())
                 .tracking(-0.4)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
                 .foregroundStyle(since == nil ? Color.white : .notchPink)
+            HStack(spacing: 4) {
+                Text("Seconds")
+                Image(systemName: "heart.fill").font(.system(size: 9)).foregroundStyle(Color.notchPink).heartbeat()
+            }
+            .font(.system(size: 11, weight: .medium))
+            .foregroundStyle(Color.secondaryLabel)
+            .padding(.bottom, 6)
             HStack(spacing: 12) {
                 small(value { Together.hours(since: $0, now: now) }, "Hours")
                 small(value { Together.weekends(since: $0, now: now) }, "Weekends")

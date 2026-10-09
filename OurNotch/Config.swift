@@ -6,7 +6,7 @@ enum Config {
     /// Rapid emoji taps within this pause are bundled into one save.
     static let emojiBundleDelay: Duration = .seconds(1)
     /// The one-tap emojis on the Emoji tab.
-    static let emojis = ["❤️", "🥰", "😘", "🫶", "🤗", "🌹"]
+    static let emojis = ["❤️", "🥰", "😘", "💋", "🫶", "🤗", "🌹"]
     /// Moods for the Mood tab: the emoji travels; the label explains it.
     static let moods: [(emoji: String, label: String)] = [
         ("🥰", String(localized: "In love")), ("😊", String(localized: "Happy")), ("🥺", String(localized: "Missing you")), ("🎉", String(localized: "Excited")), ("☕️", String(localized: "On a break")), ("🍕", String(localized: "Hungry")),
