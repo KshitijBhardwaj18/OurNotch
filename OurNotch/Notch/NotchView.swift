@@ -48,8 +48,10 @@ struct NotchView: View {
                             .animation(.easeOut(duration: 0.22).delay(0.08)),
                         removal: .opacity.animation(.easeOut(duration: 0.12))))
             } else if let banner = state.visibleBanner {
-                MessageBanner(message: banner, senderName: state.partnerName, onFinished: state.bannerFinished)
+                MessageBanner(message: banner, senderName: state.partnerName, start: state.bannerStartedAt ?? .now,
+                              onFinished: state.bannerFinished)
                     .id(banner.id) // a new note restarts the scroll
+                    .onAppear(perform: state.bannerAppeared)
                     .frame(height: 20)
                     .padding(.horizontal, 12) // + the 6 pt ear = 18 pt from the edges
                     .transition(.opacity)

@@ -25,6 +25,8 @@ final class AppState {
     }
     /// The message currently scrolling under the notch, if any. Saved so `untilOpened` survives a restart.
     private(set) var banner: Message?
+    /// When `banner` first scrolled on screen; nil until it does.
+    private(set) var bannerStartedAt: Date?
     /// While set and in the future, OurNotch is hidden: no notch, and arrivals wait.
     private(set) var hiddenUntil: Date?
     var isHidden: Bool { Hide.isHidden(until: hiddenUntil) }
@@ -107,6 +109,7 @@ final class AppState {
         myOutbox = store.myOutbox ?? Outbox()
         savedOutbox = store.savedOutbox ?? Outbox()
         banner = store.banner
+        bannerStartedAt = store.bannerStartedAt
         hiddenUntil = Hide.isHidden(until: store.hiddenUntil) ? store.hiddenUntil : nil
         if hiddenUntil == nil { myOutbox.awayUntil = nil } // came back while the app was closed
         togetherSince = store.togetherSince
@@ -263,6 +266,7 @@ final class AppState {
         myOutbox.awayUntil = nil
         store.myOutbox = myOutbox
         note("shown again")
+        setBannerStart(nil) // a whisper held back while hidden plays its passes in full
         Task { await save() }
         onHiddenChanged?()
         if let held = heldEmojis {
@@ -300,9 +304,21 @@ final class AppState {
         isNotchOpen = false
     }
 
+    /// The banner is on screen: its passes count from the first time it was, even across relaunches.
+    func bannerAppeared() {
+        guard banner != nil, bannerStartedAt == nil else { return }
+        setBannerStart(.now)
+    }
+
     private func setBanner(_ message: Message?) {
         banner = message
         store.banner = message
+        setBannerStart(nil)
+    }
+
+    private func setBannerStart(_ date: Date?) {
+        bannerStartedAt = date
+        store.bannerStartedAt = date
     }
 
     // MARK: Syncing

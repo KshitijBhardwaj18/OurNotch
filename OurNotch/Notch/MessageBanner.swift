@@ -6,11 +6,12 @@ import SwiftUI
 struct MessageBanner: View {
     let message: Message
     let senderName: String
+    /// When it first scrolled on screen (kept across relaunches); passes count from here.
+    let start: Date
     /// Called after the third pass for `.three`; never for `.untilOpened`.
     let onFinished: () -> Void
 
     @State private var textWidth: CGFloat = 0
-    @State private var start = Date.now
 
     var body: some View {
         GeometryReader { strip in

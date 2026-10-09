@@ -337,6 +337,22 @@ struct PartnersTests {
         #expect(partner.banner == nil) // read: closing the notch doesn't scroll it 3 more times
     }
 
+    @Test func aRelaunchCarriesOnTheBannersPassesInsteadOfRestartingThem() async throws {
+        let people = TwoPartners()
+        let (you, partner) = try await people.paired()
+        #expect(you.sendMessage("miss you", mode: .three))
+        try await Task.sleep(for: .milliseconds(100))
+        await partner.sync()
+        #expect(partner.bannerStartedAt == nil) // not on screen yet
+        partner.bannerAppeared()
+        let started = try #require(partner.bannerStartedAt)
+        partner.bannerAppeared()                // shown again (e.g. after the notch closed): same start
+        #expect(partner.bannerStartedAt == started)
+
+        let relaunched = try #require(AppState(store: people.partner, mailbox: people.mailbox, photosRoot: people.photosRoot))
+        #expect(relaunched.banner?.text == "miss you" && relaunched.bannerStartedAt == started)
+    }
+
     @Test func emojisArriveAndAreDelivered() async throws {
         let (you, partner) = try await TwoPartners().paired()
         var arrived = 0

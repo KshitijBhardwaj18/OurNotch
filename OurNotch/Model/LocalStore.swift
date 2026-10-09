@@ -80,6 +80,11 @@ struct LocalStore {
         get { decode("banner") }
         nonmutating set { encode(newValue, "banner") }
     }
+    /// When the banner first scrolled on screen, so relaunching carries on its 3 passes instead of restarting them.
+    var bannerStartedAt: Date? {
+        get { defaults.object(forKey: "bannerStartedAt") as? Date }
+        nonmutating set { defaults.set(newValue, forKey: "bannerStartedAt") }
+    }
 
     private func decode<T: Decodable>(_ key: String) -> T? {
         defaults.data(forKey: key).flatMap { try? JSONDecoder().decode(T.self, from: $0) }
