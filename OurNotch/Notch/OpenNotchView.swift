@@ -11,7 +11,7 @@ struct OpenNotchView: View {
         VStack(spacing: 0) {
             Group {
                 if showsSettings {
-                    SettingsPanel()
+                    SettingsPanel(state: state)
                 } else {
                     switch tab {
                     case .home: HomeTab(state: state)

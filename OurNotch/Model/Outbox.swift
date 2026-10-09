@@ -20,6 +20,8 @@ struct Outbox: Codable, Equatable {
     var seenPhotoId: UUID?
     /// My current mood emoji, shown beside my avatar in my partner's closed notch. Nil when cleared.
     var mood: String?
+    /// The buyer's licence key, so the partner's Mac can ask Dodo whether it's still valid (no slot used).
+    var licenceKey: String?
 }
 
 struct SentPhoto: Codable, Equatable {

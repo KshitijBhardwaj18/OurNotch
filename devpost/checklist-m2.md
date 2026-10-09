@@ -32,7 +32,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
   Learner check: Run the website (`npm --prefix website run dev`), open http://localhost:3000, buy with the test card, then click *Open OurNotch* on the thank-you page and watch the app activate by itself. Say whether the thank-you page feels like opening a gift.
   Commit: `Add regional prices, thank-you page, and one-click activation`
 
-- [ ] **3. Your love is covered, and a revoked key blocks you both**
+- [x] **3. Your love is covered, and a revoked key blocks you both**
   Becomes usable: After pairing, the partner's Mac quietly receives the key and checks it (no licence step for them). Only the buyer can invite. Revoke the key in Dodo → both Macs show the kind **blocked** screen (Get OurNotch, Write to us) at their next check; restore → they come back. In-notch Settings shows **Licence** for the buyer: status, *Find my licence* (Dodo's portal), *Remove from this Mac* (frees the slot, back to the gate).
   Why now: Completes the licence model — one purchase per couple and the kill switch — on top of slices 1–2, before pairing changes in slice 4 so the coverage is tested on today's working pairing.
   PRD ref: `prd-m2.md > Activation` (one slot, Remove from this Mac, offline), `prd-m2.md > Revoked or Refunded Licence`, `prd-m2.md > Invite as a Surprise` (only buyers invite)
@@ -114,7 +114,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 3 (buy → activate → partner covered → revoke): feedback on the gate, thank-you page and blocked screen, **plus your screen-by-screen walk-through and the two-Mac edge cases** that drive slice 7
+- [ ] Early usable behavior explored — moved to just before slice 7 (see Revisions); originally after slice 3 (buy → activate → partner covered → revoke): feedback on the gate, thank-you page and blocked screen, **plus your screen-by-screen walk-through and the two-Mac edge cases** that drive slice 7
 - [ ] Final kick-the-tires exploration and feedback completed — a stranger's journey on the live site to a heart in the partner's notch, then the week of daily test runs against the launch bar
 
 ## Final Review
@@ -145,3 +145,9 @@ Activity mode:
 - `/download` redirects to the GitHub releases page until slice 9 puts signed DMGs on R2. The app's *Get OurNotch* returns to `localhost:3000/thanks` in Debug and `ournotch.app/thanks` otherwise.
 - The URL scheme lives in a small `OurNotch-Info.plist` at the repo root, merged into the generated Info.plist: build settings can't express `CFBundleURLTypes`, and a plist inside the synced `OurNotch/` folder would be copied as a resource.
 - Clicking *Open OurNotch* into a fresh app wasn't driven live (the learner was on a call, and two installed copies share the `ournotch://` scheme); the purchased key was activated through the same `OnboardingModel.activate(key:)` the link calls, and the built app's Info.plist was checked for the scheme. The learner's check covers the real click.
+- Slice 3 verified live against Dodo test mode with the purchased key, through the real `LicenceService`, `AppState` sync and `LicenceBlockedModel`: the partner received the key through the encrypted outbox (no slot used; a second Mac still refused); disabling the key in Dodo → both Macs `revoked`; re-enabling → *Check Again* unblocked; *Remove from This Mac* → `removed`, and a new Mac then activated. Disabled keys answer `validate` with `{valid:false}` and `activate` with 403, as the state rules assumed.
+- *Remove from This Mac* locks this Mac behind the licence window (paste a key to use it here again) rather than returning to the onboarding gate — the Mac is still paired, and onboarding would start a new invite. The lock window serves both revoked and removed, with a key field, Get OurNotch and Write to Us; it can't be closed (quit from the ♡ menu).
+- Licence status is `active / revoked / removed` instead of a revoked flag, so a removed key isn't mistaken for a revoked one and daily checks skip it.
+- Locking applies only when this Mac has a licence that's revoked or removed; Macs paired in Milestone 1 have no licence and keep working (they re-pair on the new container in slice 9).
+- In-notch Settings now scrolls: with the Licence row it is 241 pt tall in a 200 pt area, and Hide and Language rows are still to come.
+- The early checkpoint moved from after slice 3 to just before slice 7: the learner asked to keep building through the coding first ("let's just build what we can"), and slice 7 is where their walk-through is needed. Slices 4–6 don't depend on it.

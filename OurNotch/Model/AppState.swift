@@ -45,6 +45,10 @@ final class AppState {
 
     /// Called when emojis arrive: how many are new, and the latest one (which decides how they appear).
     @ObservationIgnored var onEmojisArrived: ((Int, SentEmoji) -> Void)?
+    /// Called when this Mac's licence changed here (received from the partner, or removed), so it gets checked.
+    @ObservationIgnored var onLicenceChanged: (() -> Void)?
+
+    var licence: Licence? { store.licence }
 
     @ObservationIgnored private let key: SymmetricKey
     @ObservationIgnored private let mailbox: Mailbox
@@ -88,6 +92,28 @@ final class AppState {
         if pairing.role == .inviter {
             myOutbox.togetherSince = togetherSince // shared on the next save
         }
+        myOutbox.licenceKey = Self.sharedKey(store.licence) ?? myOutbox.licenceKey
+    }
+
+    /// The buyer shares their key with the partner; a partner shares nothing.
+    private static func sharedKey(_ licence: Licence?) -> String? {
+        guard let licence, licence.isBuyer, licence.status == .active else { return nil }
+        return licence.key
+    }
+
+    /// After the buyer activates a (new) key on this Mac: hand it to the partner on the next save.
+    func shareLicence() {
+        guard let key = Self.sharedKey(store.licence), key != myOutbox.licenceKey else { return }
+        myOutbox.licenceKey = key
+        store.myOutbox = myOutbox
+        Task { await save() }
+    }
+
+    /// Settings → Remove from This Mac (buyer only).
+    func removeLicence() async throws {
+        try await LicenceService(store: store).removeFromThisMac()
+        note("licence removed from this Mac")
+        onLicenceChanged?()
     }
 
     private func note(_ message: String, metric: Metric? = nil) {
@@ -254,6 +280,12 @@ final class AppState {
             note("[\(source.rawValue)] got together-since date")
         }
 
+        if let key = partner.licenceKey, Licence.adopts(key, over: store.licence) {
+            store.licence = Licence(key: key)
+            note("[\(source.rawValue)] got licence from partner")
+            onLicenceChanged?()
+        }
+
         var found: [String] = []
         if partner.mood != previous.mood, hasFetchedPartner { found.append("mood \(partner.mood ?? "cleared")") }
         let newEmojis = Arrival.newCount(partnerSent: partner.emojisSent, lastShown: myOutbox.seenEmojis)
@@ -356,6 +388,7 @@ final class AppState {
         if new.photo != old.photo { parts.append("photo") }
         if new.mood != old.mood { parts.append("mood \(new.mood ?? "cleared")") }
         if new.togetherSince != old.togetherSince { parts.append("date") }
+        if new.licenceKey != old.licenceKey { parts.append("licence") }
         if new.seenEmojis != old.seenEmojis { parts.append("seen emojis \(new.seenEmojis)") }
         if new.seenMessageId != old.seenMessageId { parts.append("seen note") }
         if new.seenPhotoId != old.seenPhotoId { parts.append("seen photo") }

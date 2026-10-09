@@ -58,6 +58,10 @@ enum Config {
         static let checkoutURL = URL(string: "https://test.checkout.dodopayments.com/buy/\(productId)?quantity=1&redirect_url=\(website)/thanks")!
         /// The price on the gate. The Mac doesn't know the buyer's country, so checkout shows the local price.
         static let priceLabel = "$4.50"
+        /// Dodo's customer portal: the buyer enters their purchase email and sees their key.
+        static let portalURL = URL(string: "https://test.customer.dodopayments.com/login/bus_0Np1laPQgg48PHzDsmzgI")!
+        /// How often each Mac asks Dodo "still valid?" (also on launch and wake). Revocation lands within a day.
+        static let checkInterval: Duration = .seconds(24 * 60 * 60)
         /// Placeholder until the learner picks the support address.
         static let supportEmail = "hello@ournotch.app"
     }
