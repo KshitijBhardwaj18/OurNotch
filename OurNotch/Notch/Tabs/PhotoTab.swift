@@ -15,11 +15,12 @@ struct PhotoTab: View {
             VStack(alignment: .leading, spacing: 3) {
                 eyebrow.font(.system(size: 11, weight: .medium))
                 Text(state.myPhoto == nil ? "Send \(partner) a photo" : "Last sent to \(partner)")
-                    .pastelTitle()
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
                 Text(state.myPhoto == nil ? "It shows up on their Home the next time they open their notch ♡"
                                           : "Shows on their Home until you send a new one ♡")
                     .font(.system(size: 12))
-                    .foregroundStyle(Color.pastelInk2)
+                    .foregroundStyle(Color.secondaryLabel)
                     .fixedSize(horizontal: false, vertical: true)
                 Button(state.myPhoto == nil ? "Choose Photo…" : "Send New Photo…", action: choose)
                     .buttonStyle(NotchButtonStyle(prominent: state.myPhoto == nil))
@@ -28,7 +29,7 @@ struct PhotoTab: View {
             }
         }
         .frame(maxHeight: .infinity)
-        .pastelCard(Color.pastelButter)
+        .cardStyle(tint: .pastelButter)
     }
 
     private var partner: String { state.partnerName.lowercased() }
@@ -38,9 +39,9 @@ struct PhotoTab: View {
             TreatedPhoto(image: photo)
         } else {
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(Color.pastelInk3, style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                .strokeBorder(Color.tertiaryLabel, style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
                 .overlay {
-                    Image(systemName: "photo.badge.plus").font(.system(size: 26)).foregroundStyle(Color.pastelInk3)
+                    Image(systemName: "photo.badge.plus").font(.system(size: 26)).foregroundStyle(Color.tertiaryLabel)
                 }
         }
     }
@@ -50,14 +51,14 @@ struct PhotoTab: View {
         if failed {
             Text("Couldn't send that photo. Try another ♡").foregroundStyle(Color.notchPink)
         } else if isWorking {
-            Text("Sending…").foregroundStyle(Color.pastelInk2)
+            Text("Sending…").foregroundStyle(Color.secondaryLabel)
         } else if let sent = state.myOutbox.photo {
             TimelineView(.periodic(from: .now, by: 60)) { context in
                 Text("\(shortAgo(sent.sentAt, now: context.date).capitalizedFirst) · \(state.photoStatus.label)")
             }
-            .foregroundStyle(state.photoStatus == .delivered ? Color.notchPink : .pastelInk2)
+            .foregroundStyle(state.photoStatus == .delivered ? Color.notchPink : .secondaryLabel)
         } else {
-            Text("Photo").foregroundStyle(Color.pastelInk2)
+            Text("Photo").foregroundStyle(Color.secondaryLabel)
         }
     }
 
@@ -106,17 +107,17 @@ struct NotchButtonStyle: ButtonStyle {
 
         var body: some View {
             configuration.label
-                .font(.system(size: 12.5, weight: .semibold, design: .rounded))
-                .foregroundStyle(prominent ? Color.white : .pastelInk)
-                .padding(.horizontal, 14)
-                .frame(height: 28)
-                .background(fill, in: Capsule())
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .frame(height: 24)
+                .background(fill, in: RoundedRectangle(cornerRadius: 6))
                 .opacity(isEnabled ? 1 : 0.4)
         }
 
         private var fill: Color {
             if prominent { return configuration.isPressed ? .notchPinkPressed : .notchPink }
-            return .white.opacity(configuration.isPressed ? 0.7 : 1)
+            return .white.opacity(configuration.isPressed ? 0.2 : 0.14)
         }
     }
 }

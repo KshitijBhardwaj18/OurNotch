@@ -1308,7 +1308,8 @@
             "value" : "Noch keine Notizen. Schreib %@ etwas Süßes ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "No photo from %@ yet" : {
       "localizations" : {

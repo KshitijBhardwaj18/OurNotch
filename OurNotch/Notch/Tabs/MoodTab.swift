@@ -21,17 +21,16 @@ struct MoodTab: View {
                             Text(mood.emoji).font(.system(size: 26))
                             Text(mood.label)
                                 .font(.system(size: 10.5, weight: .medium))
-                                .foregroundStyle(selected ? Color.notchPink : .pastelInk2)
+                                .foregroundStyle(selected ? Color.white : .secondaryLabel)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.8)
                         }
                         .frame(maxWidth: .infinity)
-                        .frame(height: 70)
-                        .background(selected ? Color.pastelBlush : .white, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .shadow(color: Color(hex: 0x5A1E32).opacity(0.07), radius: 4, y: 2)
+                        .frame(height: 68)
+                        .background(selected ? Color.notchPink.opacity(0.16) : .notchField, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                         .overlay {
                             if selected {
-                                RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.notchPink.opacity(0.7), lineWidth: 1.5)
+                                RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Color.notchPink.opacity(0.6), lineWidth: 1)
                             }
                         }
                         .contentShape(Rectangle())
@@ -40,24 +39,24 @@ struct MoodTab: View {
                 }
             }
         }
-        .pastelCard(Color.pastelMint)
+        .cardStyle(tint: .pastelMint)
         .animation(.snappy(duration: 0.2), value: state.myOutbox.mood)
     }
 
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Your mood").pastelTitle()
+                Text("Your mood").font(.system(size: 16, weight: .bold, design: .rounded)).foregroundStyle(.white)
                 Text("Shows next to your photo on \(state.partnerName.lowercased())'s notch ♡")
                     .font(.system(size: 11.5))
-                    .foregroundStyle(Color.pastelInk2)
+                    .foregroundStyle(Color.secondaryLabel)
             }
             Spacer()
             Group {
                 if let current = Config.moods.first(where: { $0.emoji == state.myOutbox.mood }) {
-                    Text("Now \(current.emoji) \(current.label)").foregroundStyle(Color.pastelInk)
+                    Text("Now \(current.emoji) \(current.label)").foregroundStyle(.white)
                 } else {
-                    Text("Tap one to set").foregroundStyle(Color.pastelInk3)
+                    Text("Tap one to set").foregroundStyle(Color.tertiaryLabel)
                 }
             }
             .font(.system(size: 11.5, weight: .medium))

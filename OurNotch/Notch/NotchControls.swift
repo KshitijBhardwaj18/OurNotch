@@ -40,12 +40,16 @@ struct NotchTabBar: View {
                             .font(.system(size: 14))
                             .foregroundStyle(selected ? Color.notchPink : .secondaryLabel)
                         Text(tab.label)
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-                            .foregroundStyle(selected ? Color.pastelInk : .secondaryLabel)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(selected ? Color.white : .secondaryLabel)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background {
-                        if selected { Capsule().fill(Color.pastelBlush) }
+                        if selected {
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(Color.segmentSelected)
+                                .shadow(color: .black.opacity(0.3), radius: 1, y: 1)
+                        }
                     }
                     .contentShape(Rectangle())
                 }
@@ -53,8 +57,8 @@ struct NotchTabBar: View {
             }
         }
         .padding(2)
-        .frame(width: CGFloat(NotchTab.allCases.count) * 76, height: 30)
-        .background(Color.white.opacity(0.08), in: Capsule())
+        .frame(width: CGFloat(NotchTab.allCases.count) * 76, height: 28)
+        .background(Color.segmentTrack, in: RoundedRectangle(cornerRadius: 8))
         .animation(.snappy(duration: 0.2), value: selection)
         .animation(.snappy(duration: 0.2), value: dimmed)
     }
@@ -76,12 +80,16 @@ struct SmallSegmented<Option: Hashable>: View {
                         if let symbol { Image(systemName: symbol(option)).font(.system(size: 10, weight: .semibold)) }
                         Text(label(option))
                     }
-                    .font(.system(size: 11.5, weight: .semibold, design: .rounded))
-                    .foregroundStyle(selected ? Color.white : .pastelInk)
+                    .font(.system(size: 11.5, weight: .medium))
+                    .foregroundStyle(selected ? Color.white : .secondaryLabel)
                     .padding(.horizontal, 10)
-                    .frame(height: 22)
+                    .frame(height: 20)
                     .background {
-                        if selected { Capsule().fill(Color.pastelInk) }
+                        if selected {
+                            RoundedRectangle(cornerRadius: 5)
+                                .fill(Color.segmentSelected)
+                                .shadow(color: .black.opacity(0.3), radius: 1, y: 1)
+                        }
                     }
                     .contentShape(Rectangle())
                 }
@@ -89,7 +97,7 @@ struct SmallSegmented<Option: Hashable>: View {
             }
         }
         .padding(2)
-        .background(.white.opacity(0.75), in: Capsule())
+        .background(Color.segmentTrack, in: RoundedRectangle(cornerRadius: 7))
         .animation(.snappy(duration: 0.2), value: selection)
     }
 }
@@ -114,19 +122,13 @@ struct Heartbeat: ViewModifier {
 extension View {
     func heartbeat() -> some View { modifier(Heartbeat()) }
 
-    /// The pastel page that holds a tab, like the website's cards: cream fading into the tab's colour.
-    func pastelCard(_ color: Color) -> some View {
-        padding(.horizontal, 16)
-            .padding(.vertical, 14)
+    /// The dark `#1C1C1E` card that holds a tab, with a faint wash of one of the website's pastels.
+    /// Dark first, so it's easy on the eyes in a dark room; the colour is only a hint.
+    func cardStyle(tint: Color = .clear) -> some View {
+        padding(14)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(LinearGradient(colors: [.pastelCream, color], startPoint: .topLeading, endPoint: .bottomTrailing),
-                        in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .environment(\.colorScheme, .light)
-    }
-
-    /// A tab's title, in the website's rounded heavy type.
-    func pastelTitle() -> some View {
-        font(.system(size: 16, weight: .heavy, design: .rounded)).tracking(-0.3).foregroundStyle(Color.pastelInk)
+            .background(tint.opacity(0.07), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
 

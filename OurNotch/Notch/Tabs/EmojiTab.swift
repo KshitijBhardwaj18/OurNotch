@@ -19,11 +19,11 @@ struct EmojiTab: View {
             emojiRow
             Spacer(minLength: 8)
             HStack(spacing: 8) {
-                Text("Appears").font(.system(size: 12)).foregroundStyle(Color.pastelInk2)
+                Text("Appears").font(.system(size: 12)).foregroundStyle(Color.secondaryLabel)
                 SmallSegmented(options: EmojiMode.allCases, selection: $mode, label: \.label, symbol: \.symbol)
             }
         }
-        .pastelCard(Color.pastelSky)
+        .cardStyle(tint: .pastelSky)
         .onChange(of: state.emojiStatus) { _, status in
             guard status == .delivered else { return }
             clearTask?.cancel()
@@ -37,10 +37,10 @@ struct EmojiTab: View {
     private var header: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Send an emoji").pastelTitle()
+                Text("Send an emoji").font(.system(size: 16, weight: .bold, design: .rounded)).foregroundStyle(.white)
                 Text("Tap one and it pops up on \(state.partnerName.lowercased())'s screen ♡")
                     .font(.system(size: 11.5))
-                    .foregroundStyle(Color.pastelInk2)
+                    .foregroundStyle(Color.secondaryLabel)
             }
             Spacer()
             status.font(.system(size: 11.5, weight: .medium))
@@ -52,10 +52,10 @@ struct EmojiTab: View {
             if state.emojiStatus == .delivered {
                 Text("Delivered \(lastSent)").foregroundStyle(Color.notchPink)
             } else {
-                Text("Sent \(lastSent)").foregroundStyle(Color.pastelInk)
+                Text("Sent \(lastSent)").foregroundStyle(.white)
             }
         } else {
-            Text("Tap to send").foregroundStyle(Color.pastelInk3)
+            Text("Tap to send").foregroundStyle(Color.tertiaryLabel)
         }
     }
 
@@ -86,12 +86,11 @@ private struct EmojiButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .frame(maxWidth: .infinity)
-            .frame(height: 64)
-            .background(fill(pressed: configuration.isPressed), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-            .shadow(color: Color(hex: 0x5A1E32).opacity(0.08), radius: 5, y: 2)
+            .frame(height: 66)
+            .background(fill(pressed: configuration.isPressed), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay {
                 if isLastSent {
-                    RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Color.notchPink.opacity(0.7), lineWidth: 1.5)
+                    RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Color.notchPink.opacity(0.6), lineWidth: 1)
                 }
             }
             .scaleEffect(configuration.isPressed ? 0.9 : 1)
@@ -99,8 +98,8 @@ private struct EmojiButtonStyle: ButtonStyle {
     }
 
     private func fill(pressed: Bool) -> Color {
-        if pressed { return .pastelBlush }
-        return isLastSent ? Color.notchPink.opacity(0.16) : .white
+        if pressed { return .notchPressed }
+        return isLastSent ? Color.notchPink.opacity(0.16) : .notchField
     }
 }
 

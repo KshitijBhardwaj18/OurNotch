@@ -58,14 +58,14 @@ struct SettingsPanel: View {
         // Scrolls once the rows outgrow the notch's 200 pt content area.
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Settings").pastelTitle()
+                Text("Settings").font(.system(size: 16, weight: .bold, design: .rounded)).foregroundStyle(.white)
 
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Open at Login").font(.system(size: 13, weight: .medium)).foregroundStyle(Color.pastelInk)
+                        Text("Open at Login").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
                         Text(error ?? String(localized: "Your notch will be there every time you open your Mac."))
                             .font(.system(size: 11.5))
-                            .foregroundStyle(error == nil ? Color.pastelInk2 : .notchPink)
+                            .foregroundStyle(error == nil ? Color.secondaryLabel : .notchPink)
                     }
                     Spacer()
                     Toggle("Open at Login", isOn: Binding(get: { opensAtLogin }, set: setOpensAtLogin))
@@ -75,50 +75,50 @@ struct SettingsPanel: View {
                         .tint(.notchPink)
                 }
                 .padding(12)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: 10))
+                .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
 
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Photo style").font(.system(size: 13, weight: .medium)).foregroundStyle(Color.pastelInk)
+                        Text("Photo style").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
                         Text("How photos blend into the dark notch.")
                             .font(.system(size: 11.5))
-                            .foregroundStyle(Color.pastelInk2)
+                            .foregroundStyle(Color.secondaryLabel)
                     }
                     Spacer()
                     SmallSegmented(options: PhotoStyle.allCases, selection: $photoStyle, label: \.label)
                 }
                 .padding(12)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: 10))
+                .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
 
                 VStack(alignment: .leading, spacing: 8) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Hide OurNotch").font(.system(size: 13, weight: .medium)).foregroundStyle(Color.pastelInk)
+                        Text("Hide OurNotch").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
                         Text("Hearts and notes wait for you. Your love sees you're away.")
                             .font(.system(size: 11.5))
-                            .foregroundStyle(Color.pastelInk2)
+                            .foregroundStyle(Color.secondaryLabel)
                     }
                     HStack(spacing: 6) {
                         ForEach(Hide.allCases, id: \.self) { choice in
                             Button(choice.label) { state.hide(until: choice.until()) }
                                 .buttonStyle(.plain)
                                 .font(.system(size: 12, weight: .medium))
-                                .foregroundStyle(Color.pastelInk)
+                                .foregroundStyle(.white)
                                 .padding(.horizontal, 10)
                                 .frame(height: 24)
-                                .background(.white, in: Capsule())
+                                .background(Color.notchPressed, in: Capsule())
                         }
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(12)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: 10))
+                .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
 
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Language").font(.system(size: 13, weight: .medium)).foregroundStyle(Color.pastelInk)
+                        Text("Language").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
                         Text("OurNotch restarts to switch.")
                             .font(.system(size: 11.5))
-                            .foregroundStyle(Color.pastelInk2)
+                            .foregroundStyle(Color.secondaryLabel)
                     }
                     Spacer()
                     SmallSegmented(options: AppLanguage.allCases,
@@ -126,7 +126,7 @@ struct SettingsPanel: View {
                                    label: \.label)
                 }
                 .padding(12)
-                .background(Color.white, in: RoundedRectangle(cornerRadius: 10))
+                .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
 
                 if state.licence?.isBuyer == true {
                     LicenceRow(state: state)
@@ -134,7 +134,7 @@ struct SettingsPanel: View {
             }
         }
         .scrollIndicators(.never)
-        .pastelCard(Color.pastelMist)
+        .cardStyle()
     }
 
     private func setOpensAtLogin(_ enabled: Bool) {
@@ -158,24 +158,24 @@ private struct LicenceRow: View {
     var body: some View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
-                Text("Licence").font(.system(size: 13, weight: .medium)).foregroundStyle(Color.pastelInk)
+                Text("Licence").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
                 Text(error ?? String(localized: "Active · covers you both"))
                     .font(.system(size: 11.5))
-                    .foregroundStyle(error == nil ? Color.pastelInk2 : .notchPink)
+                    .foregroundStyle(error == nil ? Color.secondaryLabel : .notchPink)
                     .lineLimit(1)
             }
             Spacer()
             Button("Find My Licence") { NSWorkspace.shared.open(Config.Licence.portalURL) }
-                .buttonStyle(.plain).font(.system(size: 11.5, weight: .medium)).foregroundStyle(Color.notchPink)
+                .buttonStyle(.plain).font(.system(size: 11.5, weight: .medium)).foregroundStyle(Color.notchBlush)
             // Two taps, so a stray click never frees the slot.
             Button(confirming ? "Tap to Remove" : "Remove from This Mac", action: remove)
                 .buttonStyle(.plain).font(.system(size: 11.5, weight: .medium))
-                .foregroundStyle(confirming ? Color.notchPink : Color.pastelInk2)
+                .foregroundStyle(confirming ? Color.notchPink : Color.secondaryLabel)
                 .disabled(working)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 9)
-        .background(Color.white, in: RoundedRectangle(cornerRadius: 10))
+        .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
     }
 
     private func remove() {
