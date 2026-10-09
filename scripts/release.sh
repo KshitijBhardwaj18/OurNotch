@@ -1,18 +1,15 @@
 #!/bin/bash
 # Builds OurNotch for people outside the App Store (devpost/spec-m2.md > Packaging and Updates):
-# archive → Developer ID export → DMG → notarize + staple → Sparkle appcast → upload to R2.
+# archive → Developer ID signing + notarization + staple → DMG → Sparkle appcast → upload to R2.
 #
 #   scripts/release.sh            # the sold build (Release: live Dodo, no diagnostics)
 #   scripts/release.sh Beta       # for test couples (test-mode Dodo, diagnostics on)
 #
-# Needs, once (slice 11, your own Apple account):
-#   - a "Developer ID Application" certificate in your keychain (Xcode > Settings > Accounts > Manage Certificates)
-#   - xcrun notarytool store-credentials ournotch      (saves your notarization login in the keychain)
-#   - Sparkle's EdDSA key in your keychain under the account "ournotch" (generate_keys --account ournotch),
-#     its public half in SPARKLE_PUBLIC_KEY
-#   - npx wrangler login                               (for the upload to R2)
-# Without a Developer ID certificate it stops after building an unsigned local DMG, so nothing
-# half-signed can ever be uploaded. Any failing step stops the script before the upload.
+# Needs Xcode signed into the team's Apple account (Xcode > Settings > Accounts): Xcode signs with the
+# team's cloud-managed Developer ID certificate and sends the app to Apple's notary service with that login.
+# Also Sparkle's EdDSA key in your keychain under the account "ournotch" (its public half in
+# SPARKLE_PUBLIC_KEY), and `npx wrangler login` for the upload to R2. Any failing step stops the script
+# before the upload, so nothing half-signed is ever published.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -30,29 +27,22 @@ echo "▸ Archiving OurNotch $VERSION ($CONFIG)"
 xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -configuration "$CONFIG" \
   -derivedDataPath build/DerivedData -archivePath "$OUT/OurNotch.xcarchive" -allowProvisioningUpdates -quiet archive
 
-if security find-identity -v -p codesigning | grep -q "Developer ID Application"; then
-  echo "▸ Exporting with Developer ID"
-  sed "s/TEAM_ID/$TEAM_ID/" scripts/ExportOptions.plist > "$OUT/ExportOptions.plist"
-  xcodebuild -exportArchive -archivePath "$OUT/OurNotch.xcarchive" -exportOptionsPlist "$OUT/ExportOptions.plist" \
-    -exportPath "$OUT/export" -allowProvisioningUpdates -quiet
-  APP=$OUT/export/OurNotch.app
-  SIGNED=1
-else
-  echo "▸ No Developer ID certificate yet: building a local, unsigned DMG only (no notarization, no upload)"
-  APP=$OUT/OurNotch.xcarchive/Products/Applications/OurNotch.app
-  SIGNED=0
-fi
+echo "▸ Signing with Developer ID and sending to Apple's notary service"
+sed "s/TEAM_ID/$TEAM_ID/" scripts/ExportOptions.plist > "$OUT/ExportOptions.plist"
+xcodebuild -exportArchive -archivePath "$OUT/OurNotch.xcarchive" -exportOptionsPlist "$OUT/ExportOptions.plist" \
+  -exportPath "$OUT/upload" -allowProvisioningUpdates -quiet
+echo "▸ Waiting for notarization (a few minutes)"
+until xcodebuild -exportNotarizedApp -archivePath "$OUT/OurNotch.xcarchive" -exportPath "$OUT/export" > "$OUT/notarize.log" 2>&1; do
+  grep -q "processing" "$OUT/notarize.log" || { cat "$OUT/notarize.log"; exit 1; }   # rejected: stop
+  sleep 30
+done
+APP=$OUT/export/OurNotch.app
+xcrun stapler validate "$APP"
+spctl --assess -vv "$APP"
 
 echo "▸ Making $DMG"
 mkdir -p "$OUT/dmg" && cp -R "$APP" "$OUT/dmg/" && ln -s /Applications "$OUT/dmg/Applications"
 hdiutil create -volname OurNotch -srcfolder "$OUT/dmg" -fs HFS+ -format UDZO -quiet "$DMG"
-[ "$SIGNED" = 1 ] || { echo "✓ Local DMG ready: $DMG"; exit 0; }
-
-codesign --sign "Developer ID Application" --timestamp "$DMG"
-echo "▸ Notarizing (a few minutes)"
-xcrun notarytool submit "$DMG" --keychain-profile ournotch --wait
-xcrun stapler staple "$DMG"
-spctl --assess --type open --context context:primary-signature -v "$DMG"
 
 echo "▸ Writing the Sparkle appcast"
 cp "$DMG" "$OUT/updates/"
