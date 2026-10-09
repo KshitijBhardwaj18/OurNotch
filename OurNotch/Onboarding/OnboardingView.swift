@@ -1,14 +1,18 @@
 import SwiftUI
 
-/// Drives the first-launch steps.
-/// Inviter: welcome → name → invite → date → login → done. Joiner: welcome → name → join → login → done.
-/// If the Mac isn't signed into iCloud, an iCloud step comes right after welcome.
+/// Drives the first-launch steps, starting at the licence gate (`spec-m2.md > Licence Gate`).
+/// Buyer: gate → licence key → name → invite → date → login → done. Partner: gate → name → join → login → done.
+/// A Mac that already has a licence starts at welcome instead of the gate.
+/// If the Mac isn't signed into iCloud, an iCloud step comes before the name.
 @MainActor
 @Observable
 final class OnboardingModel {
-    enum Step { case welcome, icloud, name, invite, join, date, login, done }
+    enum Step { case gate, licenceKey, welcome, icloud, name, invite, join, date, login, done }
 
-    var step: Step = .welcome
+    var step: Step
+    /// Chosen at the gate: a partner joins with a code and needs no licence.
+    private(set) var joining = false
+    var typedKey = ""
     var name = ""
     var typedCode = ""
     var togetherSince = Calendar.current.startOfDay(for: .now)
@@ -31,17 +35,23 @@ final class OnboardingModel {
         self.mailbox = mailbox
         self.service = PairingService(mailbox: mailbox, store: store)
         self.onFinished = onFinished
+        let start: Step = store.licence?.revoked == false ? .welcome : .gate
+        self.start = start
+        step = start
         name = store.myName ?? ""
     }
+
+    /// The first screen: the gate, or welcome for a Mac that already has a licence.
+    let start: Step
 
     var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
     var partnerName: String { (pairing?.partnerName ?? foundInvite?.inviterName ?? "your love").lowercased() }
 
     /// The steps on the current path, for the page dots.
     var path: [Step] {
-        step == .join || pairing?.role == .joiner
-            ? [.welcome, .name, .join, .login, .done]
-            : [.welcome, .name, .invite, .date, .login, .done]
+        joining || pairing?.role == .joiner
+            ? [start, .name, .join, .login, .done]
+            : (start == .gate ? [.gate, .licenceKey] : [.welcome]) + [.name, .invite, .date, .login, .done]
     }
 
     func go(to step: Step) {
@@ -49,6 +59,28 @@ final class OnboardingModel {
         if step != .invite { waitTask?.cancel() }
         self.step = step
         if step == .invite { startInvite() }
+    }
+
+    // MARK: Licence gate
+
+    func getOurNotch() { NSWorkspace.shared.open(Config.Licence.checkoutURL) }
+
+    func joinWithCode() {
+        joining = true
+        checkICloud()
+    }
+
+    func backToStart() {
+        joining = false
+        go(to: start)
+    }
+
+    /// Switches the pasted key on for this Mac, then carries on as a buyer.
+    func activate() {
+        run {
+            try await LicenceService(store: self.store).activate(key: self.typedKey)
+            self.checkICloud()
+        }
     }
 
     // MARK: iCloud
@@ -142,6 +174,8 @@ final class OnboardingModel {
                 try await work()
             } catch let pairingError as PairingError {
                 error = pairingError.errorDescription
+            } catch let licenceError as LicenceError {
+                error = licenceError.errorDescription
             } catch {
                 self.error = "Something went wrong. Try again."
             }
@@ -181,7 +215,8 @@ struct OnboardingView: View {
                 .padding(.horizontal, 36)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             if let error = model.error {
-                Text(error).font(.system(size: 12)).foregroundStyle(Color.accentPink).padding(.bottom, 8)
+                Text(error).font(.system(size: 12)).foregroundStyle(Color.accentPink)
+                    .multilineTextAlignment(.center).padding(.horizontal, 24).padding(.bottom, 8)
             }
             Divider()
             footer
@@ -194,6 +229,18 @@ struct OnboardingView: View {
 
     @ViewBuilder private var content: some View {
         switch model.step {
+        case .gate:
+            gate
+        case .licenceKey:
+            Screen(symbol: "key", title: "Enter your licence key",
+                   message: "It's in your receipt email from Dodo Payments.") {
+                TextField("Licence key", text: $model.typedKey)
+                    .textFieldStyle(.roundedBorder)
+                    .font(.system(size: 13, design: .monospaced))
+                    .frame(width: 300)
+                    .onSubmit(continueAction)
+                Button("Don't have one? Get OurNotch", action: model.getOurNotch).buttonStyle(.link)
+            }
         case .welcome:
             Screen(icon: AnyView(AppIcon()), title: "Welcome to OurNotch",
                    message: "A little love note that lives in the top of your screen.") {}
@@ -242,6 +289,26 @@ struct OnboardingView: View {
         case .done:
             Screen(symbol: "heart.fill", title: "You're all set ♡",
                    message: "Hover the notch anytime to send \(model.partnerName) a little love.") {}
+        }
+    }
+
+    /// Feels like opening a gift: the price and one big button lead; the key and the code are secondary.
+    private var gate: some View {
+        Screen(icon: AnyView(AppIcon()), title: "Welcome to OurNotch",
+               message: "A little place in your notch where things from both of you arrive.") {
+            VStack(spacing: 10) {
+                Button("Get OurNotch — \(Config.Licence.priceLabel)", action: model.getOurNotch)
+                    .buttonStyle(PinkProminentButtonStyle())
+                Text("One purchase for the two of you · local price shown at checkout")
+                    .font(.system(size: 11)).foregroundStyle(.secondary)
+                HStack(spacing: 18) {
+                    Button("I Have a Licence Key") { model.go(to: .licenceKey) }
+                    Button("I Have an Invite Code", action: model.joinWithCode)
+                }
+                .buttonStyle(.link)
+                .disabled(model.isWorking)
+                .padding(.top, 6)
+            }
         }
     }
 
@@ -308,8 +375,6 @@ struct OnboardingView: View {
 
     @ViewBuilder private var footerLeading: some View {
         switch model.step {
-        case .invite:
-            Button("I Have a Code") { model.go(to: .join) }.buttonStyle(.link)
         case .date:
             Button("Skip for Now") { model.go(to: .login) }.buttonStyle(.link)
         default:
@@ -325,6 +390,8 @@ struct OnboardingView: View {
 
     private var continueTitle: String? {
         switch model.step {
+        case .gate: nil // the gate's own buttons choose the path
+        case .licenceKey: "Activate"
         case .welcome: "Get Started"
         case .icloud: "Try Again"
         case .invite: nil // advances by itself when your love joins
@@ -337,6 +404,7 @@ struct OnboardingView: View {
     private var canContinue: Bool {
         switch model.step {
         case .welcome, .icloud: !model.isWorking
+        case .licenceKey: !model.typedKey.trimmingCharacters(in: .whitespaces).isEmpty && !model.isWorking
         case .name: !model.trimmedName.isEmpty
         case .join: !model.typedCode.isEmpty && !model.isWorking
         default: true
@@ -346,8 +414,10 @@ struct OnboardingView: View {
     private func continueAction() {
         guard canContinue else { return }
         switch model.step {
+        case .gate: break
+        case .licenceKey: model.activate()
         case .welcome, .icloud: model.checkICloud()
-        case .name: model.go(to: .invite)
+        case .name: model.go(to: model.joining ? .join : .invite)
         case .invite: break
         case .join: model.foundInvite == nil ? model.lookUpCode() : model.join()
         case .date: model.saveTogetherSince()
@@ -358,9 +428,9 @@ struct OnboardingView: View {
 
     private var backAction: (() -> Void)? {
         switch model.step {
-        case .icloud, .name: { model.go(to: .welcome) }
+        case .licenceKey, .icloud, .name: model.backToStart
         case .invite: { model.go(to: .name) }
-        case .join: model.foundInvite == nil ? { model.go(to: .invite) } : model.editCode
+        case .join: model.foundInvite == nil ? { model.go(to: .name) } : model.editCode
         case .done: { model.go(to: .login) }
         default: nil // the welcome screen, and steps after pairing that can't be undone
         }

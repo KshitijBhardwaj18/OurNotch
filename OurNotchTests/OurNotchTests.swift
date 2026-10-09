@@ -329,3 +329,34 @@ struct CheckPaceTests {
         #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, idle: .seconds(3), now: now) == .seconds(3))
     }
 }
+
+struct LicenceTests {
+    private func json(_ s: String) -> Data { Data(s.utf8) }
+
+    @Test func activationAnswers() throws {
+        #expect(try LicenceService.activationId(status: 201, body: json(#"{"id":"lki_123","name":"Mac"}"#)) == "lki_123")
+        #expect(throws: LicenceError.notFound) { try LicenceService.activationId(status: 404, body: Data()) }
+        #expect(throws: LicenceError.inUse) { try LicenceService.activationId(status: 422, body: Data()) }
+        #expect(throws: LicenceError.revoked) { try LicenceService.activationId(status: 403, body: Data()) }
+        #expect(throws: LicenceError.unreachable) { try LicenceService.activationId(status: 503, body: Data()) }
+        #expect(throws: LicenceError.unreachable) { try LicenceService.activationId(status: nil, body: Data()) }
+    }
+
+    @Test func onlyAnExplicitNoRevokes() {
+        #expect(LicenceService.validity(status: 200, body: json(#"{"valid":true}"#)) == true)
+        #expect(LicenceService.validity(status: 200, body: json(#"{"valid":false}"#)) == false)
+        #expect(LicenceService.validity(status: 403, body: Data()) == false)
+        #expect(LicenceService.validity(status: 404, body: Data()) == false)
+        #expect(LicenceService.validity(status: 500, body: Data()) == nil) // Dodo down: keep the last answer
+        #expect(LicenceService.validity(status: nil, body: Data()) == nil) // offline: keep the last answer
+    }
+
+    @Test func licenceSurvivesInTheStore() {
+        let store = LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
+        #expect(store.licence == nil)
+        store.licence = Licence(key: "ABC", activationId: "lki_1", lastGoodCheck: .now)
+        #expect(store.licence?.key == "ABC")
+        store.licence = nil
+        #expect(store.licence == nil)
+    }
+}

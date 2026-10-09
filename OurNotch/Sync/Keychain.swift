@@ -1,7 +1,7 @@
 import Foundation
 import Security
 
-/// Small wrapper over the data-protection Keychain for this app's secrets (just the private key).
+/// Small wrapper over the data-protection Keychain for this app's secrets (private key, licence).
 enum Keychain {
     static func read(service: String, account: String) -> Data? {
         var query = baseQuery(service: service, account: account)
@@ -19,6 +19,10 @@ enum Keychain {
         item[kSecAttrAccessible] = kSecAttrAccessibleAfterFirstUnlock // readable at login, before the notch starts
         let status = SecItemAdd(item as CFDictionary, nil)
         guard status == errSecSuccess else { throw NSError(domain: NSOSStatusErrorDomain, code: Int(status)) }
+    }
+
+    static func delete(service: String, account: String) {
+        SecItemDelete(baseQuery(service: service, account: account) as CFDictionary)
     }
 
     static func delete(service: String) {

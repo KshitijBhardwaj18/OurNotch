@@ -29,7 +29,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let partnerSimulator = PartnerSimulator()
     #endif
     static let keychainService = "OurNotch"
-    private let store = LocalStore(defaults: .standard, keychainService: AppDelegate.keychainService)
+    private let store: LocalStore = {
+        #if DEBUG
+        // `OURNOTCH_PROFILE=<name>` runs a separate, fresh identity next to the real one, so fresh-install
+        // checks don't touch your pairing. (Display settings like the emoji mode stay shared.)
+        if let profile = ProcessInfo.processInfo.environment["OURNOTCH_PROFILE"] {
+            let name = "OurNotch.profile.\(profile)"
+            return LocalStore(defaults: UserDefaults(suiteName: name)!, keychainService: name)
+        }
+        #endif
+        return LocalStore(defaults: .standard, keychainService: AppDelegate.keychainService)
+    }()
     private let mailbox = CloudStore()
     private var state: AppState?
     private var panel: NotchPanel?
