@@ -12,7 +12,7 @@ const CX = 582;
 // [visible width, top margin] in desk px. Phones get tighter shots so the notch stays readable.
 const SHOTS: Record<'desktop' | 'phone', Record<Shot, [number, number]>> = {
   desktop: { wide: [1084, 0], mid: [820, 0], close: [520, 0] },
-  phone: { wide: [800, 0], mid: [560, 0], close: [380, 0] },
+  phone: { wide: [800, 0], mid: [640, 0], close: [380, 0] },
 };
 const PHONE = '(max-width: 599px)'; // keep in step with .demo-shell's aspect-ratio in globals.css
 
@@ -30,7 +30,7 @@ export function runHeroTour(root: HTMLElement, d: Copy['demo'], t: Copy['tour'])
   const phone = matchMedia(PHONE);
 
   const shell = q('.demo-shell'), desk = q('.desk'), notch = q('.notch'), fx = q('.fx');
-  const banner = q('.n-banner span'), mood = q('.n-mood');
+  const banner = q('.n-banner span');
   const pip = q('.pal-pip .char'), bun = q('.pal-bun .char');
   const noteIn = q<HTMLInputElement>('.composer input'), noteStatus = q('.note-status');
   const selfie = q('.ph .chars'), selfieHTML = selfie.innerHTML;
@@ -43,7 +43,8 @@ export function runHeroTour(root: HTMLElement, d: Copy['demo'], t: Copy['tour'])
   q('.x-num').textContent = String(today.getDate());
   function tick() {
     const t = together(), now = new Date();
-    q('.s-hours').textContent = fmt(t.hours); q('.s-weekends').textContent = fmt(t.weekends); q('.s-secs').textContent = fmt(t.secs);
+    const set = (s: string, v: number) => qa(s).forEach(e => { e.textContent = fmt(v); });
+    set('.s-hours', t.hours); set('.s-weekends', t.weekends); set('.s-secs', t.secs); set('.s-days', t.days); set('.s-anniv', t.toAnniversary);
     q('.clock').textContent = now.toLocaleDateString(locale, { weekday: 'short' }) + ' ' + now.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
   }
   tick();
@@ -79,9 +80,11 @@ export function runHeroTour(root: HTMLElement, d: Copy['demo'], t: Copy['tour'])
       { duration: (strip + w) / speed * 1000, delay: 300, fill: 'both' });
     bannerAnim.onfinish = endBanner;
   }
+  // Their mood, as in the app: on the right of the closed notch with its word, and in Home's mood widget.
   function setMood(e: string) {
-    mood.textContent = e;
-    mood.animate([{ transform: 'scale(0)' }, { transform: 'scale(1.4)' }, { transform: 'scale(1)' }], { duration: 450, easing: 'cubic-bezier(.3,1.6,.5,1)' });
+    qa('.n-mood, .n-mood2').forEach(m => { m.textContent = e; });
+    qa('.n-word, .n-word2').forEach(w => { w.textContent = d.moodWords[e] ?? ''; });
+    q('.n-right').animate([{ transform: 'scale(0)' }, { transform: 'scale(1.3)' }, { transform: 'scale(1)' }], { duration: 450, easing: 'cubic-bezier(.3,1.6,.5,1)' });
   }
   const tab = (t: string) => {
     qa('.tabbar button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
@@ -130,7 +133,12 @@ export function runHeroTour(root: HTMLElement, d: Copy['demo'], t: Copy['tour'])
     }, i * 70));
     const done = text.length * 70;
     later(() => noteState(t.sending, 'sec'), done + 250);
-    later(() => { noteState(t.delivered, 'pk'); bunLoves('🥹'); }, done + 850);
+    later(() => { noteState(t.delivered, 'pk'); addMine(text); bunLoves('🥹'); }, done + 850);
+  }
+  // The whisper joins the conversation as your pink bubble, and the field clears.
+  function addMine(text: string) {
+    const b = document.createElement('span'); b.className = 'bub mine new'; b.textContent = text;
+    q('.conv').appendChild(b); pop(b); noteIn.value = '';
   }
   function sendEmoji(i: number) {
     const buttons = qa('.emojis button'), b = buttons[i], e = b.textContent!, st = q('.emoji-status');
@@ -170,7 +178,7 @@ export function runHeroTour(root: HTMLElement, d: Copy['demo'], t: Copy['tour'])
     glow(q('.ph'));
   }
   function reset() {
-    stopBanner(); close(); tab('home'); setMood('🥰');
+    stopBanner(); close(); tab('home'); setMood('🥰'); qa('.conv .new').forEach(b => b.remove());
     noteIn.value = ''; noteState(d.upTo, 'ter');
     resetPhoto();
     selfie.innerHTML = selfieHTML; q('.ph .cap').textContent = d.fromBun1h;
@@ -182,11 +190,11 @@ export function runHeroTour(root: HTMLElement, d: Copy['demo'], t: Copy['tour'])
   // is where the first one starts, so the loop has no seam.
   const L = t.lines;
   const STEPS: Step[] = [
-    [2800, 'pip', L[0], () => { reset(); camera('close'); later(() => glow(q('.n-who')), 1000); }],
-    [3000, 'bun', L[1], () => { close(); setMood('☕️'); glow(q('.n-who')); act(bun, 'is-happy', 1600); }],
+    [2800, 'pip', L[0], () => { reset(); camera('close'); later(() => glow(q('.n-av')), 1000); }],
+    [3000, 'bun', L[1], () => { close(); setMood('☕️'); glow(q('.n-right')); act(bun, 'is-happy', 1600); }],
     [3000, 'bun', L[2], () => { close(); act(bun, 'is-tap', 450); showBanner(d.ticker); }],
     [3200, 'pip', L[3], () => act(pip, 'is-love', 2200)],
-    [3000, 'bun', L[4], () => { close(); act(bun, 'is-tap', 450); fxPour(); act(pip, 'is-love', 2000); glow(q('.n-heart')); }],
+    [3000, 'bun', L[4], () => { close(); act(bun, 'is-tap', 450); fxPour(); act(pip, 'is-love', 2000); glow(q('.n-right')); }],
     [3400, 'bun', L[5], () => {
       close(); camera('wide'); act(bun, 'is-jump', 800);
       later(() => { fxSplash('🥰'); act(pip, 'is-love', 2400); }, 700);
@@ -195,7 +203,7 @@ export function runHeroTour(root: HTMLElement, d: Copy['demo'], t: Copy['tour'])
       camera('mid'); tab('home');
       later(open, 600); later(homeArrives, 1300); later(() => say('bun', L[7], 1900), 1700);
     }, 1600],
-    [3000, 'pip', L[8], () => { open(); tab('home'); glow(q('.stats')); }],
+    [3000, 'pip', L[8], () => { open(); tab('together'); glow(q('.tg-grid')); }],
     [4400, 'pip', L[9], () => { open(); tab('note'); typeNote(L[10]); }, 1600],
     [3800, 'pip', L[11], () => { open(); tab('emoji'); later(() => sendEmoji(2), 500); }, 1500],
     [4400, 'pip', L[12], () => { open(); tab('photo'); later(sendPhoto, 600); }, 1700],

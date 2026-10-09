@@ -79,10 +79,10 @@ export function Bento({ t: c }: { t: Copy['bento'] }) {
           <span className="y-kicker">{c.secondsTogether} <span style={{ color: 'var(--pink)' }}>♥</span></span>
           <span className="b-big">{n('secs')}</span>
           <div className="b-chips">
-            <span className="y-butter"><b>{n('days')}</b> {c.days}</span>
-            <span className="y-sky"><b>{n('hours')}</b> {c.hours}</span>
-            <span className="y-mint"><b>{n('weekends')}</b> {c.weekends}</span>
-            <span className="y-blush"><b>{n('toAnniversary')}</b> {c.toAnniversary}</span>
+            <span className="y-butter"><b>{n('days')}</b>{c.days}</span>
+            <span className="y-sky"><b>{n('hours')}</b>{c.hours}</span>
+            <span className="y-mint"><b>{n('weekends')}</b>{c.weekends}</span>
+            <span className="y-blush"><b>{n('toAnniversary')}</b>{c.toAnniversary}</span>
           </div>
         </div>
       }>{c.countBody}</Card>

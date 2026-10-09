@@ -9,14 +9,15 @@ const NS = 'http://www.w3.org/2000/svg';
 
 function Laptop({ x, id }: { x: number; id: string }) {
   return (
-    <g transform={`translate(${x} 150)`} id={id}>
+    <g transform={`translate(${x} 150) scale(.92)`} id={id}>
       <rect className="lap-lid" x="0" y="0" width="290" height="196" rx="16" />
       <rect className="lap-screen" x="11" y="11" width="268" height="172" rx="8" fill="url(#wall)" />
       <clipPath id={`${id}-clip`}><rect x="11" y="11" width="268" height="172" rx="8" /></clipPath>
       <g clipPath={`url(#${id}-clip)`}><g className="pour" /></g>
       <path className="mini-notch" d="M100 11 Q105 11 105 16 V20 Q105 27 112 27 H178 Q185 27 185 20 V16 Q185 11 190 11 Z" fill="#000" />
-      <g transform="translate(173 19)"><g className="beat"><use href="#hrt" transform="scale(.42)" fill="#FF375F" /></g></g>
-      <circle cx="117" cy="19" r="5" fill="#FF8FAB" /><text x="125" y="22.5" fontSize="9">🥰</text>
+      {/* as in the app: their face on the left, a heartbeat on the right */}
+      <circle cx="115" cy="19" r="5.5" fill="#FF8FAB" />
+      <g transform="translate(175 19)"><g className="beat"><use href="#hrt" transform="scale(.42)" fill="#FF375F" /></g></g>
       <path className="lap-base" d="M-22 196 H312 Q316 210 300 212 H-10 Q-26 210 -22 196 Z" />
     </g>
   );
@@ -63,7 +64,7 @@ export function MadeForTwo({ t }: { t: Copy['two'] }) {
       }
     }
     function sendHeart(dir: number) {
-      const [from, to, lap, toX] = dir > 0 ? [pip, bun, 'lapR', 907] as const : [bun, pip, 'lapL', 93] as const;
+      const [from, to, lap, toX] = dir > 0 ? [pip, bun, 'lapR', 908] as const : [bun, pip, 'lapL', 92] as const;
       act(from, 'is-tap', 450); act(from, 'is-happy', 1700);
       const h = heartEl('#FF375F'); fly.appendChild(h);
       const t0 = performance.now() + 220, dur = 1150;
@@ -103,12 +104,13 @@ export function MadeForTwo({ t }: { t: Copy['two'] }) {
   return (
     <svg className="scene" ref={ref} viewBox="0 0 1000 400" role="img"
       aria-label={t.aria}>
-      <path className="route" d="M320 172 C 380 0, 620 0, 680 172" />
-      <Laptop x={175} id="lapL" /><Laptop x={535} id="lapR" />
-      <g className="slot-pip"><Char kind="pip" x="18" y="206" width="150" height="162" /></g>
-      <g className="slot-bun"><Char kind="bun" x="832" y="206" width="150" height="162" /></g>
-      <text className="who" x="93" y="396">{t.you}</text>
-      <text className="who" x="907" y="396">{t.person}</text>
+      <path className="route" d="M323 168 C 383 0, 597 0, 656 168" />
+      <Laptop x={190} id="lapL" /><Laptop x={523} id="lapR" />
+      <g className="slot-pip"><Char kind="pip" x="22" y="214" width="140" height="151" /></g>
+      <g className="slot-bun"><Char kind="bun" x="838" y="214" width="140" height="151" /></g>
+      {/* anchored to the edges, so a long label ("your person", "deine Person") never runs off */}
+      <text className="who" x="20" y="396" textAnchor="start">{t.you}</text>
+      <text className="who" x="980" y="396" textAnchor="end">{t.person}</text>
       <g className="fly" />
     </svg>
   );

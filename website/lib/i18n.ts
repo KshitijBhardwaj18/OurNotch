@@ -18,13 +18,13 @@ type Section = { h: string; p: string[] };
 const en = {
   meta: {
     title: 'OurNotch: send love, notch to notch',
-    description: 'OurNotch puts your person in your MacBook notch: their face, their mood, their notes, emoji and photos. One license works for you both.',
-    ogDescription: 'Notes, emoji and photos that appear in your person’s MacBook notch. One license works for you both.',
+    description: 'OurNotch puts your person in your MacBook notch: their face, their mood, their whispers, kisses and photos. One license works for you both.',
+    ogDescription: 'Whispers, kisses and photos that appear in your person’s MacBook notch. One license works for you both.',
   },
   nav: { features: 'Features', pricing: 'Pricing', faq: 'FAQ', get: 'Get OurNotch' },
   hero: {
     h1a: 'Send love,', h1b: 'notch to notch.',
-    sub: 'OurNotch keeps your person at the top of your MacBook screen. Send them a note, an emoji or a photo, and it appears in their notch.',
+    sub: 'OurNotch keeps your person at the top of your MacBook screen. Send them a whisper, a kiss or a photo, and it appears in their notch.',
     cta: 'Get it for {price}', how: 'See how it works',
     underB: 'One-time purchase.', under: 'Works on both your Macs.',
   },
@@ -41,7 +41,7 @@ const en = {
     photoTitle: 'A photo for their Home.', photoBody: 'Send a favorite photo. It stays on their Home until you send the next one.',
     us: 'us ♡', sunday: 'sunday ♡',
     countTitle: 'Every second, counted.', countBody: 'Your days, weekends and seconds together, ticking up in their notch, and the countdown to your anniversary.',
-    secondsTogether: 'Seconds of us, and counting', days: 'days', hours: 'hours', weekends: 'weekends', toAnniversary: 'days to your anniversary',
+    secondsTogether: 'Seconds of us', days: 'days', hours: 'hours', weekends: 'weekends', toAnniversary: 'to your anniversary',
   },
   two: {
     kicker: 'Made for two', h2: 'Built for exactly two Macs.',
@@ -84,7 +84,11 @@ const en = {
   demo: {
     aria: 'Demo: Bun sends Pip a note, hearts and a photo through the MacBook notch, and Pip writes back',
     menus: ['File', 'Edit', 'View', 'Window'], event: 'Date night', eventWhen: '8:00 PM · our spot',
-    tabs: ['Home', 'Whispers', 'Emoji', 'Mood', 'Photo'],
+    tabs: ['Home', 'Together', 'Whispers', 'Emoji', 'Mood', 'Photo'],
+    moodWords: { '🥰': 'in love', '☕️': 'on a break' } as Record<string, string>,
+    secondsOfUs: 'seconds of us, and counting', theirMood: 'Their mood', daysTogether: 'Days together',
+    emojisBetween: 'Emojis between you', toAnniversary: 'Days to your anniversary',
+    justBetween: 'just between us ❤️', missYou: 'miss you already 🥺', scrollsLine: "Scrolls 3 times on bun's notch",
     you: 'you', hours: 'Hours', weekends: 'Weekends', seconds: 'Seconds',
     fromBun1h: 'from bun · 1h', bun2m: 'bun · 2m ago', favorite: "you're my favorite notification",
     from2m: 'From bun · 2m ago', placeholder: 'Say something sweet…', scroll: 'Scroll', three: '3 times', untilOpened: 'Until opened',
@@ -177,13 +181,13 @@ export type Copy = typeof en;
 const fr: Copy = {
   meta: {
     title: 'OurNotch : de l’amour, d’encoche à encoche',
-    description: 'OurNotch met ta personne dans l’encoche de ton MacBook : son visage, son humeur, ses mots, emojis et photos. Une seule licence pour vous deux.',
-    ogDescription: 'Des mots, emojis et photos qui apparaissent dans l’encoche du MacBook de ta personne. Une seule licence pour vous deux.',
+    description: 'OurNotch met ta personne dans l’encoche de ton MacBook : son visage, son humeur, ses murmures, bisous et photos. Une seule licence pour vous deux.',
+    ogDescription: 'Des murmures, bisous et photos qui apparaissent dans l’encoche du MacBook de ta personne. Une seule licence pour vous deux.',
   },
   nav: { features: 'Fonctions', pricing: 'Prix', faq: 'FAQ', get: 'Obtenir OurNotch' },
   hero: {
     h1a: 'De l’amour,', h1b: 'd’encoche à encoche.',
-    sub: 'OurNotch garde ta personne tout en haut de l’écran de ton MacBook. Envoie-lui un mot, un emoji ou une photo, et ça apparaît dans son encoche.',
+    sub: 'OurNotch garde ta personne tout en haut de l’écran de ton MacBook. Envoie-lui un murmure, un bisou ou une photo, et ça apparaît dans son encoche.',
     cta: 'Obtenir pour {price}', how: 'Voir comment ça marche',
     underB: 'Achat unique.', under: 'Fonctionne sur vos deux Mac.',
   },
@@ -200,7 +204,7 @@ const fr: Copy = {
     photoTitle: 'Une photo pour son Accueil.', photoBody: 'Envoie une photo préférée. Elle reste dans son Accueil jusqu’à la suivante.',
     us: 'nous ♡', sunday: 'dimanche ♡',
     countTitle: 'Chaque seconde compte.', countBody: 'Vos jours, week-ends et secondes à deux, qui défilent dans son encoche, et le compte à rebours jusqu’à votre anniversaire.',
-    secondsTogether: 'Secondes à nous deux, et ça continue', days: 'jours', hours: 'heures', weekends: 'week-ends', toAnniversary: 'jours avant votre anniversaire',
+    secondsTogether: 'Secondes à nous deux', days: 'jours', hours: 'heures', weekends: 'week-ends', toAnniversary: 'avant l’anniversaire',
   },
   two: {
     kicker: 'Fait pour deux', h2: 'Conçu pour deux Mac, pas un de plus.',
@@ -243,7 +247,11 @@ const fr: Copy = {
   demo: {
     aria: 'Démo : Bun envoie à Pip un mot, des cœurs et une photo via l’encoche du MacBook, et Pip répond',
     menus: ['Fichier', 'Édition', 'Présentation', 'Fenêtre'], event: 'Soirée en amoureux', eventWhen: '20 h · notre resto',
-    tabs: ['Accueil', 'Murmures', 'Emoji', 'Humeur', 'Photo'],
+    tabs: ['Accueil', 'Ensemble', 'Murmures', 'Emoji', 'Humeur', 'Photo'],
+    moodWords: { '🥰': 'amour', '☕️': 'en pause' } as Record<string, string>,
+    secondsOfUs: 'secondes à nous deux, et ça continue', theirMood: 'Son humeur', daysTogether: 'Jours ensemble',
+    emojisBetween: 'Emojis entre vous', toAnniversary: 'Jours avant votre anniversaire',
+    justBetween: 'rien qu’entre nous ❤️', missYou: 'tu me manques déjà 🥺', scrollsLine: 'Défile 3 fois dans l’encoche de bun',
     you: 'toi', hours: 'Heures', weekends: 'Week-ends', seconds: 'Secondes',
     fromBun1h: 'de bun · 1 h', bun2m: 'bun · il y a 2 min', favorite: 'tu es ma notification préférée',
     from2m: 'De bun · il y a 2 min', placeholder: 'Dis quelque chose de doux…', scroll: 'Défilement', three: '3 fois', untilOpened: 'Jusqu’à ouverture',
@@ -334,13 +342,13 @@ const fr: Copy = {
 const de: Copy = {
   meta: {
     title: 'OurNotch: Liebe, von Notch zu Notch',
-    description: 'OurNotch holt deinen Menschen in die Notch deines MacBooks: Gesicht, Stimmung, Notizen, Emojis und Fotos. Eine Lizenz für euch beide.',
-    ogDescription: 'Notizen, Emojis und Fotos, die in der MacBook-Notch deines Menschen erscheinen. Eine Lizenz für euch beide.',
+    description: 'OurNotch holt deinen Menschen in die Notch deines MacBooks: Gesicht, Stimmung, Flüstern, Küsse und Fotos. Eine Lizenz für euch beide.',
+    ogDescription: 'Flüstern, Küsse und Fotos, die in der MacBook-Notch deines Menschen erscheinen. Eine Lizenz für euch beide.',
   },
   nav: { features: 'Funktionen', pricing: 'Preis', faq: 'FAQ', get: 'OurNotch holen' },
   hero: {
     h1a: 'Liebe senden,', h1b: 'von Notch zu Notch.',
-    sub: 'OurNotch hält deinen Menschen ganz oben auf deinem MacBook-Bildschirm. Schick eine Notiz, ein Emoji oder ein Foto – und es erscheint in der Notch.',
+    sub: 'OurNotch hält deinen Menschen ganz oben auf deinem MacBook-Bildschirm. Schick ein Flüstern, einen Kuss oder ein Foto – und es erscheint in der Notch.',
     cta: 'Für {price} holen', how: 'So funktioniert’s',
     underB: 'Einmaliger Kauf.', under: 'Läuft auf euren beiden Macs.',
   },
@@ -357,7 +365,7 @@ const de: Copy = {
     photoTitle: 'Ein Foto für den Start-Tab.', photoBody: 'Schick ein Lieblingsfoto. Es bleibt auf dem Start-Tab, bis du das nächste schickst.',
     us: 'wir ♡', sunday: 'sonntag ♡',
     countTitle: 'Jede Sekunde zählt.', countBody: 'Eure Tage, Wochenenden und Sekunden zu zweit, tickend in der Notch, und der Countdown bis zu eurem Jahrestag.',
-    secondsTogether: 'Sekunden zu zweit, und es werden mehr', days: 'Tage', hours: 'Stunden', weekends: 'Wochenenden', toAnniversary: 'Tage bis zum Jahrestag',
+    secondsTogether: 'Sekunden zu zweit', days: 'Tage', hours: 'Stunden', weekends: 'Wochenenden', toAnniversary: 'bis zum Jahrestag',
   },
   two: {
     kicker: 'Für zwei gemacht', h2: 'Gebaut für genau zwei Macs.',
@@ -400,7 +408,11 @@ const de: Copy = {
   demo: {
     aria: 'Demo: Bun schickt Pip über die MacBook-Notch eine Notiz, Herzen und ein Foto, und Pip schreibt zurück',
     menus: ['Ablage', 'Bearbeiten', 'Darstellung', 'Fenster'], event: 'Date-Abend', eventWhen: '20:00 · unser Platz',
-    tabs: ['Start', 'Flüstern', 'Emoji', 'Laune', 'Foto'],
+    tabs: ['Start', 'Zusammen', 'Flüstern', 'Emoji', 'Laune', 'Foto'],
+    moodWords: { '🥰': 'verliebt', '☕️': 'pause' } as Record<string, string>,
+    secondsOfUs: 'Sekunden zu zweit, und es werden mehr', theirMood: 'Ihre Laune', daysTogether: 'Tage zusammen',
+    emojisBetween: 'Emojis zwischen euch', toAnniversary: 'Tage bis zum Jahrestag',
+    justBetween: 'nur zwischen uns ❤️', missYou: 'vermisse dich schon 🥺', scrollsLine: 'Läuft 3-mal durch buns Notch',
     you: 'du', hours: 'Stunden', weekends: 'Wochenenden', seconds: 'Sekunden',
     fromBun1h: 'von bun · 1 Std.', bun2m: 'bun · vor 2 Min.', favorite: 'du bist meine liebste mitteilung',
     from2m: 'Von bun · vor 2 Min.', placeholder: 'Sag etwas Süßes …', scroll: 'Laufschrift', three: '3-mal', untilOpened: 'Bis geöffnet',
