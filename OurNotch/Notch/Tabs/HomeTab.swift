@@ -12,22 +12,22 @@ struct HomeTab: View {
         // Ticks every second, only while the notch is open on Home.
         TimelineView(.periodic(from: .now, by: 1)) { context in
             HStack(spacing: 10) {
-                card(.photo) { photoTile(now: context.date) }.frame(width: side, height: side)
+                card(.photo, hint: String(localized: "Send \(state.partnerName.lowercased()) a photo back ♡")) { photoTile(now: context.date) }.frame(width: side, height: side)
                 VStack(spacing: 10) {
-                    card(.note) { noteTile(now: context.date) }.frame(height: (side - 10) * 0.56)
+                    card(.note, hint: String(localized: "Read all your notes and write back ♡")) { noteTile(now: context.date) }.frame(height: (side - 10) * 0.56)
                     HStack(spacing: 10) {
-                        card(.stats) { togetherTile(now: context.date) }
-                        card(.mood) { moodTile }.frame(width: 110)
+                        card(.stats, hint: String(localized: "Every second counts ♡ Click for all your numbers together")) { togetherTile(now: context.date) }
+                        card(.mood, hint: String(localized: "See how \(state.partnerName.lowercased()) feels, and share yours")) { moodTile }.frame(width: 110)
                     }
                 }
             }
         }
     }
 
-    private func card(_ tab: NotchTab, @ViewBuilder _ content: () -> some View) -> some View {
+    private func card(_ tab: NotchTab, hint: String, @ViewBuilder _ content: () -> some View) -> some View {
         Button { go(tab) } label: { content() }
             .buttonStyle(CardButtonStyle())
-            .help(tab.label)
+            .help(hint)
     }
 
     // MARK: Photo
@@ -118,7 +118,7 @@ struct HomeTab: View {
                 .minimumScaleFactor(0.6)
                 .foregroundStyle(state.togetherSince == nil ? Color.white : .notchPink)
             HStack(spacing: 4) {
-                Text("Seconds together")
+                Text("seconds of us, and counting")
                 Image(systemName: "heart.fill").font(.system(size: 9)).foregroundStyle(Color.notchPink).heartbeat()
             }
             .font(.system(size: 11.5, weight: .medium))

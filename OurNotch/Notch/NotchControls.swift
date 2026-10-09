@@ -24,6 +24,18 @@ enum NotchTab: CaseIterable {
         case .stats: "chart.bar"
         }
     }
+
+    /// The tab bar's hover tooltip.
+    var hint: String {
+        switch self {
+        case .home: String(localized: "Everything from your love, at a glance")
+        case .note: String(localized: "Your little notes to each other")
+        case .emoji: String(localized: "Send a little burst of love")
+        case .mood: String(localized: "How you're both feeling")
+        case .photo: String(localized: "A photo for their Home")
+        case .stats: String(localized: "Your life together, in numbers")
+        }
+    }
 }
 
 /// The native-looking segmented control at the bottom of the open notch (76 pt per tab × 28).
@@ -56,6 +68,7 @@ struct NotchTabBar: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .help(tab.hint)
             }
         }
         .padding(2)

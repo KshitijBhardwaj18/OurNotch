@@ -282,6 +282,22 @@
         }
       }
     },
+    "A photo for their Home" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une photo pour leur accueil"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Foto für ihr Zuhause"
+          }
+        }
+      }
+    },
     "Activate" : {
       "localizations" : {
         "fr" : {
@@ -310,6 +326,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aktiv · gilt für euch beide"
+          }
+        }
+      }
+    },
+    "And not one of them wasted ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Et pas une seule de perdue ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Und keine einzige verschwendet ♡"
           }
         }
       }
@@ -730,6 +762,70 @@
         }
       }
     },
+    "Every little heart you've sent each other" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque petit cœur que vous vous êtes envoyé"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jedes kleine Herz, das ihr euch geschickt habt"
+          }
+        }
+      }
+    },
+    "Every second counts ♡ Click for all your numbers together" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque seconde compte ♡ Clique pour voir tous vos chiffres"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jede Sekunde zählt ♡ Klick für all eure Zahlen"
+          }
+        }
+      }
+    },
+    "Every single one of them with you ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chacun d’entre eux avec toi ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeder einzelne mit dir ♡"
+          }
+        }
+      }
+    },
+    "Everything from your love, at a glance" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout de ton amour, en un coup d’œil"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles von deiner Liebe auf einen Blick"
+          }
+        }
+      }
+    },
     "Excited" : {
       "localizations" : {
         "fr" : {
@@ -987,6 +1083,22 @@
         }
       }
     },
+    "How you're both feeling" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment vous vous sentez tous les deux"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie es euch beiden geht"
+          }
+        }
+      }
+    },
     "Hungry" : {
       "localizations" : {
         "fr" : {
@@ -1210,6 +1322,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zuletzt an %@ gesendet"
+          }
+        }
+      }
+    },
+    "Lazy Sundays included ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dimanches paresseux compris ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faule Sonntage inklusive ♡"
           }
         }
       }
@@ -1766,6 +1894,22 @@
         }
       }
     },
+    "Pick a photo of you two ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis une photo de vous deux ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähl ein Foto von euch beiden ♡"
+          }
+        }
+      }
+    },
     "Quit OurNotch" : {
       "localizations" : {
         "fr" : {
@@ -1794,6 +1938,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Unsere AGB lesen"
+          }
+        }
+      }
+    },
+    "Read all your notes and write back ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lis tous vos mots et réponds ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lies all eure Notizen und schreib zurück ♡"
           }
         }
       }
@@ -1911,6 +2071,23 @@
             "value" : "Sekunden zusammen"
           }
         }
+      },
+      "extractionState" : "stale"
+    },
+    "See how %@ feels, and share yours" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vois comment %@ se sent, et partage ton humeur"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sieh, wie es %@ geht, und teil deine Laune"
+          }
+        }
       }
     },
     "Send" : {
@@ -1927,6 +2104,23 @@
             "value" : "Senden"
           }
         }
+      },
+      "extractionState" : "stale"
+    },
+    "Send %@ a %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoie un %2$@ à %1$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schick %1$@ ein %2$@"
+          }
+        }
       }
     },
     "Send %@ a photo" : {
@@ -1941,6 +2135,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Schick %@ ein Foto"
+          }
+        }
+      }
+    },
+    "Send %@ a photo back ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renvoie une photo à %@ ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schick %@ ein Foto zurück ♡"
           }
         }
       }
@@ -1977,6 +2187,22 @@
         }
       }
     },
+    "Send a little burst of love" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoie une petite pluie d’amour"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schick einen kleinen Liebesgruß"
+          }
+        }
+      }
+    },
     "Send an emoji" : {
       "localizations" : {
         "fr" : {
@@ -1989,6 +2215,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Schick ein Emoji"
+          }
+        }
+      }
+    },
+    "Send it to their notch ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoie-le dans son encoche ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ab in die Notch ♡"
           }
         }
       }
@@ -2233,6 +2475,22 @@
         }
       }
     },
+    "Start planning something sweet ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prépare quelque chose de doux ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan schon mal etwas Süßes ♡"
+          }
+        }
+      }
+    },
     "Stats" : {
       "localizations" : {
         "fr" : {
@@ -2277,6 +2535,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "System"
+          }
+        }
+      }
+    },
+    "Tap again to clear your mood" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touche encore pour effacer ton humeur"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nochmal tippen, um deine Laune zu löschen"
           }
         }
       }
@@ -2358,6 +2632,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zum Senden klicken"
+          }
+        }
+      }
+    },
+    "Tell %@ you're feeling %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dis à %1$@ : %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sag %1$@: %2$@"
           }
         }
       }
@@ -2454,6 +2744,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dieser Schlüssel wurde entzogen: Der Kauf wurde erstattet oder die Lizenz missbraucht, wie unsere AGB erklären. Hol dir einen neuen oder schreib uns an %@, wenn du denkst, dass das ein Fehler ist."
+          }
+        }
+      }
+    },
+    "Tick, tick, love ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tic, tac, amour ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tick, tack, Liebe ♡"
+          }
+        }
+      }
+    },
+    "Today's your day ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C’est votre jour ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heute ist euer Tag ♡"
           }
         }
       }
@@ -2746,6 +3068,38 @@
         }
       }
     },
+    "Your life together, in numbers" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre vie à deux, en chiffres"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Euer Leben zu zweit in Zahlen"
+          }
+        }
+      }
+    },
+    "Your little notes to each other" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos petits mots l’un à l’autre"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eure kleinen Notizen aneinander"
+          }
+        }
+      }
+    },
     "Your love lives at the top of your screen. Whatever you send appears in their notch." : {
       "localizations" : {
         "fr" : {
@@ -2902,6 +3256,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "unsere kleinen Notizen ♡"
+          }
+        }
+      }
+    },
+    "seconds of us, and counting" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "secondes à nous deux, et ça continue"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sekunden zu zweit, und es werden mehr"
           }
         }
       }

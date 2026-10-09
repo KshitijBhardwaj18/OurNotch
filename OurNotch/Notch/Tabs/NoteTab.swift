@@ -103,7 +103,7 @@ struct NoteTab: View {
                     .scaleEffect(canSend ? 1 : 0.92)
                     .animation(.spring(response: 0.3, dampingFraction: 0.5), value: canSend)
             }
-            .help("Send")
+            .help(String(localized: "Send it to their notch ♡"))
             .buttonStyle(.plain)
             .disabled(!canSend)
         }
