@@ -276,19 +276,25 @@ final class OnboardingModel {
 struct OnboardingView: View {
     @Bindable var model: OnboardingModel
 
+    /// Split like the website: Pip and Bun's carousel on the left, the steps on the right.
     var body: some View {
-        VStack(spacing: 0) {
-            content
-                .padding(.horizontal, 36)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            if let error = model.error {
-                Text(error).font(.system(size: 12)).foregroundStyle(Color.accentPink)
-                    .multilineTextAlignment(.center).padding(.horizontal, 24).padding(.bottom, 8)
+        HStack(spacing: 0) {
+            OnboardingStory().frame(width: 340)
+            VStack(spacing: 0) {
+                content
+                    .padding(.horizontal, 36)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                if let error = model.error {
+                    Text(error).font(.system(size: 12)).foregroundStyle(Color.accentPink)
+                        .multilineTextAlignment(.center).padding(.horizontal, 24).padding(.bottom, 8)
+                }
+                Divider()
+                footer
             }
-            Divider()
-            footer
+            .frame(width: 420)
         }
-        .frame(width: 420, height: 440)
+        .frame(height: 480)
+        .ignoresSafeArea() // under the transparent title bar
         .animation(.smooth(duration: 0.25), value: model.step)
     }
 
@@ -561,8 +567,10 @@ struct Screen<Content: View>: View {
 /// The OurNotch app icon (a heart dropping out of the notch). Its artwork has the standard macOS
 /// margin, so 88 pt shows a tile of about 72 pt.
 struct AppIcon: View {
+    var size: CGFloat = 88
+
     var body: some View {
-        Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 88, height: 88)
+        Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: size, height: size)
     }
 }
 

@@ -287,7 +287,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         onboarding = model
         let window = NSWindow(contentViewController: NSHostingController(rootView: OnboardingView(model: model)))
         window.title = "Welcome to OurNotch"
-        window.styleMask = [.titled, .closable]
+        window.styleMask = [.titled, .closable, .fullSizeContentView] // the story's pastel runs to the top edge
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
         window.isReleasedWhenClosed = false
         window.center()
         onboardingWindow = window

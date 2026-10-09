@@ -266,6 +266,22 @@
         }
       }
     },
+    "A short note scrolls across their notch, until they open it." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un petit mot défile dans son encoche, jusqu’à ce qu’elle l’ouvre."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine kurze Notiz läuft durch die Notch, bis sie geöffnet wird."
+          }
+        }
+      }
+    },
     "Activate" : {
       "localizations" : {
         "fr" : {
@@ -602,6 +618,22 @@
         }
       }
     },
+    "End-to-end encrypted, no account, and none of your iCloud storage. One purchase for both Macs." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiffré de bout en bout, sans compte, sans utiliser ton stockage iCloud. Un seul achat pour vos deux Mac."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ende-zu-Ende-verschlüsselt, ohne Konto und ohne deinen iCloud-Speicher. Ein Kauf für eure beiden Macs."
+          }
+        }
+      }
+    },
     "Enter your code" : {
       "localizations" : {
         "fr" : {
@@ -858,6 +890,22 @@
         }
       }
     },
+    "How you are, at a glance." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment tu vas, en un coup d’œil."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie’s dir geht, auf einen Blick."
+          }
+        }
+      }
+    },
     "Hungry" : {
       "localizations" : {
         "fr" : {
@@ -1014,6 +1062,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Er steht in deiner Beleg-E-Mail von Dodo Payments."
+          }
+        }
+      }
+    },
+    "Just for the two of you." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien que pour vous deux."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur für euch zwei."
           }
         }
       }
@@ -1309,6 +1373,22 @@
         }
       }
     },
+    "One tap, many hearts." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un clic, plein de cœurs."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Klick, viele Herzen."
+          }
+        }
+      }
+    },
     "One word is too long ♡" : {
       "localizations" : {
         "fr" : {
@@ -1523,6 +1603,22 @@
         }
       }
     },
+    "Pick a mood. It sits next to your face in their notch." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis une humeur. Elle s’affiche à côté de ton visage dans son encoche."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähl eine Laune. Sie erscheint neben deinem Gesicht in der Notch."
+          }
+        }
+      }
+    },
     "Quit OurNotch" : {
       "localizations" : {
         "fr" : {
@@ -1698,6 +1794,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Schick ein Emoji"
+          }
+        }
+      }
+    },
+    "Send love, notch to notch." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De l’amour, d’encoche à encoche."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liebe senden, von Notch zu Notch."
           }
         }
       }
@@ -1958,6 +2070,22 @@
         }
       }
     },
+    "Tap an emoji and it pours out of their notch." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis un emoji : il coule de son encoche."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wähl ein Emoji: Es fließt aus der Notch."
+          }
+        }
+      }
+    },
     "Tap one and it pops up on %@'s screen ♡" : {
       "localizations" : {
         "fr" : {
@@ -2018,6 +2146,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zum Senden klicken"
+          }
+        }
+      }
+    },
+    "Ten words or fewer." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dix mots ou moins."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zehn Wörter oder weniger."
           }
         }
       }
@@ -2406,6 +2550,22 @@
         }
       }
     },
+    "Your love lives at the top of your screen. Whatever you send appears in their notch." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton amour vit en haut de ton écran. Tout ce que tu envoies apparaît dans son encoche."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Liebe wohnt oben auf deinem Bildschirm. Alles, was du schickst, erscheint in der Notch."
+          }
+        }
+      }
+    },
     "Your mood" : {
       "localizations" : {
         "fr" : {
@@ -2498,6 +2658,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "von %@ · %@"
+          }
+        }
+      }
+    },
+    "lunch at 1? i'll bring dumplings 🥟" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "déj à 13 h ? j’apporte des raviolis 🥟"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "mittag um 1? ich bring dumplings mit 🥟"
           }
         }
       }
