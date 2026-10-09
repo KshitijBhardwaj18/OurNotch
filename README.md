@@ -32,6 +32,8 @@ Get a test key by buying with card 4242 4242 4242 4242 at the gate's *Get OurNot
 
 **Languages:** English, French and German live in `OurNotch/Localizable.xcstrings`. Building in Xcode keeps it in step with the code; after a command-line build, run `python3 scripts/sync-strings.py --check` to add new strings and list any missing a translation. Settings → Language overrides the Mac's language for OurNotch only (it restarts). To see a language without switching: `xcodebuild test -testLanguage de`, or run with `-AppleLanguages "(de)"`.
 
+**Builds and releases:** *Debug* (Partner Simulator, 3 s checks), *Beta* (for test couples: diagnostics upload, Dodo test mode) and *Release* (the sold build: nothing uploaded). `scripts/release.sh [Release|Beta]` archives, exports with Developer ID, makes a DMG, notarizes it, writes the Sparkle appcast and uploads to R2; until a Developer ID certificate is installed it stops after a local, unsigned DMG in `build/release/`. Sparkle updates stay off until `SPARKLE_PUBLIC_KEY` is set (slice 11). Give testers Beta builds, not Release.
+
 Tests: `xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/DerivedData test`
 
 ## Project layout

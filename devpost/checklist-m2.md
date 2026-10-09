@@ -92,25 +92,45 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
   Learner check: Choose Deutsch in Settings, let OurNotch restart, and look through every tab. Then switch back.
   Commit: `Add French and German`
 
-- [ ] **9. Signed, notarized, and self-updating**
-  Becomes usable: A DMG from `scripts/release.sh` opens on a Mac that never ran OurNotch with no Gatekeeper warning, on your own Apple account and a new iCloud container. Publishing a newer version makes an installed copy offer "a new version is ready ♡" and install it. Beta builds upload diagnostics; the sold Release build uploads nothing.
-  Why now: Needs your own Apple Developer account (not ready yet); everything earlier works on the company account. Sparkle is the first third-party dependency (agreed).
+- [x] **9. Ready to release: Beta and sold builds, updates, and the release script**
+  Becomes usable: Three build kinds — *Debug* (simulator), *Beta* (for test couples: diagnostics upload, Dodo test mode) and *Release* (the sold build: logs and metrics stay on the Mac). Sparkle is built in with a *Check for Updates…* item and separate Beta and Release feeds, switched on once the release key exists. `scripts/release.sh` archives, exports with Developer ID, makes the DMG, notarizes, writes the appcast and uploads to R2 — and until your account exists it stops after a local DMG.
+  Why now: Everything about shipping that doesn't need your Apple account, done while you're away; the account steps are slice 11. Sparkle is the agreed first third-party dependency.
   PRD ref: `prd-m2.md > Packaging and Updates`, `prd-m2.md > Performance and Monitoring` (private diagnostics)
-  Spec ref: `spec-m2.md > Components` (Packaging and Updates, Diagnostics by Build), `spec-m2.md > Where It Runs and How Someone Tries It` (three build kinds, release), `spec-m2.md > External Services and Dependencies` (Apple, Sparkle, Cloudflare R2)
-  Build: Bundle ID `app.ournotch.OurNotch` and container `iCloud.app.ournotch.OurNotch`, Beta configuration, `Config.Diagnostics.uploads` by build, Sparkle 2 via Swift Package + appcast, `scripts/release.sh` (archive → notarize → staple → DMG → Sparkle sign → upload to R2), CloudKit schema deployed to Production by the learner, `/download` redirect.
-  Verify (mechanical): `release.sh` completes; `spctl -a -vv` and `xcrun stapler validate` pass on the DMG and app; an older build offers and installs the newer one from the appcast; a Release build makes no diagnostics upload (log line); silent pings arrive in the Production build (verify item 5).
-  Learner check: Download the DMG on your partner's Mac (or a fresh user account), open it — no warning — and pair again on the new container.
-  Commit: `Ship signed, notarized DMG with Sparkle updates`
+  Spec ref: `spec-m2.md > Components` (Packaging and Updates, Diagnostics by Build), `spec-m2.md > Where It Runs and How Someone Tries It` (three build kinds, release), `spec-m2.md > External Services and Dependencies` (Sparkle, Cloudflare R2)
+  Build: Beta configuration (`BETA` flag), `Config.Diagnostics.uploads` by build, Sparkle 2 via Swift Package with per-configuration `SUFeedURL` / `SUPublicEDKey` build settings, *Check for Updates…* in the ♡ menu, `scripts/release.sh` + `scripts/ExportOptions.plist`, README release notes.
+  Verify (mechanical): Debug, Beta and Release all build; each app's Info.plist carries its feed and Sparkle is embedded; only Beta has the `BETA` flag (so only Debug and Beta upload); `scripts/release.sh Beta` produces a DMG that mounts with the app and an Applications link and passes `codesign --verify`; tests pass.
+  Learner check: Run `scripts/release.sh Beta`, open the DMG from `build/release/Beta/`, and drag OurNotch to Applications. Give testers Beta builds from now on.
+  Commit: `Add Beta builds, Sparkle updates, and the release script`
 
-- [ ] **10. ournotch.app is live**
-  Becomes usable: ournotch.app on Cloudflare: landing with regional prices, Download, thank-you page, *My licence* help, privacy policy and terms (revocation, no refunds), French and German versions, and `/admin` locked to your email by Cloudflare Access. The whole journey runs from the live site in Dodo test mode; switching to live mode is the launch step.
-  Why now: Last, because it needs the DMG (slice 9), final copy, and the domain; the app never depends on the site, so nothing earlier waits for it.
+- [ ] **10. The website is complete: help, legal, French and German, locked admin**
+  Becomes usable: On `localhost:3000`: the *My licence* help page, privacy policy and terms (revocation, no refunds except where the law requires), French and German versions of every page, `/download` pointing at the newest DMG, and `/admin` ready for Cloudflare Access (it verifies Access's signed token). The site builds for Cloudflare Workers and runs in Wrangler's local preview.
+  Why now: All the website work that doesn't need the domain or a Cloudflare account; going live is slice 12.
+  PRD ref: `prd-m2.md > The Landing Page`, `prd-m2.md > Admin Page`
+  Spec ref: `spec-m2.md > Components` (Website Pages, Admin Page), `spec-m2.md > Stack` (Cloudflare, verify item 4), `spec-m2.md > Look and Feel` (Website)
+  Build: `/licence`, `/privacy`, `/terms`, `/fr` and `/de` versions, `/download` → R2, Access JWT check in `lib/admin.ts`, `wrangler.jsonc` and the Cloudflare build adapter.
+  Verify (mechanical): `npm run build` and the Cloudflare build succeed; Wrangler's local preview serves `/`, `/thanks`, `/licence`, `/privacy`, `/terms`, `/fr`, `/de`; `/admin` refuses a request without a valid Access token; pages pass 320 / 375 / 1280 px with no horizontal scroll.
+  Learner check: Read the help, privacy and terms pages as a buyer would, and the French and German home pages.
+  Commit: `Add help, legal, French and German pages and prepare the Cloudflare build`
+
+- [ ] **11. Signed, notarized, and on your own Apple account**
+  Becomes usable: A DMG from `scripts/release.sh` opens on a Mac that never ran OurNotch with no Gatekeeper warning, on your own Apple account and a new iCloud container. Publishing a newer version makes an installed copy offer "a new version is ready" and install it.
+  Why now: Needs your own Apple Developer account, which comes last.
+  PRD ref: `prd-m2.md > Packaging and Updates`
+  Spec ref: `spec-m2.md > Components` (Packaging and Updates), `spec-m2.md > External Services and Dependencies` (Apple, Sparkle)
+  Build: Bundle ID `app.ournotch.OurNotch`, container `iCloud.app.ournotch.OurNotch`, team and entitlements; Developer ID certificate and `notarytool` profile (learner); Sparkle `generate_keys` (learner backs up the key) and `SPARKLE_PUBLIC_KEY`; CloudKit schema deployed to Production with `Outbox.ownerId`, `Metric.ownerId` and `Join.code` Queryable; test couples pair again.
+  Verify (mechanical): `release.sh` completes; `spctl -a -vv` and `xcrun stapler validate` pass on the DMG and app; an older build offers and installs the newer one from the appcast; the sold Release build uploads no diagnostics (log line); silent pings arrive in the Production build (verify item 5).
+  Learner check: Download the DMG on your partner's Mac (or a fresh user account), open it — no warning — and pair again on the new container.
+  Commit: `Ship signed, notarized DMG on our own account`
+
+- [ ] **12. ournotch.app is live**
+  Becomes usable: ournotch.app on Cloudflare with everything from slice 10, `/admin` locked to your email by Cloudflare Access, downloads served from R2. The whole journey runs from the live site in Dodo test mode; switching Dodo to live mode is the launch step.
+  Why now: Last — it needs the domain, your Cloudflare account and slice 11's DMG; the app never depends on the site.
   PRD ref: `prd-m2.md > The Landing Page`, `prd-m2.md > Admin Page`, `prd-m2.md > The Core Journey`
-  Spec ref: `spec-m2.md > Components` (Website Pages, Admin Page), `spec-m2.md > Stack` (Cloudflare, verify item 4), `spec-m2.md > Where It Runs and How Someone Tries It` (website, live)
-  Build: `/licence`, `/privacy`, `/terms`, `/fr` and `/de`, `wrangler.jsonc` + Cloudflare Workers deploy (vinext path), `DODO_API_KEY` as a Wrangler secret, Access policy on `/admin`, DNS for ournotch.app (learner's account steps).
-  Verify (mechanical): Deploy succeeds; live pages load at 320 / 375 / 1280 px with no horizontal scroll; `CF-IPCountry` picks the price; `/admin` redirects a signed-out browser to the Access login; a test purchase on the live site ends on `/thanks` and *Open OurNotch* activates.
+  Spec ref: `spec-m2.md > Where It Runs and How Someone Tries It` (website, live), `spec-m2.md > External Services and Dependencies` (Cloudflare)
+  Build: DNS for ournotch.app and downloads.ournotch.app (learner), R2 bucket `ournotch-downloads`, `wrangler deploy`, `DODO_API_KEY` as a Wrangler secret, the Access application and team domain for `/admin`.
+  Verify (mechanical): Deploy succeeds; live pages load at 320 / 375 / 1280 px; `CF-IPCountry` picks the price; a signed-out browser is sent to Access's login for `/admin`; a test purchase on the live site ends on `/thanks` and *Open OurNotch* activates.
   Learner check: Open ournotch.app on your phone and laptop, read it as a stranger would, and buy once in test mode from the live site.
-  Commit: `Deploy ournotch.app with legal, help, and admin pages`
+  Commit: `Deploy ournotch.app`
 
 ## Hands-on Checkpoints
 
@@ -119,7 +139,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
 
 ## Final Review
 
-- [ ] **Learner action before pairing through CloudKit:** in CloudKit Console (Development), add a **Queryable** index on `Join.code` — without it the buyer's Mac can't see join requests. (Production gets it in slice 9.)
+- [ ] **Learner action before pairing through CloudKit:** in CloudKit Console (Development), add a **Queryable** index on `Join.code` — without it the buyer's Mac can't see join requests. (Production gets it in slice 11.)
 - [ ] **Learner action, admin page with real data:** put your Dodo **test-mode** API key in `website/.env.local` as `DODO_API_KEY=…` (ignored by git), restart the dev server, open http://localhost:3000/admin, and confirm the ₹200 test purchase and its key show. Revoke / Restore / Free slot were verified against a stand-in with Dodo's real response shapes, not yet against Dodo with your key.
 - [ ] **Native-speaker check** of the French and German (`OurNotch/Localizable.xcstrings`; drafted by the agent with informal *tu* / *du*) before launch — who checks them is still an open question.
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
@@ -161,7 +181,7 @@ Activity mode:
 - Verify item 3 settled: `GET /license_key_instances?license_key_id=…` lists a key's Macs, and *Free slot* frees one through Dodo's public `deactivate` call (no secret needed).
 - The payment list has no country, so the admin page reads each sale once more for `billing.country` (one request per sale, latest 50; marked `ponytail:`).
 - Admin actions are Next.js server actions rather than route handlers — the same server-only boundary with less code; each action re-checks access, since server actions can be POSTed directly.
-- `/admin` answers 404 in any production build until slice 10 puts it behind Cloudflare Access and verifies Access's signed token; only the local dev server shows it.
+- `/admin` answers 404 in any production build until slice 10 checks Cloudflare Access and verifies Access's signed token; only the local dev server shows it.
 - Slice 5 verified without the learner's secret key (it lives only in their Claude settings): the build succeeds, a production build returns 404 for `/admin`, no browser bundle mentions the key, and against a local stand-in serving Dodo's real response shapes the page listed the ₹200 sale from India and the key with its Mac, and Revoke → `PATCH {disabled:true}`, Restore → `{disabled:false}`, Free slot → `POST /licenses/deactivate`. The real-key run is a learner action in Final Review.
 - Slice 6 verified by tests (hide timing incl. "until tomorrow" = next 6 am; two emojis and a note sent while hidden don't play, then play once together on show; the partner's notch shows "away" and clears; hidden survives a restart and ends if its time passed while closed) and by rendering the Settings row and the closed notch's "away". Showing and hiding the real notch window and the ♡ menu wasn't driven live (the learner was on a call); that's in the learner check.
 - Held emojis are marked seen when they arrive, so the sender sees *Delivered* while their love is away; the "away" label tells them why nothing reacted yet. Holding the delivery back too would need a second "seen" counter.
@@ -172,3 +192,7 @@ Activity mode:
 - Fit verified by rendering every onboarding screen, the licence window, each notch tab, Settings and the closed header in German and French (`xcodebuild test -testLanguage`), instead of Xcode's double-length pseudo-language. Fixes found: German tab "Stimmung" → "Laune"; "Wochenenden" / "Week-ends" shrink to fit their tile; the Note tab's word counter wasn't localized; French "Envoyer un e-mail…" → "E-mail…"; German gate link shortened, and the gate's two links now stack in every language.
 - French and German use the informal *tu* / *du* (a playful app for couples) and Apple's words for the notch ("encoche", "Notch"); moods are gender-neutral words ("Amour", "Joie", "Pas dispo") because French adjectives would need a gender.
 - Settings → Language writes `AppleLanguages` for OurNotch only and relaunches it; the live relaunch wasn't driven (the learner was on a call) and is in the learner check.
+- Slices 9 and 10 split into code now and accounts later (new slices 11 and 12), because the learner asked to finish all the coding first ("we can put things later"): slice 9 is the Beta / Release builds, private diagnostics, Sparkle wiring and the release script; slice 11 is everything that needs the learner's own Apple account (signing, notarization, the new container, Production, the Sparkle key); slice 10 is the rest of the website; slice 12 is going live on Cloudflare. What the learner gets is unchanged.
+- Beta and Release use separate Sparkle feeds (`downloads.ournotch.app/beta/appcast.xml` and `/appcast.xml`), so test couples aren't "updated" onto a sold build that uploads no diagnostics.
+- Sparkle stays off until `SPARKLE_PUBLIC_KEY` is set: its EdDSA key is generated in slice 11 with the learner present, because a lost key means existing users can never be updated again.
+- Slice 9 verified: all three configurations build, feeds and the embedded Sparkle framework checked in each app, the `BETA` flag only in Beta, and `scripts/release.sh Beta` made a DMG that mounts with the app and an Applications link and passes `codesign --verify`. Notarization, upload and an end-to-end update need the account (slice 11).

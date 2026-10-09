@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A10000000000000000001003 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000001002 /* Sparkle */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A10000000000000000000C01 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -39,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A10000000000000000001003 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -90,6 +95,7 @@
 			);
 			name = OurNotch;
 			packageProductDependencies = (
+				A10000000000000000001002 /* Sparkle */,
 			);
 			productName = OurNotch;
 			productReference = A10000000000000000000F01 /* OurNotch.app */;
@@ -147,6 +153,9 @@
 				de,
 			);
 			mainGroup = A10000000000000000000600;
+			packageReferences = (
+				A10000000000000000001001 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A10000000000000000000601 /* Products */;
@@ -262,6 +271,8 @@
 				CODE_SIGN_ENTITLEMENTS = OurNotch/OurNotch.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SPARKLE_FEED_URL = "https://downloads.ournotch.app/beta/appcast.xml";
+				SPARKLE_PUBLIC_KEY = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -291,6 +302,8 @@
 				CODE_SIGN_ENTITLEMENTS = OurNotch/OurNotch.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SPARKLE_FEED_URL = "https://downloads.ournotch.app/appcast.xml";
+				SPARKLE_PUBLIC_KEY = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -329,7 +342,91 @@
 			};
 			name = Release;
 		};
+		A10000000000000000000E07 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Beta;
+		};
+		A10000000000000000000E08 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				DEVELOPMENT_TEAM = FFP4CMK386;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = OurNotch;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_FILE = "OurNotch-Info.plist";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				CODE_SIGN_ENTITLEMENTS = OurNotch/OurNotch.entitlements;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "BETA $(inherited)";
+				SPARKLE_FEED_URL = "https://downloads.ournotch.app/beta/appcast.xml";
+				SPARKLE_PUBLIC_KEY = "";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Beta;
+		};
+		A10000000000000000000E09 /* Beta */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				DEVELOPMENT_TEAM = FFP4CMK386;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev.Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OurNotch.app/Contents/MacOS/OurNotch";
+			};
+			name = Beta;
+		};
 /* End XCBuildConfiguration section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A10000000000000000001001 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.6.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A10000000000000000001002 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A10000000000000000001001 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCConfigurationList section */
 		A10000000000000000000900 /* Build configuration list for PBXProject "OurNotch" */ = {
@@ -337,6 +434,7 @@
 			buildConfigurations = (
 				A10000000000000000000E01 /* Debug */,
 				A10000000000000000000E02 /* Release */,
+				A10000000000000000000E07 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -346,6 +444,7 @@
 			buildConfigurations = (
 				A10000000000000000000E03 /* Debug */,
 				A10000000000000000000E04 /* Release */,
+				A10000000000000000000E08 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -355,6 +454,7 @@
 			buildConfigurations = (
 				A10000000000000000000E05 /* Debug */,
 				A10000000000000000000E06 /* Release */,
+				A10000000000000000000E09 /* Beta */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

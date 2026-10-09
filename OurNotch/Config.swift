@@ -32,8 +32,13 @@ enum Config {
     }
 
     enum Diagnostics {
-        /// Upload this Mac's event log to CloudKit so both partners' logs can be read from either Mac.
+        /// Upload this Mac's event log and measurements to CloudKit so both partners' logs can be read from
+        /// either Mac. Debug and Beta (test couples) only: the sold Release build keeps its log on the Mac.
+        #if DEBUG || BETA
         static let uploads = true
+        #else
+        static let uploads = false
+        #endif
         /// Lines kept in memory and uploaded (~150 KB; a CloudKit record holds 1 MB).
         static let maxLines = 1000
         /// The on-disk log starts fresh past this size, keeping one previous file.

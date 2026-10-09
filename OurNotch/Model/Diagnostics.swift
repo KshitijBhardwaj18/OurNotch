@@ -9,7 +9,7 @@ import os
 /// record each, from both Macs, so a test session can be queried and compared side by side.
 /// Never records note text, photos, or keys — only events, counts, timings, and errors.
 // ponytail: diagnostics records sit in the public database, readable by any install of the app.
-// Fine for testing; turn `Config.Diagnostics.uploads` off (or move them to the private database) before real users.
+// Only Debug and Beta builds upload (`Config.Diagnostics.uploads`); the sold Release build never does.
 @MainActor
 final class Diagnostics {
     static let shared = Diagnostics()

@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!-- Merged into the generated Info.plist. Only what build settings can't express: the ournotch:// link
-     the website's "Open OurNotch" button uses to activate the app. -->
+     the website's "Open OurNotch" button uses to activate the app, and Sparkle's update feed and key
+     (set per configuration: SPARKLE_FEED_URL, SPARKLE_PUBLIC_KEY). -->
 <plist version="1.0">
 <dict>
+	<key>SUFeedURL</key>
+	<string>$(SPARKLE_FEED_URL)</string>
+	<key>SUPublicEDKey</key>
+	<string>$(SPARKLE_PUBLIC_KEY)</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
