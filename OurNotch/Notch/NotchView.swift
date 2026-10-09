@@ -62,6 +62,7 @@ struct NotchView: View {
         .compositingGroup()
         .animation(Config.Notch.spring, value: isOpen)
         .animation(Config.Notch.spring, value: state.visibleBanner?.id)
+        .animation(Config.Notch.spring, value: state.closedSideWidth)
         .contentShape(Rectangle())
         .onHover(perform: hoverChanged)
         .sensoryFeedback(.alignment, trigger: isOpen)
@@ -84,7 +85,7 @@ struct NotchView: View {
 
     private var size: CGSize {
         if isOpen { return Config.Notch.openSize }
-        let width = geometry.notchSize.width + Config.Notch.closedSideWidth * 2 + Self.closedRadii.top * 2
+        let width = geometry.notchSize.width + state.closedSideWidth * 2 + Self.closedRadii.top * 2
         let bannerRoom = state.visibleBanner == nil ? 0 : Config.Message.bannerHeight
         return CGSize(width: width, height: closedHeight + bannerRoom)
     }

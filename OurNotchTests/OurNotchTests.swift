@@ -401,11 +401,14 @@ struct MoodTests {
         try await Task.sleep(for: .milliseconds(100))
         await partner.sync()
         #expect(partner.partnerOutbox.mood == "😴")
+        #expect(Config.moodLabel("😴") == "Sleepy")
+        #expect(partner.closedSideWidth == Config.Notch.closedSideWidthWithMood) // room for "😴 sleepy"
 
         you.setMood(nil)
         try await Task.sleep(for: .milliseconds(100))
         await partner.sync()
         #expect(partner.partnerOutbox.mood == nil)
+        #expect(partner.closedSideWidth == Config.Notch.closedSideWidth)
     }
 }
 

@@ -18,6 +18,11 @@ final class AppState {
     private(set) var togetherSince: Date?
     private(set) var myOutbox: Outbox
     private(set) var partnerOutbox = Outbox()
+
+    /// Width of each slot beside the camera in the closed notch: wider while my love's mood has a word to show.
+    var closedSideWidth: CGFloat {
+        partnerOutbox.mood == nil ? Config.Notch.closedSideWidth : Config.Notch.closedSideWidthWithMood
+    }
     /// The message currently scrolling under the notch, if any. Saved so `untilOpened` survives a restart.
     private(set) var banner: Message?
     /// While set and in the future, OurNotch is hidden: no notch, and arrivals wait.

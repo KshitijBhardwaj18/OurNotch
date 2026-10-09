@@ -13,6 +13,9 @@ enum Config {
         ("💻", String(localized: "Busy")), ("🎧", String(localized: "Focused")), ("🏃", String(localized: "Out")), ("😴", String(localized: "Sleepy")), ("😔", String(localized: "Low")), ("🤒", String(localized: "Unwell")),
     ]
 
+    /// The word for a mood emoji, in this Mac's language (only the emoji travels between Macs).
+    static func moodLabel(_ emoji: String) -> String? { moods.first { $0.emoji == emoji }?.label }
+
     enum Cloud {
         /// Throwaway container on the company team; swap for your own account's container before selling.
         static let containerId = "iCloud.app.ournotch.OurNotch"
@@ -116,6 +119,9 @@ enum Config {
         static let openSize = CGSize(width: contentSize.width + (margin + openEarRadius) * 2, height: 296)
         /// Width of the slots on each side of the camera in the closed notch: avatar + mood on the left, ♥ on the right.
         static let closedSideWidth: CGFloat = 60
+        /// The same slots while your love has a mood, so its word fits next to the emoji ("🥺 Missing you").
+        /// Both sides grow, so the notch stays centred on the camera.
+        static let closedSideWidthWithMood: CGFloat = 122
         /// Space between the closed notch's curved edge and its content.
         static let closedInset: CGFloat = 10
         /// How far the closed shape reaches below the menu bar, so it fully covers the camera housing.

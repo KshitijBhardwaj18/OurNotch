@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The row beside the camera. Closed: your love's little avatar and mood, and a heartbeat ♥. Open: the couple's names and the
+/// The row beside the camera. Closed: your love's little avatar and mood (emoji and word), and a heartbeat ♥. Open: the couple's names and the
 /// Settings gear. Both layouts sit in the same row and crossfade, so nothing reflows mid-animation.
 struct NotchHeaderView: View {
     let state: AppState
@@ -25,13 +25,23 @@ struct NotchHeaderView: View {
                     if state.partnerIsAway(now: context.date) {
                         Text("away").font(.system(size: 10, weight: .medium)).foregroundStyle(Color.secondaryLabel)
                     } else if let mood = state.partnerOutbox.mood {
-                        Text(mood).font(.system(size: 13)).transition(.scale.combined(with: .opacity))
+                        HStack(spacing: 3) {
+                            Text(mood).font(.system(size: 13))
+                            if let word = Config.moodLabel(mood) {
+                                Text(word.lowercased())
+                                    .font(.system(size: 11, weight: .medium))
+                                    .foregroundStyle(.white.opacity(0.85))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.8)
+                            }
+                        }
+                        .transition(.scale.combined(with: .opacity))
                     }
                 }
             }
             .animation(.spring(response: 0.35, dampingFraction: 0.6), value: state.partnerOutbox.mood)
             .padding(.leading, Config.Notch.closedInset)
-            .frame(width: Config.Notch.closedSideWidth, alignment: .leading)
+            .frame(width: state.closedSideWidth, alignment: .leading)
 
             // Nothing drawn behind the camera is visible, so leave at least its width empty.
             Spacer(minLength: notchSize.width)
@@ -41,7 +51,7 @@ struct NotchHeaderView: View {
                 .foregroundStyle(Color.notchPink)
                 .heartbeat()
                 .padding(.trailing, Config.Notch.closedInset + 2)
-                .frame(width: Config.Notch.closedSideWidth, alignment: .trailing)
+                .frame(width: state.closedSideWidth, alignment: .trailing)
         }
     }
 
