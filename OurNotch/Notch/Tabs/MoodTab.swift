@@ -36,8 +36,6 @@ struct MoodTab: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .notchHint(selected ? String(localized: "Tap again to clear your mood")
-                                   : String(localized: "Tell \(state.partnerName.lowercased()) you're feeling \(mood.label.lowercased())"))
                 }
             }
         }

@@ -53,7 +53,6 @@ struct PhotoTab: View {
                 }
                 .contentShape(Rectangle())
                 .onTapGesture(perform: choose)
-                .notchHint(String(localized: "Pick a photo of you two ♡"))
         }
     }
 

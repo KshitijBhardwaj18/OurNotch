@@ -25,17 +25,6 @@ enum NotchTab: CaseIterable {
         }
     }
 
-    /// The tab bar's hover tooltip.
-    var hint: String {
-        switch self {
-        case .home: String(localized: "Everything from your love, at a glance")
-        case .note: String(localized: "Your little notes to each other")
-        case .emoji: String(localized: "Send a little burst of love")
-        case .mood: String(localized: "How you're both feeling")
-        case .photo: String(localized: "A photo for their Home")
-        case .stats: String(localized: "Your life together, in numbers")
-        }
-    }
 }
 
 /// The native-looking segmented control at the bottom of the open notch (76 pt per tab × 28).
@@ -68,7 +57,6 @@ struct NotchTabBar: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .notchHint(tab.hint)
             }
         }
         .padding(2)
@@ -79,41 +67,37 @@ struct NotchTabBar: View {
     }
 }
 
-/// The small two-option control used for "Scroll" and "Appears".
+/// The little choice chips used for "Scroll", "Appears" and in Settings: separate rounded chips,
+/// the chosen one in solid pink, the others quiet until hovered.
 struct SmallSegmented<Option: Hashable>: View {
     let options: [Option]
     @Binding var selection: Option
     let label: (Option) -> String
     var symbol: ((Option) -> String)? = nil
+    @State private var hovered: Option?
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 6) {
             ForEach(options, id: \.self) { option in
                 let selected = option == selection
                 Button { selection = option } label: {
-                    HStack(spacing: 4) {
-                        if let symbol { Image(systemName: symbol(option)).font(.system(size: 10, weight: .semibold)) }
+                    HStack(spacing: 5) {
+                        if let symbol { Image(systemName: symbol(option)).font(.system(size: 10.5, weight: .bold)) }
                         Text(label(option))
                     }
-                    .font(.system(size: 11.5, weight: .medium))
-                    .foregroundStyle(selected ? Color.white : .secondaryLabel)
-                    .padding(.horizontal, 10)
-                    .frame(height: 20)
-                    .background {
-                        if selected {
-                            RoundedRectangle(cornerRadius: 5)
-                                .fill(Color.segmentSelected)
-                                .shadow(color: .black.opacity(0.3), radius: 1, y: 1)
-                        }
-                    }
-                    .contentShape(Rectangle())
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(selected ? Color.white : hovered == option ? .white.opacity(0.85) : .secondaryLabel)
+                    .padding(.horizontal, 12)
+                    .frame(height: 26)
+                    .background(selected ? Color.notchPink : hovered == option ? .notchPressed : .notchField, in: Capsule())
+                    .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
+                .onHover { hovered = $0 ? option : (hovered == option ? nil : hovered) }
             }
         }
-        .padding(2)
-        .background(Color.segmentTrack, in: RoundedRectangle(cornerRadius: 7))
         .animation(.snappy(duration: 0.2), value: selection)
+        .animation(.easeOut(duration: 0.12), value: hovered)
     }
 }
 
@@ -134,12 +118,13 @@ struct Heartbeat: ViewModifier {
     }
 }
 
-/// A small tooltip pill above a view, shown after a short hover. The notch belongs to a background app,
-/// and macOS only shows its own tooltips (`.help`) for the app in front, so the notch draws its own.
+/// A cute tooltip for Home's cards. macOS shows `.help` tooltips only for the app in front,
+/// and the notch belongs to a background app, so the notch draws its own: after a short hover the view
+/// asks for a pill, and `OpenNotchView` draws it on top of everything (see `HintLayer`).
 struct NotchHint: ViewModifier {
     let text: String
-    /// Which edge the pill lines up with; views at the notch's sides keep theirs inside it.
-    var edge: HorizontalAlignment = .center
+    var below = false
+    var leading = false
     @State private var shown = false
     @State private var wait: Task<Void, Never>?
 
@@ -147,30 +132,55 @@ struct NotchHint: ViewModifier {
         content
             .onHover { inside in
                 wait?.cancel()
-                guard inside else { withAnimation(.easeOut(duration: 0.12)) { shown = false }; return }
+                guard inside else { shown = false; return }
                 wait = Task {
                     try? await Task.sleep(for: .milliseconds(550))
-                    guard !Task.isCancelled else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) { shown = true }
+                    if !Task.isCancelled { shown = true }
                 }
             }
-            .overlay(alignment: Alignment(horizontal: edge, vertical: .top)) {
-                if shown {
-                    Text(text)
-                        .font(.system(size: 11.5, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(Color.notchPressed, in: Capsule())
-                        .overlay(Capsule().strokeBorder(.white.opacity(0.08), lineWidth: 0.5))
-                        .shadow(color: .black.opacity(0.4), radius: 6, y: 2)
-                        .fixedSize()
-                        .offset(y: -30)
-                        .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottom)))
-                        .allowsHitTesting(false)
-                }
+            .anchorPreference(key: HintKey.self, value: .bounds) { shown ? Hint(text: text, bounds: $0, below: below, leading: leading) : nil }
+    }
+}
+
+struct Hint: Equatable {
+    let text: String
+    let bounds: Anchor<CGRect>
+    /// Above the view unless asked; `leading` lines it up with the view's left edge.
+    let below: Bool
+    let leading: Bool
+}
+
+struct HintKey: PreferenceKey {
+    static let defaultValue: Hint? = nil
+    static func reduce(value: inout Hint?, nextValue: () -> Hint?) { value = nextValue() ?? value }
+}
+
+/// Draws the hovered view's hint above it (or below, if asked), always inside the notch's sides.
+struct HintLayer: View {
+    let hint: Hint?
+
+    var body: some View {
+        GeometryReader { box in
+            if let hint {
+                let rect = box[hint.bounds]
+                let width = min(box.size.width - 8, CGFloat(hint.text.count) * 6.4 + 22) // close enough to centre it
+                Text(hint.text)
+                    .font(.system(size: 11.5, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(Color.notchPressed, in: Capsule())
+                    .overlay(Capsule().strokeBorder(.white.opacity(0.1), lineWidth: 0.5))
+                    .shadow(color: .black.opacity(0.45), radius: 8, y: 3)
+                    .fixedSize()
+                    .position(x: min(max(hint.leading ? rect.minX + width / 2 : rect.midX, width / 2 + 4), box.size.width - width / 2 - 4),
+                              y: hint.below ? rect.maxY : rect.minY) // centred on the card's edge, clear of the names row
+                    .transition(.opacity)
+                    .id(hint.text)
             }
-            .zIndex(shown ? 10 : 0)
+        }
+        .allowsHitTesting(false)
+        .animation(.easeOut(duration: 0.15), value: hint?.text)
     }
 }
 
@@ -178,7 +188,9 @@ extension View {
     func heartbeat() -> some View { modifier(Heartbeat()) }
 
     /// A cute tooltip for anything in the notch (see `NotchHint`).
-    func notchHint(_ text: String, edge: HorizontalAlignment = .center) -> some View { modifier(NotchHint(text: text, edge: edge)) }
+    func notchHint(_ text: String, below: Bool = false, leading: Bool = false) -> some View {
+        modifier(NotchHint(text: text, below: below, leading: leading))
+    }
 
     /// The dark `#1C1C1E` card that holds a tab. Neutral, so it's easy on the eyes in a dark room;
     /// pink is kept for what matters (your notes, the send heart, the counter, a selection).

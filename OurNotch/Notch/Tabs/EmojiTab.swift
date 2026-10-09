@@ -13,15 +13,12 @@ struct EmojiTab: View {
     @State private var taps: [String: Int] = [:]
 
     var body: some View {
-        // The row sits in the middle of the card, with the title above and the choice below.
+        // Title and where it appears on top, the row in the middle of the card, its status underneath.
         ZStack {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(spacing: 0) {
                 header
                 Spacer(minLength: 0)
-                HStack(spacing: 8) {
-                    Text("Appears").font(.system(size: 12)).foregroundStyle(Color.secondaryLabel)
-                    SmallSegmented(options: EmojiMode.allCases, selection: $mode, label: \.label, symbol: \.symbol)
-                }
+                status.font(.system(size: 11.5, weight: .medium, design: .rounded))
             }
             emojiRow
         }
@@ -45,7 +42,7 @@ struct EmojiTab: View {
                     .foregroundStyle(Color.secondaryLabel)
             }
             Spacer()
-            status.font(.system(size: 11.5, weight: .medium))
+            SmallSegmented(options: EmojiMode.allCases, selection: $mode, label: \.label, symbol: \.symbol)
         }
     }
 
@@ -57,7 +54,7 @@ struct EmojiTab: View {
                 Text("Sent \(lastSent)").foregroundStyle(.white)
             }
         } else {
-            Text("Tap to send").foregroundStyle(Color.tertiaryLabel)
+            Text("Tap one to send").foregroundStyle(Color.tertiaryLabel)
         }
     }
 
@@ -69,7 +66,6 @@ struct EmojiTab: View {
                 }
                 .buttonStyle(EmojiButtonStyle(isLastSent: char == lastSent))
                 .overlay { TapBurst(char: char, trigger: taps[char, default: 0]) }
-                .notchHint(String(localized: "Send \(state.partnerName.lowercased()) a \(char)"))
             }
         }
     }

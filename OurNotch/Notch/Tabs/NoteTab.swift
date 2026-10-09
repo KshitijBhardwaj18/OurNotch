@@ -22,7 +22,7 @@ struct NoteTab: View {
                 .padding(.bottom, 4)
             conversation
             composer
-            footer.padding(.top, 10)
+            footer.padding(.top, 7)
         }
         .cardStyle()
         .onChange(of: focused) { _, now in isEditing = now }
@@ -94,6 +94,17 @@ struct NoteTab: View {
                 .disabled(isLocked)
                 .opacity(isLocked ? 0.5 : 1)
 
+            // How the note scrolls on their notch: one tap switches, the line underneath says which.
+            Button { mode = mode == .three ? .untilOpened : .three } label: {
+                Image(systemName: mode.symbol)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(Color.notchField, in: Circle())
+                    .contentTransition(.symbolEffect(.replace))
+            }
+            .buttonStyle(.plain)
+
             Button(action: send) {
                 Image(systemName: "heart.fill")
                     .font(.system(size: 15, weight: .semibold))
@@ -103,7 +114,6 @@ struct NoteTab: View {
                     .scaleEffect(canSend ? 1 : 0.92)
                     .animation(.spring(response: 0.3, dampingFraction: 0.5), value: canSend)
             }
-            .notchHint(String(localized: "Send it to their notch ♡"))
             .buttonStyle(.plain)
             .disabled(!canSend)
         }
@@ -111,13 +121,19 @@ struct NoteTab: View {
         .overlay(alignment: .top) { Rectangle().fill(Color.separator).frame(height: 1) }
     }
 
+    /// What the scroll button will do, and how the note is going.
     private var footer: some View {
-        HStack(spacing: 8) {
-            Text("Scroll").font(.system(size: 12)).foregroundStyle(Color.secondaryLabel)
-            SmallSegmented(options: BannerMode.allCases, selection: $mode, label: \.label)
+        HStack(spacing: 5) {
+            Image(systemName: mode.symbol).font(.system(size: 10, weight: .semibold))
+            Text(mode == .three ? String(localized: "Scrolls 3 times on \(state.partnerName.lowercased())'s notch")
+                                : String(localized: "Scrolls on \(state.partnerName.lowercased())'s notch until they open it"))
             Spacer()
             status
         }
+        .font(.system(size: 11.5, weight: .medium))
+        .foregroundStyle(Color.tertiaryLabel)
+        .padding(.horizontal, 14)
+        .animation(.snappy(duration: 0.2), value: mode)
     }
 
     // MARK: Status and validation

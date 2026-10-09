@@ -23,22 +23,6 @@
         }
       }
     },
-    "%@ is" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Humeur de %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@s Laune"
-          }
-        }
-      }
-    },
     "%@ planned a surprise for you, sweetheart ♡\n\nA little place in your Mac's notch where things from both of us arrive.\n\n1. Download OurNotch (free for you): %@\n2. Open it, choose \"I Have an Invite Code\" and type: %@\n\nThe code works for 24 hours.\n\nlove, %@" : {
       "localizations" : {
         "fr" : {
@@ -312,7 +296,8 @@
             "value" : "Ein Foto für ihr Zuhause"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Activate" : {
       "localizations" : {
@@ -360,7 +345,8 @@
             "value" : "Und keine einzige verschwendet ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Appears" : {
       "localizations" : {
@@ -376,7 +362,8 @@
             "value" : "Erscheint"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Back" : {
       "localizations" : {
@@ -425,6 +412,23 @@
           }
         }
       }
+    },
+    "Change how it scrolls" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change le défilement"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändern, wie sie läuft"
+          }
+        }
+      },
+      "extractionState" : "stale"
     },
     "Check Again" : {
       "localizations" : {
@@ -778,6 +782,23 @@
         }
       }
     },
+    "Every day with you ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque jour avec toi ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeder Tag mit dir ♡"
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
     "Every little heart you've sent each other" : {
       "localizations" : {
         "fr" : {
@@ -792,7 +813,8 @@
             "value" : "Jedes kleine Herz, das ihr euch geschickt habt"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Every second counts ♡ Click for all your numbers together" : {
       "localizations" : {
@@ -841,7 +863,8 @@
             "value" : "Jeder einzelne mit dir ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Everything from your love, at a glance" : {
       "localizations" : {
@@ -857,7 +880,8 @@
             "value" : "Alles von deiner Liebe auf einen Blick"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Excited" : {
       "localizations" : {
@@ -1130,7 +1154,8 @@
             "value" : "Wie es euch beiden geht"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Hungry" : {
       "localizations" : {
@@ -1373,7 +1398,8 @@
             "value" : "Faule Sonntage inklusive ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Licence" : {
       "localizations" : {
@@ -1942,7 +1968,8 @@
             "value" : "Wähl ein Foto von euch beiden ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Quit OurNotch" : {
       "localizations" : {
@@ -2073,6 +2100,39 @@
             "value" : "Laufschrift"
           }
         }
+      },
+      "extractionState" : "stale"
+    },
+    "Scrolls 3 times on %@'s notch" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défile 3 fois dans l’encoche de %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Läuft 3-mal durch %@s Notch"
+          }
+        }
+      }
+    },
+    "Scrolls on %@'s notch until they open it" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défile dans l’encoche de %@ jusqu’à ce qu’il l’ouvre"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Läuft durch %@s Notch, bis sie geöffnet wird"
+          }
+        }
       }
     },
     "Seconds" : {
@@ -2156,7 +2216,8 @@
             "value" : "Schick %1$@ ein %2$@"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Send %@ a photo" : {
       "localizations" : {
@@ -2236,7 +2297,8 @@
             "value" : "Schick einen kleinen Liebesgruß"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Send an emoji" : {
       "localizations" : {
@@ -2268,7 +2330,8 @@
             "value" : "Ab in die Notch ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Send love, notch to notch." : {
       "localizations" : {
@@ -2540,7 +2603,8 @@
             "value" : "Plan schon mal etwas Süßes ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Stats" : {
       "localizations" : {
@@ -2604,7 +2668,8 @@
             "value" : "Nochmal tippen, um deine Laune zu löschen"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Tap an emoji and it pours out of their notch." : {
       "localizations" : {
@@ -2634,6 +2699,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wähl eins, dann erscheint es auf dem Bildschirm von %@ ♡"
+          }
+        }
+      }
+    },
+    "Tap one to send" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touche-en un pour l’envoyer"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp eins an zum Senden"
           }
         }
       }
@@ -2685,7 +2766,8 @@
             "value" : "Zum Senden klicken"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Tell %@ you're feeling %@" : {
       "localizations" : {
@@ -2701,7 +2783,8 @@
             "value" : "Sag %1$@: %2$@"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "That key doesn't look right. Check your receipt email and try again." : {
       "localizations" : {
@@ -2747,6 +2830,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Die 6 Zeichen aus der Einladung deiner Liebe."
+          }
+        }
+      }
+    },
+    "Their mood" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son humeur"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ihre Laune"
           }
         }
       }
@@ -2813,7 +2912,8 @@
             "value" : "Tick, tack, Liebe ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Today's your day ♡" : {
       "localizations" : {
@@ -2829,7 +2929,8 @@
             "value" : "Heute ist euer Tag ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Together since" : {
       "localizations" : {
@@ -3133,7 +3234,8 @@
             "value" : "Euer Leben zu zweit in Zahlen"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Your little notes to each other" : {
       "localizations" : {
@@ -3149,7 +3251,8 @@
             "value" : "Eure kleinen Notizen aneinander"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Your love lives at the top of your screen. Whatever you send appears in their notch." : {
       "localizations" : {
@@ -3231,6 +3334,23 @@
         }
       }
     },
+    "days of us" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "jours à deux"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tage zu zweit"
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
     "from %@" : {
       "localizations" : {
         "fr" : {
@@ -3291,6 +3411,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "noch keine Laune"
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
+    "not set" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pas choisie"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nicht gesetzt"
           }
         }
       }

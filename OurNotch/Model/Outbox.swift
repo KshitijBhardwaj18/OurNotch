@@ -108,6 +108,13 @@ enum BannerMode: String, Codable, CaseIterable {
         case .untilOpened: String(localized: "Until opened")
         }
     }
+
+    var symbol: String {
+        switch self {
+        case .three: "repeat"
+        case .untilOpened: "envelope.open"
+        }
+    }
 }
 
 /// How arriving emojis are shown, kept pure for tests.

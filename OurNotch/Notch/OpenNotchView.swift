@@ -32,5 +32,6 @@ struct OpenNotchView: View {
         }
         .padding(.top, 8)
         .padding(.bottom, 14)
+        .overlayPreferenceValue(HintKey.self) { HintLayer(hint: $0) } // on top of every card and the tab bar
     }
 }
