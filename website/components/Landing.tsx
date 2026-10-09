@@ -60,7 +60,7 @@ export async function Landing({ lang, country }: { lang: Lang; country?: string 
           <a className="y-logo" href="#top"><img className="y-logo-mark" src="/logo.svg" alt="" />OurNotch</a>
           <div className="y-links">
             <a href="#fits">{t.nav.features}</a><a href="#buy">{t.nav.pricing}</a><a href="#faq">{t.nav.faq}</a>
-            <a className="y-btn" href="#buy">{t.nav.get}</a>
+            <a className="y-btn" href={checkout}>{t.nav.get}</a>
           </div>
         </div>
       </nav>
@@ -78,7 +78,7 @@ export async function Landing({ lang, country }: { lang: Lang; country?: string 
         <p className="y-sub">{t.hero.sub}</p>
         <div className="y-show"><HeroDemo t={t.demo} tour={t.tour} /></div>
         <div className="y-ctas">
-          <a className="y-btn" href="#buy"><Heart />{fill(t.hero.cta, { price })}</a>
+          <a className="y-btn" href={checkout}><Heart />{fill(t.hero.cta, { price })}</a>
           <a className="y-link" href="#fits">{t.hero.how}</a>
         </div>
         <p className="y-under"><b>{t.hero.underB}</b> {t.hero.under}</p>
@@ -149,7 +149,7 @@ export async function Landing({ lang, country }: { lang: Lang; country?: string 
           <span className="y-zz">z z</span>
         </div>
         <h2>{t.end.h2}</h2>
-        <a className="y-btn" href="#buy"><Heart />{fill(t.end.cta, { price })}</a>
+        <a className="y-btn" href={checkout}><Heart />{fill(t.end.cta, { price })}</a>
       </section>
 
       <SiteFooter lang={lang} />
