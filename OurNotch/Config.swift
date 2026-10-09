@@ -111,6 +111,9 @@ enum Config {
         static let historyCount = 10
         /// How fast the banner scrolls, in points per second.
         static let bannerSpeed: CGFloat = 40
+        /// Longer than 3 passes of the longest whisper (~800 pt of strip and text at 40 pt/s ≈ 20 s a pass).
+        /// A 3-pass banner older than this at launch is dropped, instead of flashing up and away.
+        static let bannerThreePassesAtMost: TimeInterval = 90
         /// Height the closed notch grows by while a banner is showing.
         static let bannerHeight: CGFloat = 22
     }

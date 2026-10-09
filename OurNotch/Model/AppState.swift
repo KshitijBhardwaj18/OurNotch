@@ -110,6 +110,11 @@ final class AppState {
         savedOutbox = store.savedOutbox ?? Outbox()
         banner = store.banner
         bannerStartedAt = store.bannerStartedAt
+        // Quit mid-scroll and reopened after its passes would have ended: it's done, don't flash it.
+        if banner?.mode == .three, let started = bannerStartedAt,
+           Date.now.timeIntervalSince(started) > Config.Message.bannerThreePassesAtMost {
+            setBanner(nil)
+        }
         hiddenUntil = Hide.isHidden(until: store.hiddenUntil) ? store.hiddenUntil : nil
         if hiddenUntil == nil { myOutbox.awayUntil = nil } // came back while the app was closed
         togetherSince = store.togetherSince

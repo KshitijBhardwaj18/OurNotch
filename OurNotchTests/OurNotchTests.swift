@@ -351,6 +351,10 @@ struct PartnersTests {
 
         let relaunched = try #require(AppState(store: people.partner, mailbox: people.mailbox, photosRoot: people.photosRoot))
         #expect(relaunched.banner?.text == "miss you" && relaunched.bannerStartedAt == started)
+
+        people.partner.bannerStartedAt = .now.addingTimeInterval(-Config.Message.bannerThreePassesAtMost - 1)
+        let later = try #require(AppState(store: people.partner, mailbox: people.mailbox, photosRoot: people.photosRoot))
+        #expect(later.banner == nil) // its passes ended while the app was closed
     }
 
     @Test func emojisArriveAndAreDelivered() async throws {
