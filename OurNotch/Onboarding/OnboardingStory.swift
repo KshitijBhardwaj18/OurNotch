@@ -1,8 +1,7 @@
 import SwiftUI
 
 /// The left half of onboarding: a slow carousel of what OurNotch does, starring Pip and Bun from the
-/// website. Each slide is a little scene under a notch that hangs from the window's top edge (the window
-/// has no visible title bar). It moves on every 8 s; a swipe picks a slide and restarts the clock.
+/// website. Each slide is a little scene on a Mac screen card, under its notch. It moves on every 8 s; a swipe picks a slide and restarts the clock.
 /// The onboarding window owns `index` so the steps side can take on the slide's colour.
 struct OnboardingStory: View {
     @Binding var index: Int
@@ -31,10 +30,18 @@ struct OnboardingStory: View {
     /// One whole slide (colour, scene and words), so the carousel moves it as a single card.
     private func page(_ slide: Slide) -> some View {
         VStack(spacing: 0) {
+            // A little Mac screen, below the window buttons, with the notch hanging from its top edge.
             TimelineView(.animation) { context in
                 Scene(slide: slide, t: context.date.timeIntervalSinceReferenceDate)
             }
-            .frame(height: 270)
+            .frame(height: 236)
+            .background(.white.opacity(0.55))
+            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).strokeBorder(.white.opacity(0.8), lineWidth: 1))
+            .shadow(color: Color(hex: 0x5A1E32).opacity(0.12), radius: 14, y: 8)
+            .padding(.horizontal, 22)
+            .padding(.top, 46)
+            .padding(.bottom, 22)
             VStack(alignment: .leading, spacing: 8) {
                 Text(slide.title)
                     .font(.system(size: 25, weight: .heavy, design: .rounded))
@@ -116,12 +123,12 @@ private struct Scene: View {
                 default: EmptyView()
                 }
                 buddy("pip", mood: slide == .mood ? "love" : (slide == .note ? "open" : "happy"), phase: 0)
-                    .position(x: w * 0.27, y: h - 52)
+                    .position(x: w * 0.27, y: h - 54)
                 buddy("bun", mood: slide == .emoji || slide == .love ? "love" : "happy", phase: 1.3)
-                    .position(x: w * 0.73, y: h - 52)
+                    .position(x: w * 0.73, y: h - 54)
             }
         }
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 12)
     }
 
     private var notchHeight: CGFloat { slide == .note || slide == .mood ? 34 : 28 }
