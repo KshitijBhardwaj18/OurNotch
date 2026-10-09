@@ -27,10 +27,11 @@ enum Config {
         // Pings should deliver within seconds; this catches lost ones. One request per check.
         static let pollInterval: Duration = .seconds(60)
         #endif
-        /// Checks while the notch is open or within `activeWindow` of sending or receiving, because pings
-        /// often don't arrive. At 1,000 users with ~10 % active: 900/60 + 100/10 ≈ 25 requests/s,
-        /// under CloudKit's ~40/s free starting allowance.
-        static let activePollInterval: Duration = .seconds(10)
+        /// Checks while the notch is open or within `activeWindow` of sending or receiving, so a conversation
+        /// feels live even when a ping is late or lost (Beta 1.0: arrivals waited 4 to 15 s at 10 s checks).
+        // ponytail: at 1,000 users with ~10 % active, 900/60 + 100/3 ≈ 48 requests/s, past CloudKit's ~40/s
+        // starting allowance (it grows with users, and busy replies are retried). Raise this if CloudKit throttles.
+        static let activePollInterval: Duration = .seconds(3)
         static let activeWindow: TimeInterval = 180
     }
 

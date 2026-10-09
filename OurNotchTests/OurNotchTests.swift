@@ -449,8 +449,8 @@ struct CheckPaceTests {
     @Test func fastWhileOpenOrRecentlyActive() {
         let now = Date.now, idle = Duration.seconds(60)
         #expect(CheckPace.interval(notchOpen: false, lastActivity: nil, idle: idle, now: now) == .seconds(60))
-        #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, idle: idle, now: now) == .seconds(10))
-        #expect(CheckPace.interval(notchOpen: false, lastActivity: now.addingTimeInterval(-179), idle: idle, now: now) == .seconds(10))
+        #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, idle: idle, now: now) == Config.Cloud.activePollInterval)
+        #expect(CheckPace.interval(notchOpen: false, lastActivity: now.addingTimeInterval(-179), idle: idle, now: now) == Config.Cloud.activePollInterval)
         #expect(CheckPace.interval(notchOpen: false, lastActivity: now.addingTimeInterval(-181), idle: idle, now: now) == .seconds(60))
         // Never slower than the idle pace (Debug's 3 s).
         #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, idle: .seconds(3), now: now) == .seconds(3))
