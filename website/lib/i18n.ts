@@ -72,6 +72,7 @@ const en = {
     kicker: 'FAQ', h2: 'Good questions.',
     items: [
       ['Do we both need to buy it?', "No. One license covers your Mac and your person's."],
+      ['Is it a subscription?', "No. It's a one-time purchase: pay once and it's yours on both Macs, with no monthly fees."],
       ['What do we need?', 'Two Macs with macOS 14 Sonoma or later, each signed in with an Apple Account.'],
       ['Can anyone else see what we send?', "No. It's end-to-end encrypted, so only your two Macs can read it."],
       ['Do we keep our whispers?', "Your last few stay as a tiny conversation in the notch. There's no endless history to scroll."],
@@ -235,6 +236,7 @@ const fr: Copy = {
     kicker: 'FAQ', h2: 'Bonnes questions.',
     items: [
       ['Faut-il l’acheter tous les deux ?', 'Non. Une licence couvre ton Mac et celui de ta personne.'],
+      ['C’est un abonnement ?', 'Non. C’est un achat unique : tu paies une fois et il est à vous sur vos deux Mac, sans frais mensuels.'],
       ['De quoi avons-nous besoin ?', 'Deux Mac avec macOS 14 Sonoma ou plus récent, chacun connecté avec un compte Apple.'],
       ['Quelqu’un d’autre peut-il voir ce que nous envoyons ?', 'Non. C’est chiffré de bout en bout : seuls vos deux Mac peuvent le lire.'],
       ['Gardons-nous nos murmures ?', 'Vos derniers restent comme une mini conversation dans l’encoche. Pas d’historique sans fin à faire défiler.'],
@@ -396,6 +398,7 @@ const de: Copy = {
     kicker: 'FAQ', h2: 'Gute Fragen.',
     items: [
       ['Müssen wir es beide kaufen?', 'Nein. Eine Lizenz gilt für deinen Mac und den deines Menschen.'],
+      ['Ist das ein Abo?', 'Nein. Es ist ein einmaliger Kauf: einmal zahlen, und es gehört euch auf beiden Macs, ohne monatliche Kosten.'],
       ['Was brauchen wir?', 'Zwei Macs mit macOS 14 Sonoma oder neuer, beide mit einem Apple Account angemeldet.'],
       ['Kann sonst jemand sehen, was wir schicken?', 'Nein. Es ist Ende-zu-Ende-verschlüsselt, nur eure zwei Macs können es lesen.'],
       ['Behalten wir unser Flüstern?', 'Eure letzten bleiben als kleine Unterhaltung in der Notch. Kein endloser Verlauf zum Scrollen.'],
