@@ -276,10 +276,13 @@ final class OnboardingModel {
 struct OnboardingView: View {
     @Bindable var model: OnboardingModel
 
-    /// Split like the website: Pip and Bun's carousel on the left, the steps on the right.
+    @State private var slide = 0
+
+    /// Split like the website: Pip and Bun's carousel on the left, the steps on the right in a soft tint
+    /// of the same pastel. Always light, so the two halves read as one page.
     var body: some View {
         HStack(spacing: 0) {
-            OnboardingStory().frame(width: 340)
+            OnboardingStory(index: $slide).frame(width: 340)
             VStack(spacing: 0) {
                 content
                     .padding(.horizontal, 36)
@@ -288,14 +291,16 @@ struct OnboardingView: View {
                     Text(error).font(.system(size: 12)).foregroundStyle(Color.accentPink)
                         .multilineTextAlignment(.center).padding(.horizontal, 24).padding(.bottom, 8)
                 }
-                Divider()
                 footer
             }
             .frame(width: 420)
+            .background(OnboardingStory.Slide.allCases[slide].color.opacity(0.28))
+            .background(Color(hex: 0xFFFCFA))
         }
         .frame(height: 480)
-        .ignoresSafeArea() // under the transparent title bar
+        .environment(\.colorScheme, .light)
         .animation(.smooth(duration: 0.25), value: model.step)
+        .animation(.smooth(duration: 0.6), value: slide)
     }
 
     // MARK: Screens

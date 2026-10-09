@@ -285,7 +285,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func showOnboarding() {
         let model = OnboardingModel(store: store, mailbox: mailbox) { [weak self] in self?.finishOnboarding() }
         onboarding = model
-        let window = NSWindow(contentViewController: NSHostingController(rootView: OnboardingView(model: model)))
+        let hosting = NSHostingController(rootView: OnboardingView(model: model))
+        hosting.safeAreaRegions = [] // the view starts at the very top, under the hidden title bar
+        let window = NSWindow(contentViewController: hosting)
+        window.appearance = NSAppearance(named: .aqua) // a light, pastel page even in dark mode
         window.title = "Welcome to OurNotch"
         window.styleMask = [.titled, .closable, .fullSizeContentView] // the story's pastel runs to the top edge
         window.titlebarAppearsTransparent = true
