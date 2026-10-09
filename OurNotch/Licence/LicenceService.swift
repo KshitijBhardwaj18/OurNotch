@@ -129,10 +129,12 @@ struct LicenceService {
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             let status = (response as? HTTPURLResponse)?.statusCode
-            await Diagnostics.shared.record("licence \(path): HTTP \(status.map(String.init) ?? "?") in \(Int(Date.now.timeIntervalSince(started) * 1000)) ms")
+            await Diagnostics.shared.record("licence \(path): HTTP \(status.map(String.init) ?? "?") in \(Int(Date.now.timeIntervalSince(started) * 1000)) ms",
+                                            metric: Metric(kind: .cloud, name: "licence \(path)", ms: Metric.ms(since: started), detail: "HTTP \(status.map(String.init) ?? "?")"))
             return (status, data)
         } catch {
-            await Diagnostics.shared.record("licence \(path) FAILED after \(Int(Date.now.timeIntervalSince(started) * 1000)) ms: \(error.diagnosticDescription)")
+            await Diagnostics.shared.record("licence \(path) FAILED after \(Int(Date.now.timeIntervalSince(started) * 1000)) ms: \(error.diagnosticDescription)",
+                                            metric: Metric(kind: .cloud, name: "licence \(path)", ms: Metric.ms(since: started), detail: "FAILED \(error.diagnosticDescription)"))
             return (nil, Data())
         }
     }

@@ -9,7 +9,16 @@ import SwiftUI
 final class OnboardingModel {
     enum Step { case gate, licenceKey, welcome, icloud, name, invite, join, date, login, done }
 
-    var step: Step
+    var step: Step {
+        didSet {
+            guard step != oldValue else { return }
+            Diagnostics.shared.record("onboarding: \(oldValue) → \(step) after \(Int(Metric.ms(since: stepStarted) / 1000)) s",
+                                      metric: Metric(kind: .step, name: "onboarding \(oldValue)", ms: Metric.ms(since: stepStarted), detail: "\(step)"))
+            stepStarted = .now
+        }
+    }
+    /// When the current step appeared, so diagnostics show how long each one took.
+    @ObservationIgnored private var stepStarted = Date.now
     /// Chosen at the gate: a partner joins with a code and needs no licence.
     private(set) var joining = false
     var typedKey = ""
@@ -44,6 +53,7 @@ final class OnboardingModel {
         let start: Step = store.licence?.status == .active ? .welcome : .gate
         self.start = start
         step = start
+        Diagnostics.shared.record("onboarding: started at \(start)")
         name = store.myName ?? String(localized: "")
     }
 
@@ -91,7 +101,7 @@ final class OnboardingModel {
 
     /// Switches the pasted key on for this Mac, then carries on as a buyer.
     func activate() {
-        run {
+        run("activate licence") {
             try await LicenceService(store: self.store).activate(key: self.typedKey)
             self.checkICloud()
         }
@@ -147,7 +157,7 @@ final class OnboardingModel {
     /// "Yes, this is my love."
     func approveJoin() {
         guard let join = pendingJoin, let inviteCode else { return }
-        run {
+        run("approve join") {
             self.pairing = try await self.service.approve(join, code: inviteCode)
             self.pendingJoin = nil
             self.go(to: .date)
@@ -157,7 +167,7 @@ final class OnboardingModel {
     /// "No": they're told gently, and the code keeps waiting for the right person.
     func declineJoin() {
         guard let join = pendingJoin, let inviteCode else { return }
-        run {
+        run("decline join") {
             try await self.service.decline(join, code: inviteCode)
             self.declined.insert(join.joinerId)
             self.pendingJoin = nil
@@ -204,7 +214,7 @@ final class OnboardingModel {
     // MARK: Join
 
     func lookUpCode() {
-        run {
+        run("look up code") {
             self.foundInvite = try await self.service.lookUpInvite(code: self.typedCode)
         }
     }
@@ -213,7 +223,7 @@ final class OnboardingModel {
     func join() {
         guard let invite = foundInvite else { return }
         let code = typedCode
-        run {
+        run("join and wait for yes") {
             try await self.service.requestJoin(code: code, name: self.trimmedName)
             self.awaitingAnswer = true
             defer { self.awaitingAnswer = false }
@@ -232,21 +242,28 @@ final class OnboardingModel {
         error = nil
     }
 
-    private func run(_ work: @escaping () async throws -> Void) {
+    /// Runs one onboarding action, timing it for diagnostics and showing any error.
+    private func run(_ name: String, _ work: @escaping () async throws -> Void) {
         isWorking = true
         error = nil
         Task {
             defer { isWorking = false }
+            let started = Date.now
             do {
                 try await work()
-            } catch let pairingError as PairingError {
-                error = pairingError.errorDescription
-            } catch let licenceError as LicenceError {
-                error = licenceError.errorDescription
+                Diagnostics.shared.record("onboarding: \(name) took \(Int(Metric.ms(since: started))) ms",
+                                          metric: Metric(kind: .step, name: name, ms: Metric.ms(since: started)))
             } catch {
-                self.error = String(localized: "Something went wrong. Try again.")
+                Diagnostics.shared.record("onboarding: \(name) FAILED after \(Int(Metric.ms(since: started))) ms: \(error.diagnosticDescription)",
+                                          metric: Metric(kind: .step, name: name, ms: Metric.ms(since: started), detail: "FAILED \(error.diagnosticDescription)"))
+                show(error)
             }
         }
+    }
+
+    private func show(_ error: Error) {
+        self.error = (error as? PairingError)?.errorDescription ?? (error as? LicenceError)?.errorDescription
+            ?? String(localized: "Something went wrong. Try again.")
     }
 
     // MARK: After pairing

@@ -115,8 +115,10 @@ struct Metric: Codable, Sendable, Equatable {
         case arrival
         /// The partner's Mac showed what I sent: `ms` from my tap to their "seen" reaching me.
         case delivered
-        /// A CloudKit request: `ms` is how long it took; `detail` says why it ran, or that it failed.
+        /// A network request (CloudKit, or Dodo for the licence): `ms` is how long it took; `detail` says why it ran, or that it failed.
         case cloud
+        /// Something the person went through (an onboarding screen, pairing, activating): `ms` is how long it took.
+        case step
         /// A CloudKit ping arrived.
         case ping
     }
@@ -134,7 +136,7 @@ struct Metric: Codable, Sendable, Equatable {
 
     static func ms(since date: Date) -> Double { Date.now.timeIntervalSince(date) * 1000 }
 
-    /// "Mac16,12 · macOS 26.6.2 · 0.1 (1) Release"
+    /// "Mac16,12 · macOS 26.6.2 · 1.0 (2) Beta"
     static let device: String = {
         var size = 0
         sysctlbyname("hw.model", nil, &size, nil, 0)
@@ -144,6 +146,8 @@ struct Metric: Codable, Sendable, Equatable {
         let os = ProcessInfo.processInfo.operatingSystemVersion
         #if DEBUG
         let build = "Debug"
+        #elseif BETA
+        let build = "Beta"
         #else
         let build = "Release"
         #endif

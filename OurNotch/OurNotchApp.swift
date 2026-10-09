@@ -77,6 +77,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Unit tests run inside the app; they don't need a notch on screen.
         guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
         Diagnostics.shared.record(Self.launchSummary)
+        // From launch, not from pairing: a Mac stuck in onboarding is the one whose log matters most.
+        Diagnostics.shared.startUploading(owner: store.myId, mailbox: mailbox)
         PerfMonitor.shared.startWatchdog()
 
         if !startNotch() { showOnboarding() }
@@ -208,7 +210,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.checkLicence()
         }
         state.start()
-        Diagnostics.shared.startUploading(owner: state.pairing.myId, mailbox: mailbox)
         startAutoExport()
         self.state = state
         menu.isPaired = true
