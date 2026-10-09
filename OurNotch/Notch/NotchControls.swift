@@ -6,7 +6,7 @@ enum NotchTab: CaseIterable {
     var label: String {
         switch self {
         case .home: String(localized: "Home")
-        case .note: String(localized: "Note")
+        case .note: String(localized: "Whispers")
         case .emoji: String(localized: "Emoji")
         case .mood: String(localized: "Mood")
         case .photo: String(localized: "Photo")
@@ -27,7 +27,7 @@ enum NotchTab: CaseIterable {
 
 }
 
-/// The native-looking segmented control at the bottom of the open notch (76 pt per tab × 28).
+/// The native-looking segmented control at the bottom of the open notch (88 pt per tab × 28).
 struct NotchTabBar: View {
     @Binding var selection: NotchTab
     /// True while Settings covers the tabs, so no tab looks selected.
@@ -60,7 +60,7 @@ struct NotchTabBar: View {
             }
         }
         .padding(2)
-        .frame(width: CGFloat(NotchTab.allCases.count) * 76, height: 28)
+        .frame(width: CGFloat(NotchTab.allCases.count) * 88, height: 28)
         .background(Color.segmentTrack, in: RoundedRectangle(cornerRadius: 8))
         .animation(.snappy(duration: 0.2), value: selection)
         .animation(.snappy(duration: 0.2), value: dimmed)

@@ -16,7 +16,7 @@ struct NoteTab: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("our little notes ❤️")
+            Text("just between us ❤️")
                 .font(.system(size: 13, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.notchBlush)
                 .padding(.bottom, 4)
@@ -33,7 +33,7 @@ struct NoteTab: View {
     @ViewBuilder private var conversation: some View {
         let lines = Conversation.lines(mine: state.myOutbox, theirs: state.partnerOutbox)
         if lines.isEmpty {
-            Text("No notes from \(state.partnerName.lowercased()) yet ♡")
+            Text("No whispers from \(state.partnerName.lowercased()) yet ♡")
                 .font(.system(size: 13))
                 .foregroundStyle(Color.secondaryLabel)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

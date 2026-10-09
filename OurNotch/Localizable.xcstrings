@@ -1592,7 +1592,8 @@
             "value" : "Noch keine Notiz von %@ ♡"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "No notes yet. Say something sweet to %@ ♡" : {
       "localizations" : {
@@ -1627,6 +1628,22 @@
         }
       }
     },
+    "No whispers from %@ yet ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas encore de murmures de %@ ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch kein Flüstern von %@ ♡"
+          }
+        }
+      }
+    },
     "Not set yet" : {
       "localizations" : {
         "fr" : {
@@ -1657,7 +1674,8 @@
             "value" : "Notiz"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Now %@ %@" : {
       "localizations" : {
@@ -2015,6 +2033,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lies all eure Notizen und schreib zurück ♡"
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
+    "Read your whispers and whisper back ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lis vos murmures et murmure en retour ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lies euer Flüstern und flüstere zurück ♡"
           }
         }
       }
@@ -3140,6 +3175,22 @@
         }
       }
     },
+    "Whispers" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Murmures"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flüstern"
+          }
+        }
+      }
+    },
     "Write to Us" : {
       "localizations" : {
         "fr" : {
@@ -3383,6 +3434,22 @@
         }
       }
     },
+    "just between us ❤️" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rien qu’entre nous ❤️"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nur zwischen uns ❤️"
+          }
+        }
+      }
+    },
     "lunch at 1? i'll bring dumplings 🥟" : {
       "localizations" : {
         "fr" : {
@@ -3444,22 +3511,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "jetzt"
-          }
-        }
-      }
-    },
-    "our little notes ❤️" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "nos petits mots ❤️"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "unsere kleinen Notizen ❤️"
           }
         }
       }

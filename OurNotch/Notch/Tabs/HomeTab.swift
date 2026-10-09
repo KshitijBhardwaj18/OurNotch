@@ -14,7 +14,7 @@ struct HomeTab: View {
             HStack(spacing: 10) {
                 card(.photo, hint: String(localized: "Send \(state.partnerName.lowercased()) a photo back ♡"), leading: true) { photoTile(now: context.date) }.frame(width: side, height: side)
                 VStack(spacing: 10) {
-                    card(.note, hint: String(localized: "Read all your notes and write back ♡"), below: true) { noteTile(now: context.date) }.frame(height: (side - 10) * 0.56)
+                    card(.note, hint: String(localized: "Read your whispers and whisper back ♡"), below: true) { noteTile(now: context.date) }.frame(height: (side - 10) * 0.56)
                     HStack(spacing: 10) {
                         card(.stats, hint: String(localized: "Every second counts ♡ Click for more")) { togetherTile(now: context.date) }
                         card(.mood, hint: String(localized: "Share your mood too ♡")) { moodTile }.frame(width: 116)
@@ -98,7 +98,7 @@ struct HomeTab: View {
                     .lineLimit(2)
                     .foregroundStyle(.white)
             } else {
-                Text("No notes from \(state.partnerName.lowercased()) yet ♡")
+                Text("No whispers from \(state.partnerName.lowercased()) yet ♡")
                     .font(.system(size: 13))
                     .foregroundStyle(Color.secondaryLabel)
             }
