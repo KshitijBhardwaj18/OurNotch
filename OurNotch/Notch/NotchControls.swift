@@ -27,43 +27,55 @@ enum NotchTab: CaseIterable {
 
 }
 
-/// The native-looking segmented control at the bottom of the open notch (88 pt per tab × 28).
+/// The tab bar at the bottom of the open notch: a small floating capsule of icons, where the chosen tab
+/// opens into a pill with its name. The pill slides between tabs.
 struct NotchTabBar: View {
     @Binding var selection: NotchTab
     /// True while Settings covers the tabs, so no tab looks selected.
     var dimmed = false
+    @State private var hovered: NotchTab?
+    @Namespace private var pill
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 2) {
             ForEach(NotchTab.allCases, id: \.self) { tab in
                 let selected = tab == selection && !dimmed
                 Button { selection = tab } label: {
-                    HStack(spacing: 5) {
+                    HStack(spacing: 6) {
                         Image(systemName: selected ? "\(tab.symbol).fill" : tab.symbol)
-                            .font(.system(size: 14))
-                            .foregroundStyle(selected ? Color.notchPink : .secondaryLabel)
-                        Text(tab.label)
-                            .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(selected ? Color.white : .secondaryLabel)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background {
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(selected ? Color.notchPink : hovered == tab ? .white : .secondaryLabel)
                         if selected {
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color.segmentSelected)
-                                .shadow(color: .black.opacity(0.3), radius: 1, y: 1)
+                            Text(tab.label)
+                                .font(.system(size: 12.5, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .fixedSize()
+                                .transition(.opacity.combined(with: .scale(scale: 0.8, anchor: .leading)))
                         }
                     }
-                    .contentShape(Rectangle())
+                    .padding(.horizontal, selected ? 14 : 12)
+                    .frame(height: 30)
+                    .background {
+                        if selected {
+                            Capsule().fill(.white.opacity(0.12)).matchedGeometryEffect(id: "pill", in: pill)
+                        }
+                    }
+                    .contentShape(Capsule())
                 }
                 .buttonStyle(.plain)
+                // The icon-only tabs still have a name (not the symbol's, like "Chart Column").
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(tab.label)
+                .accessibilityAddTraits(.isButton)
+                .onHover { hovered = $0 ? tab : (hovered == tab ? nil : hovered) }
             }
         }
-        .padding(2)
-        .frame(width: CGFloat(NotchTab.allCases.count) * 88, height: 28)
-        .background(Color.segmentTrack, in: RoundedRectangle(cornerRadius: 8))
-        .animation(.snappy(duration: 0.2), value: selection)
-        .animation(.snappy(duration: 0.2), value: dimmed)
+        .padding(4)
+        .background(.white.opacity(0.06), in: Capsule())
+        .overlay(Capsule().strokeBorder(.white.opacity(0.06), lineWidth: 0.5))
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selection)
+        .animation(.spring(response: 0.35, dampingFraction: 0.8), value: dimmed)
+        .animation(.easeOut(duration: 0.12), value: hovered)
     }
 }
 
