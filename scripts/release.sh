@@ -42,7 +42,12 @@ spctl --assess -vv "$APP"
 
 echo "▸ Making $DMG"
 mkdir -p "$OUT/dmg" && cp -R "$APP" "$OUT/dmg/" && ln -s /Applications "$OUT/dmg/Applications"
-hdiutil create -volname OurNotch -srcfolder "$OUT/dmg" -fs HFS+ -format UDZO -quiet "$DMG"
+# The mounted disk shows the OurNotch icon: a writable image gets the icon, then is compressed.
+hdiutil create -volname OurNotch -srcfolder "$OUT/dmg" -fs HFS+ -format UDRW -quiet "$OUT/rw.dmg"
+MOUNT=$(hdiutil attach "$OUT/rw.dmg" -nobrowse -noautoopen | awk -F'\t' '/\/Volumes\//{print $NF}')
+cp "$APP/Contents/Resources/AppIcon.icns" "$MOUNT/.VolumeIcon.icns" && SetFile -a C "$MOUNT"
+hdiutil detach "$MOUNT" -quiet
+hdiutil convert "$OUT/rw.dmg" -format UDZO -quiet -o "$DMG" && rm "$OUT/rw.dmg"
 
 echo "▸ Writing the Sparkle appcast"
 cp "$DMG" "$OUT/updates/"

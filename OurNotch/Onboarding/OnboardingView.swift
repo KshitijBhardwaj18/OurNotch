@@ -558,13 +558,11 @@ struct Screen<Content: View>: View {
     }
 }
 
-/// The OurNotch icon: a white heart on a pink gradient tile.
+/// The OurNotch app icon (a heart dropping out of the notch). Its artwork has the standard macOS
+/// margin, so 88 pt shows a tile of about 72 pt.
 struct AppIcon: View {
     var body: some View {
-        RoundedRectangle(cornerRadius: 17)
-            .fill(LinearGradient(colors: [Color(hex: 0xFF5C7A), Color(hex: 0xFF2D55)], startPoint: .top, endPoint: .bottom))
-            .frame(width: 72, height: 72)
-            .overlay(Image(systemName: "heart.fill").font(.system(size: 38)).foregroundStyle(.white))
+        Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 88, height: 88)
     }
 }
 
