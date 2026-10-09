@@ -14,11 +14,12 @@ struct OpenNotchView: View {
                     SettingsPanel(state: state)
                 } else {
                     switch tab {
-                    case .home: HomeTab(state: state)
+                    case .home: HomeTab(state: state) { tab = $0 }
                     case .note: NoteTab(state: state, isEditing: $isEditing)
                     case .emoji: EmojiTab(state: state)
                     case .mood: MoodTab(state: state)
                     case .photo: PhotoTab(state: state)
+                    case .stats: StatsTab(state: state)
                     }
                 }
             }

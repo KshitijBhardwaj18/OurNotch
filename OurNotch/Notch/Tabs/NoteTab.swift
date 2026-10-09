@@ -63,7 +63,7 @@ struct NoteTab: View {
             .foregroundStyle(Color.tertiaryLabel)
         return HStack(alignment: .bottom, spacing: 6) {
             if line.isMine { Spacer(minLength: 60); ago }
-            Text(line.message.text)
+            Text(line.message.shown)
                 .font(.system(size: 14, weight: .medium, design: .rounded))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 12)

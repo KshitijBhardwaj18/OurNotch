@@ -10,6 +10,15 @@ struct TogetherTests {
         calendar.date(from: DateComponents(year: y, month: m, day: d, hour: h, minute: min, second: s))!
     }
 
+    @Test func daysToAnniversaryCountsDownAndIsZeroOnTheDay() {
+        let since = date(2022, 3, 14)
+        #expect(Together.daysToAnniversary(since: since, now: date(2026, 3, 14, 18), calendar: calendar) == 0)
+        #expect(Together.daysToAnniversary(since: since, now: date(2026, 3, 13), calendar: calendar) == 1)
+        #expect(Together.daysToAnniversary(since: since, now: date(2026, 3, 15), calendar: calendar) == 364)
+        // Together on 29 Feb: in other years the anniversary is kept on 1 March.
+        #expect(Together.daysToAnniversary(since: date(2024, 2, 29), now: date(2026, 2, 27), calendar: calendar) == 2)
+    }
+
     @Test func countsWholeCalendarDays() {
         #expect(Together.days(since: date(2023, 2, 14), now: date(2023, 2, 14, 23, 59), calendar: calendar) == 0)
         #expect(Together.days(since: date(2023, 2, 14, 22), now: date(2023, 2, 15, 1), calendar: calendar) == 1)
@@ -104,6 +113,7 @@ struct MessageRulesTests {
         #expect(MessageRules.check(sixtyOneChars) == .invalid(hint: "A little shorter ♡"))
         #expect(MessageRules.check("sooooooooooooooo cute") == .invalid(hint: "One word is too long ♡"))
         #expect(MessageRules.check("soooooooooooooo cute") == .valid("soooooooooooooo cute")) // 15 letters is fine
+        #expect(MessageRules.check("see you soon ♡ ♥ ❤ ❤️") == .valid("see you soon ❤️ ❤️ ❤️ ❤️")) // text hearts turn red
     }
 }
 

@@ -8,9 +8,10 @@ struct PhotoTab: View {
     @State private var isWorking = false
     @State private var failed = false
 
+    /// Laid out like Home: the photo is the same square in the same place, so switching tabs doesn't jump.
     var body: some View {
-        HStack(spacing: 16) {
-            tile.frame(width: 150, height: 150)
+        HStack(spacing: 10) {
+            tile.frame(width: Config.Notch.contentSize.height, height: Config.Notch.contentSize.height)
 
             VStack(alignment: .leading, spacing: 3) {
                 eyebrow.font(.system(size: 11, weight: .medium))
@@ -27,22 +28,31 @@ struct PhotoTab: View {
                     .disabled(isWorking)
                     .padding(.top, 10)
             }
+            .padding(16)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .background(Color.notchCard, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
-        .frame(maxHeight: .infinity)
-        .cardStyle()
     }
 
     private var partner: String { state.partnerName.lowercased() }
 
     @ViewBuilder private var tile: some View {
         if let photo = state.myPhoto {
-            TreatedPhoto(image: photo)
+            TreatedPhoto(image: photo, cornerRadius: 16)
         } else {
-            RoundedRectangle(cornerRadius: 12)
+            // Pip and Bun wait for your first photo together.
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.notchCard)
                 .strokeBorder(Color.tertiaryLabel, style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
                 .overlay {
-                    Image(systemName: "photo.badge.plus").font(.system(size: 26)).foregroundStyle(Color.tertiaryLabel)
+                    HStack(spacing: -6) {
+                        Image("pip-love").resizable().scaledToFit().frame(width: 72)
+                        Image("bun-happy").resizable().scaledToFit().frame(width: 72)
+                    }
+                    .opacity(0.9)
                 }
+                .contentShape(Rectangle())
+                .onTapGesture(perform: choose)
         }
     }
 

@@ -21,7 +21,24 @@ enum MessageRules {
         if words.contains(where: { $0.count > Config.Message.maxWordLength }) {
             return .invalid(hint: String(localized: "One word is too long ♡"))
         }
-        return .valid(text)
+        return .valid(redHearts(text))
+    }
+
+    /// Text hearts (♡ ♥ ❤) become the red ❤️ emoji, so a heart in a note always looks like a heart.
+    static func redHearts(_ text: String) -> String {
+        var out = String.UnicodeScalarView()
+        var skipVariation = false
+        for scalar in text.unicodeScalars {
+            if skipVariation, scalar.value == 0xFE0F || scalar.value == 0xFE0E { skipVariation = false; continue }
+            skipVariation = false
+            if [0x2661, 0x2665, 0x2764].contains(scalar.value) {
+                out.append(contentsOf: "\u{2764}\u{FE0F}".unicodeScalars)
+                skipVariation = true
+            } else {
+                out.append(scalar)
+            }
+        }
+        return String(out)
     }
 
     static func wordCount(_ raw: String) -> Int {

@@ -58,6 +58,22 @@
     "%@ · %@" : {
       "shouldTranslate" : false
     },
+    "%@'s mood" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Humeur de %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@s Laune"
+          }
+        }
+      }
+    },
     "%lld of %lld words" : {
       "localizations" : {
         "fr" : {
@@ -522,6 +538,54 @@
         }
       }
     },
+    "Day to your anniversary" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jour avant votre anniversaire"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tag bis zu eurem Jahrestag"
+          }
+        }
+      }
+    },
+    "Days to your anniversary" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jours avant votre anniversaire"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tage bis zu eurem Jahrestag"
+          }
+        }
+      }
+    },
+    "Days together" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jours ensemble"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tage zusammen"
+          }
+        }
+      }
+    },
     "Delivered %@" : {
       "localizations" : {
         "fr" : {
@@ -598,6 +662,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Emoji"
+          }
+        }
+      }
+    },
+    "Emojis between you" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emojis entre vous"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Emojis zwischen euch"
           }
         }
       }
@@ -775,6 +855,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Glücklich"
+          }
+        }
+      }
+    },
+    "Happy anniversary!" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Joyeux anniversaire !"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles Gute zum Jahrestag!"
           }
         }
       }
@@ -1343,6 +1439,22 @@
         }
       }
     },
+    "Not set yet" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas encore choisie"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch nicht gesetzt"
+          }
+        }
+      }
+    },
     "Note" : {
       "localizations" : {
         "fr" : {
@@ -1373,7 +1485,8 @@
             "value" : "Jetzt %@ %@"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "On a break" : {
       "localizations" : {
@@ -1784,6 +1897,22 @@
         }
       }
     },
+    "Seconds together" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secondes ensemble"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sekunden zusammen"
+          }
+        }
+      }
+    },
     "Send" : {
       "localizations" : {
         "fr" : {
@@ -2104,6 +2233,22 @@
         }
       }
     },
+    "Stats" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stats"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statistik"
+          }
+        }
+      }
+    },
     "Still not active. If you think this is a mistake, write to us." : {
       "localizations" : {
         "fr" : {
@@ -2182,7 +2327,8 @@
             "value" : "Wähl eine aus"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Tap to Remove" : {
       "localizations" : {
@@ -2820,6 +2966,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "dieser Code ist abgelaufen ♡ bitte deine Liebe um einen neuen"
+          }
+        }
+      }
+    },
+    "you %lld · %@ %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "toi %lld · %@ %lld"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "du %lld · %@ %lld"
           }
         }
       }

@@ -43,7 +43,7 @@ struct MessageBanner: View {
 
     private var text: some View {
         (Text(senderName.lowercased()).foregroundColor(.notchPink).fontWeight(.semibold)
-            + Text("  \(message.text)").foregroundColor(.white))
+            + Text("  \(message.shown)").foregroundColor(.white))
             .font(.system(size: 12, weight: .medium))
             .fixedSize()
             .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { textWidth = $0 }

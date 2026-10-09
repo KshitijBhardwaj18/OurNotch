@@ -90,6 +90,9 @@ struct Message: Codable, Equatable {
     let text: String
     let mode: BannerMode
     let sentAt: Date
+
+    /// The text as shown: hearts typed as ♡ (even in notes from older builds) show as a red ❤️.
+    var shown: String { MessageRules.redHearts(text) }
 }
 
 /// How the note scrolls on the partner's notch. The sender chooses.

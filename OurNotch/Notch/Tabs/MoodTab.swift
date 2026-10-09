@@ -52,11 +52,15 @@ struct MoodTab: View {
                     .foregroundStyle(Color.secondaryLabel)
             }
             Spacer()
-            Group {
-                if let current = Config.moods.first(where: { $0.emoji == state.myOutbox.mood }) {
-                    Text("Now \(current.emoji) \(current.label)").foregroundStyle(.white)
+            // Their mood, so you can answer it with yours.
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("\(state.partnerName.lowercased())'s mood").foregroundStyle(Color.secondaryLabel)
+                if let mood = state.partnerOutbox.mood {
+                    Text(verbatim: "\(mood) \((Config.moodLabel(mood) ?? "").lowercased())")
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
                 } else {
-                    Text("Tap one to set").foregroundStyle(Color.tertiaryLabel)
+                    Text("Not set yet").foregroundStyle(Color.tertiaryLabel)
                 }
             }
             .font(.system(size: 11.5, weight: .medium))

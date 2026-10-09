@@ -497,6 +497,15 @@ enum Together {
         seconds(since: start, now: now, calendar: calendar) / 3600
     }
 
+    /// Days until the next anniversary of the together-since date; 0 on the day itself.
+    static func daysToAnniversary(since start: Date, now: Date = .now, calendar: Calendar = .current) -> Int {
+        let today = calendar.startOfDay(for: now)
+        let parts = calendar.dateComponents([.month, .day], from: start)
+        if parts.month == calendar.component(.month, from: today), parts.day == calendar.component(.day, from: today) { return 0 }
+        guard let next = calendar.nextDate(after: today, matching: parts, matchingPolicy: .nextTimePreservingSmallerComponents) else { return 0 }
+        return calendar.dateComponents([.day], from: today, to: next).day ?? 0
+    }
+
     /// Saturdays from the together-since day through today, counting both ends.
     static func weekends(since start: Date, now: Date = .now, calendar: Calendar = .current) -> Int {
         let days = days(since: start, now: now, calendar: calendar)
