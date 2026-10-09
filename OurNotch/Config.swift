@@ -77,6 +77,8 @@ enum Config {
         static let codeLength = 6
         /// Codes work for a day, so an old code in an email can't pair someone later.
         static let codeLifetime: TimeInterval = 24 * 60 * 60
+        /// Join requests one code can hold, so a wrong person can't use up a code (spare slots for the right one).
+        static let joinSlots = 5
         /// Linked from the invite email.
         static let downloadURL = "\(Licence.website)/download"
     }

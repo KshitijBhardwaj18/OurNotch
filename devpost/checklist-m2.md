@@ -102,7 +102,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
   Learner check: Run `scripts/release.sh Beta`, open the DMG from `build/release/Beta/`, and drag OurNotch to Applications. Give testers Beta builds from now on.
   Commit: `Add Beta builds, Sparkle updates, and the release script`
 
-- [ ] **10. The website is complete: help, legal, French and German, locked admin**
+- [x] **10. The website is complete: help, legal, French and German, locked admin**
   Becomes usable: On `localhost:3000`: the *My licence* help page, privacy policy and terms (revocation, no refunds except where the law requires), French and German versions of every page, `/download` pointing at the newest DMG, and `/admin` ready for Cloudflare Access (it verifies Access's signed token). The site builds for Cloudflare Workers and runs in Wrangler's local preview.
   Why now: All the website work that doesn't need the domain or a Cloudflare account; going live is slice 12.
   PRD ref: `prd-m2.md > The Landing Page`, `prd-m2.md > Admin Page`
@@ -139,8 +139,9 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
 
 ## Final Review
 
-- [ ] **Learner action before pairing through CloudKit:** in CloudKit Console (Development), add a **Queryable** index on `Join.code` — without it the buyer's Mac can't see join requests. (Production gets it in slice 11.)
-- [ ] **Learner action, admin page with real data:** put your Dodo **test-mode** API key in `website/.env.local` as `DODO_API_KEY=…` (ignored by git), restart the dev server, open http://localhost:3000/admin, and confirm the ₹200 test purchase and its key show. Revoke / Restore / Free slot were verified against a stand-in with Dodo's real response shapes, not yet against Dodo with your key.
+- [x] ~~Learner action: `Join.code` Queryable index~~ — no longer needed: join requests use named slots (see Revisions).
+- [x] **Admin page with real data:** learner added a test-mode key to `website/.env.local`; `/admin` lists the ₹200 sale from India and both test keys (active, 0 of 1 Macs) live from Dodo.
+- [ ] **Review the privacy policy and terms** (`website/lib/i18n.ts > privacy, terms`): drafted by the agent from the PRD's decisions (no refunds except where the law requires, revocation for abuse, Dodo as seller of record, what's stored where); not legal advice — have them checked before selling.
 - [ ] **Native-speaker check** of the French and German (`OurNotch/Localizable.xcstrings`; drafted by the agent with informal *tu* / *du*) before launch — who checks them is still an open question.
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
@@ -196,3 +197,9 @@ Activity mode:
 - Beta and Release use separate Sparkle feeds (`downloads.ournotch.app/beta/appcast.xml` and `/appcast.xml`), so test couples aren't "updated" onto a sold build that uploads no diagnostics.
 - Sparkle stays off until `SPARKLE_PUBLIC_KEY` is set: its EdDSA key is generated in slice 11 with the learner present, because a lost key means existing users can never be updated again.
 - Slice 9 verified: all three configurations build, feeds and the embedded Sparkle framework checked in each app, the `BETA` flag only in Beta, and `scripts/release.sh Beta` made a DMG that mounts with the app and an Applications link and passes `codesign --verify`. Notarization, upload and an end-to-end update need the account (slice 11).
+- Slice 10: every word on the site moved into `website/lib/i18n.ts` (English, French, German); pages are shared components used by `app/(en)` (English at `/`) and `app/[lang]` (`/fr`, `/de`), two root layouts so each page has the right `<html lang>`. The landing page's demo, bento and "made for two" scene are translated too, including the scripted conversation. Checkout returns to the thank-you page in the buyer's language.
+- Footer on every page: *My licence*, Privacy, Terms (the PRD asks for privacy and terms everywhere) and the language switch.
+- `/admin` verifies Cloudflare Access's signed token itself (signature against the team's keys, audience, issuer, expiry, owner email) rather than trusting that Access is in front — a request through the workers.dev address or with a forged header gets a 404. Checked by `website/lib/admin.test.mjs` (9 cases) and in the built Worker (no token and a forged token → 404).
+- Cloudflare build with `vinext` (Cloudflare's recommended path; `vinext check`: 100 % compatible), set up with no CDN cache, no KV data cache and no image optimization (free tier; the site has no `next/image`). Two fixes: the lockfile was regenerated because npm had left out rolldown's platform binary (`next` stays 16.3.8), and the Worker's compatibility date is 2026-09-28, the newest the local runtime supports. Verify item 4 confirmed locally: the built Worker serves every page in all three languages and `CF-IPCountry: IN` shows ₹200.
+- `/download` points at `downloads.ournotch.app/OurNotch.dmg` (what `release.sh` uploads); `DOWNLOAD_URL` overrides it until R2 is live.
+- Join requests moved from a query on `Join.code` (which needed a Queryable index added by hand in CloudKit Console) to five named slots per code (`join-<CODE>-0…4`) that the inviter reads by name — the learner couldn't find the field to index (CloudKit only creates it on first save), and reading by name needs no index in Development or Production. A joiner takes the first free slot; asking again reuses theirs; five strangers on one code would use it up (the inviter makes a New Code). Verified live through the real CloudKit container (Development): invite → a stranger and the partner both ask → the stranger is declined and told so → the partner is approved → both paired; this also created the `Join`, `Approval` and `Decline` record types.

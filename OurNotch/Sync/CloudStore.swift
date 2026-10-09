@@ -7,7 +7,7 @@ import CloudKit
 /// | Record      | Name              | Fields                                 |
 /// |-------------|-------------------|----------------------------------------|
 /// | `Invite`    | `invite-<CODE>`   | inviterId, inviterName, inviterKey (`creationDate` sets the 24 h expiry) |
-/// | `Join`      | `join-<CODE>-<joinerId>` | code (queryable), joinerId, joinerName, joinerKey |
+/// | `Join`      | `join-<CODE>-<slot>` | joinerId, joinerName, joinerKey (slots 0…4: read by name, no index needed) |
 /// | `Approval`  | `approval-<CODE>` | joinerId (created once: the inviter's yes) |
 /// | `Decline`   | `decline-<CODE>-<joinerId>` | code (the inviter's no)      |
 /// | `Outbox`    | `outbox-<userId>` | ownerId (queryable), payload           |
@@ -132,26 +132,36 @@ struct CloudStore: Mailbox {
         return Invite(inviterId: id, inviterName: name, inviterKey: key, createdAt: record.creationDate ?? .now)
     }
 
-    func createJoin(_ join: Join, code: String) async throws {
-        let record = CKRecord(recordType: "Join", recordID: .init(recordName: "join-\(code)-\(join.joinerId)"))
-        record["code"] = code
-        record["joinerId"] = join.joinerId
-        record["joinerName"] = join.joinerName
-        record["joinerKey"] = join.joinerKey
-        try await create(record)
+    /// Join requests sit in a few numbered slots per code, so the inviter reads them by name — no query, so no
+    /// Queryable index to set up in CloudKit Console. A joiner takes the first free slot.
+    private static func joinIDs(_ code: String) -> [CKRecord.ID] {
+        (0..<Config.Pairing.joinSlots).map { CKRecord.ID(recordName: "join-\(code)-\($0)") }
     }
 
-    /// Needs `Join.code` marked Queryable in CloudKit Console.
-    func fetchJoins(code: String) async throws -> [Join] {
-        let query = CKQuery(recordType: "Join", predicate: NSPredicate(format: "code == %@", code))
-        let (results, _) = try await retrying { try await database.records(matching: query) }
-        return results.compactMap { try? $0.1.get() }
-            .sorted { ($0.creationDate ?? .distantPast) < ($1.creationDate ?? .distantPast) }
-            .compactMap { record in
-                guard let id = record["joinerId"] as? String, let name = record["joinerName"] as? String,
-                      let key = record["joinerKey"] as? Data else { return nil }
-                return Join(joinerId: id, joinerName: name, joinerKey: key)
+    func createJoin(_ join: Join, code: String) async throws {
+        for id in Self.joinIDs(code) {
+            let record = CKRecord(recordType: "Join", recordID: id)
+            record["joinerId"] = join.joinerId
+            record["joinerName"] = join.joinerName
+            record["joinerKey"] = join.joinerKey
+            do {
+                return try await create(record)
+            } catch MailboxError.alreadyExists {
+                // Taken. If it's my own earlier request, it still stands; otherwise try the next slot.
+                if try await fetch(id.recordName)?["joinerId"] as? String == join.joinerId { throw MailboxError.alreadyExists }
             }
+        }
+        throw PairingError.usedCode // every slot taken by others
+    }
+
+    func fetchJoins(code: String) async throws -> [Join] {
+        let results = try await retrying { try await database.records(for: Self.joinIDs(code)) }
+        return Self.joinIDs(code).compactMap { id in
+            guard let record = try? results[id]?.get(),
+                  let joinerId = record["joinerId"] as? String, let name = record["joinerName"] as? String,
+                  let key = record["joinerKey"] as? Data else { return nil }
+            return Join(joinerId: joinerId, joinerName: name, joinerKey: key)
+        }
     }
 
     func createApproval(joinerId: String, code: String) async throws {

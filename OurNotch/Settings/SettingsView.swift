@@ -40,6 +40,7 @@ enum AppLanguage: String, CaseIterable {
         }
         let config = NSWorkspace.OpenConfiguration()
         config.createsNewApplicationInstance = true
+        config.environment = ProcessInfo.processInfo.environment // keeps OURNOTCH_PROFILE across the restart
         NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: config) { _, _ in
             DispatchQueue.main.async { NSApp.terminate(nil) }
         }
