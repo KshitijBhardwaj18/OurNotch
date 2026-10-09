@@ -14,5 +14,9 @@ const START = new Date(2022, 4, 21, 19, 30);
 export function together(now = new Date()) {
   const ms = +now - +START, days = Math.floor(ms / 864e5);
   const firstSat = (6 - START.getDay() + 7) % 7;
-  return { days, hours: Math.floor(ms / 36e5), secs: Math.floor(ms / 1e3), weekends: days >= firstSat ? Math.floor((days - firstSat) / 7) + 1 : 0 };
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  let next = new Date(now.getFullYear(), START.getMonth(), START.getDate());
+  if (next < today) next = new Date(now.getFullYear() + 1, START.getMonth(), START.getDate());
+  const toAnniversary = Math.round((+next - +today) / 864e5);
+  return { days, hours: Math.floor(ms / 36e5), secs: Math.floor(ms / 1e3), weekends: days >= firstSat ? Math.floor((days - firstSat) / 7) + 1 : 0, toAnniversary };
 }

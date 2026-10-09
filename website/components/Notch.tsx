@@ -1,12 +1,14 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Char, Heart } from './Char';
 
-// A small closed notch: your person's face and mood on the left, a heartbeat on the right.
-export function MiniNotch({ mood, tall, ticker }: { mood: ReactNode; tall?: boolean; ticker?: string }) {
+// A small closed notch, as in the app: your person's face on the left, and on the right their mood
+// (with its word) or a heartbeat.
+export function MiniNotch({ mood, word, tall, ticker }: { mood?: ReactNode; word?: string; tall?: boolean; ticker?: string }) {
   return (
     <div className={`x-mini${tall ? ' x-tall' : ''}`}>
-      <span className="x-who"><span className="x-av"><Char kind="bun" className="is-happy" /></span>{typeof mood === 'string' ? <span className="x-mood">{mood}</span> : mood}</span>
-      <Heart className="x-heart" />
+      <span className="x-who"><span className="x-av"><Char kind="bun" className="is-happy" /></span></span>
+      {mood ? <span className="x-who">{typeof mood === 'string' ? <span className="x-mood">{mood}</span> : mood}{word && <span className="x-word">{word}</span>}</span>
+            : <Heart className="x-heart" />}
       {ticker && <div className="x-tick"><span><b>bun</b>{ticker}</span></div>}
     </div>
   );

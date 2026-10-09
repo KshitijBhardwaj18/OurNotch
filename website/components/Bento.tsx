@@ -40,14 +40,14 @@ export function Bento({ t: c }: { t: Copy['bento'] }) {
     <div className="b-grid">
       <Card color="y-butter" title={c.noteTitle} art={
         <div className="b-art">
-          <MiniNotch mood="🥰" tall ticker={c.ticker} />
+          <MiniNotch tall ticker={c.ticker} />
           <div className="b-pal" style={{ left: 22 }}><Char kind="pip" className="is-happy" /></div>
         </div>
       }>{c.noteBody}</Card>
 
       <Card color="y-blush" title={c.heartTitle} art={
         <div className="b-art">
-          <MiniNotch mood="😘" />
+          <MiniNotch />
           <Drips />
           <div className="b-pal" style={{ right: 22 }}><Char kind="bun" className="is-love" /></div>
         </div>
@@ -55,6 +55,7 @@ export function Bento({ t: c }: { t: Copy['bento'] }) {
 
       <Card color="y-mint" title={c.moodTitle} art={
         <div className="b-art b-moods" role="radiogroup" aria-label={c.moodsLabel}>
+          <MiniNotch mood={mood} word={c.moods[MOODS.indexOf(mood)].toLowerCase()} />
           {MOODS.map((e, i) => [e, c.moods[i]]).map(([e, l]) => (
             <button key={e} type="button" role="radio" aria-checked={mood === e} className={mood === e ? 'is-on' : ''} onClick={() => setMood(e)}>
               <span>{e}</span>{l}
@@ -81,6 +82,7 @@ export function Bento({ t: c }: { t: Copy['bento'] }) {
             <span className="y-butter"><b>{n('days')}</b> {c.days}</span>
             <span className="y-sky"><b>{n('hours')}</b> {c.hours}</span>
             <span className="y-mint"><b>{n('weekends')}</b> {c.weekends}</span>
+            <span className="y-blush"><b>{n('toAnniversary')}</b> {c.toAnniversary}</span>
           </div>
         </div>
       }>{c.countBody}</Card>

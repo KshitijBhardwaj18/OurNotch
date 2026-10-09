@@ -198,6 +198,7 @@ button{font-family:inherit}
 .x-av{width:20px;height:20px;border-radius:50%;overflow:hidden;position:relative;background:linear-gradient(160deg,#FFE0C8,#FFB3C2);box-shadow:inset 0 0 0 .5px rgba(255,255,255,.2)}
 .x-av svg{position:absolute;width:26px;left:-3px;top:0}
 .x-mood{font-size:13px;line-height:20px;display:inline-block}
+.x-word{font-size:11px;font-weight:600;line-height:20px;color:rgba(255,255,255,.85)}
 .x-heart{width:13px;fill:var(--pink);margin-top:4px;animation:beat 2.6s infinite}
 .x-tick{position:absolute;left:12px;right:12px;top:28px;height:18px;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 12px,#000 calc(100% - 12px),transparent);mask:linear-gradient(90deg,transparent,#000 12px,#000 calc(100% - 12px),transparent)}
 .x-tick span{position:absolute;white-space:nowrap;font:500 12px/18px var(--sys);animation:x-tick 7s linear infinite}
@@ -223,7 +224,7 @@ button{font-family:inherit}
 .b-art .x-mini{width:230px}
 .b-art .x-mini.x-tall{height:54px}
 .b-art .x-tick{top:30px}
-.b-moods{padding:12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:7px}
+.b-moods{padding:44px 12px 12px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:7px}
 .b-moods button{border:0;border-radius:14px;background:rgba(255,255,255,.55);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:500 10.5px var(--body);color:var(--ink3);transition:transform .2s cubic-bezier(.3,1.6,.5,1),background .2s}
 .b-moods button:hover{transform:scale(1.06)}
 .b-moods button span{font-size:20px;line-height:1}
