@@ -266,22 +266,6 @@
         }
       }
     },
-    "A short note scrolls across their notch, until they open it." : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un petit mot défile dans son encoche, jusqu’à ce qu’elle l’ouvre."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eine kurze Notiz läuft durch die Notch, bis sie geöffnet wird."
-          }
-        }
-      }
-    },
     "Activate" : {
       "localizations" : {
         "fr" : {
@@ -1165,6 +1149,22 @@
         }
       }
     },
+    "Little notes, big feelings." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Petits mots, grands sentiments."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kleine Notizen, große Gefühle."
+          }
+        }
+      }
+    },
     "Low" : {
       "localizations" : {
         "fr" : {
@@ -1686,6 +1686,22 @@
         }
       }
     },
+    "Say something sweet. It scrolls across their notch until they open it." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dis-lui un mot doux. Il défile dans son encoche jusqu’à ce qu’elle l’ouvre."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreib etwas Süßes. Es läuft durch die Notch, bis es geöffnet wird."
+          }
+        }
+      }
+    },
     "Say something sweet…" : {
       "localizations" : {
         "fr" : {
@@ -2146,22 +2162,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zum Senden klicken"
-          }
-        }
-      }
-    },
-    "Ten words or fewer." : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dix mots ou moins."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zehn Wörter oder weniger."
           }
         }
       }

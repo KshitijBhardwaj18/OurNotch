@@ -73,7 +73,7 @@ struct OnboardingStory: View {
         var title: LocalizedStringKey {
             switch self {
             case .love: "Send love, notch to notch."
-            case .note: "Ten words or fewer."
+            case .note: "Little notes, big feelings."
             case .emoji: "One tap, many hearts."
             case .mood: "How you are, at a glance."
             case .together: "Just for the two of you."
@@ -83,7 +83,7 @@ struct OnboardingStory: View {
         var body: LocalizedStringKey {
             switch self {
             case .love: "Your love lives at the top of your screen. Whatever you send appears in their notch."
-            case .note: "A short note scrolls across their notch, until they open it."
+            case .note: "Say something sweet. It scrolls across their notch until they open it."
             case .emoji: "Tap an emoji and it pours out of their notch."
             case .mood: "Pick a mood. It sits next to your face in their notch."
             case .together: "End-to-end encrypted, no account, and none of your iCloud storage. One purchase for both Macs."
