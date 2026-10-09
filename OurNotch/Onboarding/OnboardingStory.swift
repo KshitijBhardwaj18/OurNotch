@@ -117,6 +117,9 @@ private struct Scene: View {
     let t: Double
 
     private static let pink = Color(hex: 0xFF375F)
+    /// When this slide appeared, so its story starts at the beginning instead of wherever the clock is.
+    @State private var start = Date.now.timeIntervalSinceReferenceDate
+    private var local: Double { max(0, t - start) }
 
     var body: some View {
         GeometryReader { box in
@@ -132,10 +135,19 @@ private struct Scene: View {
                 case .together: closedNotch { locked }.position(x: w / 2, y: 14)
                 }
                 buddy("pip", mood: slide == .mood || slide == .seconds ? "love" : "happy", phase: 0).position(pip)
-                buddy("bun", mood: slide == .whispers || slide == .together ? "happy" : "love", phase: 1.3).position(bun)
+                buddy("bun", mood: bunMood, phase: 1.3).position(bun)
             }
         }
         .padding(.horizontal, 12)
+    }
+
+    /// Bun lights up when love arrives; in Whispers, once the conversation opens.
+    private var bunMood: String {
+        switch slide {
+        case .whispers: whisperP > 0.7 && whisperP < 0.95 ? "love" : "happy"
+        case .together: "happy"
+        default: "love"
+        }
     }
 
     /// The black notch hanging from the screen's top edge, with something inside.
@@ -148,9 +160,8 @@ private struct Scene: View {
 
     /// The closed notch as it really looks: your love's avatar on the left, and on the right the beating
     /// heart (or whatever the slide puts there).
-    private func closedNotch(width: CGFloat = 206, banner: Bool = false,
-                             @ViewBuilder right: () -> some View = { heart }) -> some View {
-        notch(width: width, height: banner ? 50 : 28) {
+    private func closedNotch(width: CGFloat = 206, @ViewBuilder right: () -> some View = { heart }) -> some View {
+        notch(width: width, height: 28) {
             HStack(spacing: 0) {
                 Circle().fill(Color(hex: 0xFF8FAB)).frame(width: 17, height: 17)
                     .overlay(Text(verbatim: "p").font(.system(size: 9.5, weight: .heavy, design: .rounded)).foregroundStyle(.white))
@@ -172,7 +183,7 @@ private struct Scene: View {
     // MARK: Love: a heart goes up into Pip's side of the notch, and pours out onto Bun.
 
     @ViewBuilder private func love(width w: CGFloat, pip: CGPoint, bun: CGPoint) -> some View {
-        let p = (t / 3.4).truncatingRemainder(dividingBy: 1)
+        let p = (local / 3.4).truncatingRemainder(dividingBy: 1)
         closedNotch().position(x: w / 2, y: 14)
 
         // Up from Pip into the notch.
@@ -196,36 +207,66 @@ private struct Scene: View {
         }
     }
 
-    // MARK: Whispers: one arrives scrolling under the notch, then the notch opens on your little conversation.
+    // MARK: Whispers: one arrives scrolling under the notch, then the same notch opens on your conversation.
+
+    /// One loop of the Whispers scene, 0 to 1.
+    private var whisperP: Double { (local / 7.6).truncatingRemainder(dividingBy: 1) }
 
     @ViewBuilder private func whispers(width w: CGFloat) -> some View {
-        let p = (t / 7.6).truncatingRemainder(dividingBy: 1)
-        let open = smooth(p, 0.55, 0.62)
-        ZStack(alignment: .top) {
-            closedNotch(banner: true) { Self.heart }
-                .overlay(alignment: .bottom) { banner.frame(width: 180).padding(.bottom, 5) }
-                .opacity(1 - open)
-            notch(width: 236, height: 104) { conversation }
-                .opacity(open)
-        }
-        .position(x: w / 2, y: 52)
+        let p = whisperP
+        let back = smooth(p, 0.93, 1)                          // eases closed again before the loop
+        let grow = smooth(p, 0.06, 0.16) * (1 - back)          // the banner row slides open
+        let open = smooth(p, 0.58, 0.68) * (1 - back)          // the notch morphs open
+        let width = 206 + 30 * open
+        let height = (28 + 22 * grow) * (1 - open) + 104 * open
+        UnevenRoundedRectangle(bottomLeadingRadius: 13 + 5 * open, bottomTrailingRadius: 13 + 5 * open)
+            .fill(.black)
+            .frame(width: width, height: height)
+            .overlay(alignment: .top) {
+                ZStack(alignment: .top) {
+                    VStack(spacing: 0) {
+                        closedRow
+                        banner(progress: (p - 0.16) / 0.42)
+                            .frame(width: width - 26, height: 18)
+                            .opacity(grow)
+                    }
+                    .opacity(1 - open)
+                    conversation(progress: (p - 0.68) / 0.25).opacity(open)
+                }
+            }
+            .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 13 + 5 * open, bottomTrailingRadius: 13 + 5 * open))
+            .position(x: w / 2, y: height / 2)
     }
 
-    /// The whisper scrolling under the closed notch, the sender's name in pink, like the real banner.
-    private var banner: some View {
-        let x = 190 - (t * 34).truncatingRemainder(dividingBy: 400)
+    /// The closed notch's row: the avatar on the left, the beating heart on the right.
+    private var closedRow: some View {
+        HStack(spacing: 0) {
+            Circle().fill(Color(hex: 0xFF8FAB)).frame(width: 17, height: 17)
+                .overlay(Text(verbatim: "p").font(.system(size: 9.5, weight: .heavy, design: .rounded)).foregroundStyle(.white))
+            Spacer()
+            Self.heart
+        }
+        .padding(.horizontal, 11)
+        .frame(height: 28)
+    }
+
+    /// The whisper gliding in from the right and across once, the sender's name in pink, faded at both edges.
+    private func banner(progress: Double) -> some View {
+        let x = 190 - 440 * min(1, max(0, progress))
         return (Text(verbatim: "pip").foregroundColor(Self.pink) + Text(verbatim: "  ") + Text("lunch at 1? i'll bring dumplings 🥟").foregroundColor(.white))
             .font(.system(size: 10.5, weight: .semibold, design: .rounded))
             .fixedSize()
             .offset(x: x)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(height: 14)
             .clipped()
+            .mask(LinearGradient(stops: [.init(color: .clear, location: 0), .init(color: .black, location: 0.12),
+                                         .init(color: .black, location: 0.88), .init(color: .clear, location: 1)],
+                                 startPoint: .leading, endPoint: .trailing))
     }
 
-    /// The open notch's conversation, the bubbles popping in one by one.
-    private var conversation: some View {
-        let step = ((t / 7.6).truncatingRemainder(dividingBy: 1) - 0.6) / 0.1 // after the notch opens, one bubble per step
+    /// The open notch's conversation, the bubbles popping in one by one as `progress` goes 0 to 1.
+    private func conversation(progress: Double) -> some View {
+        let step = progress * 3.6
         let lines: [(LocalizedStringKey, Bool)] = [("lunch at 1? 🥟", false), ("yes please!! ❤️", true), ("see you soon 😘", false)]
         return VStack(spacing: 5) {
             ForEach(lines.indices, id: \.self) { i in
