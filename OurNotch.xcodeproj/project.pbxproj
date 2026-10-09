@@ -250,7 +250,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
-				DEVELOPMENT_TEAM = FFP4CMK386;
+				DEVELOPMENT_TEAM = HDFVQX8ZDA;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -269,10 +269,10 @@
 				);
 				MARKETING_VERSION = 0.1;
 				CODE_SIGN_ENTITLEMENTS = OurNotch/OurNotch.entitlements;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = app.ournotch.OurNotch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SPARKLE_FEED_URL = "https://downloads.ournotch.app/beta/appcast.xml";
-				SPARKLE_PUBLIC_KEY = "";
+				SPARKLE_PUBLIC_KEY = "asZ8pannFzADstEOaDPw/QCZAfkKbtZ+OBMZLKtY5g8=";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -281,7 +281,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
-				DEVELOPMENT_TEAM = FFP4CMK386;
+				DEVELOPMENT_TEAM = HDFVQX8ZDA;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -300,10 +300,10 @@
 				);
 				MARKETING_VERSION = 0.1;
 				CODE_SIGN_ENTITLEMENTS = OurNotch/OurNotch.entitlements;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = app.ournotch.OurNotch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SPARKLE_FEED_URL = "https://downloads.ournotch.app/appcast.xml";
-				SPARKLE_PUBLIC_KEY = "";
+				SPARKLE_PUBLIC_KEY = "asZ8pannFzADstEOaDPw/QCZAfkKbtZ+OBMZLKtY5g8=";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -313,12 +313,12 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				DEVELOPMENT_TEAM = FFP4CMK386;
+				DEVELOPMENT_TEAM = HDFVQX8ZDA;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev.Tests;
+				PRODUCT_BUNDLE_IDENTIFIER = app.ournotch.OurNotchTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OurNotch.app/Contents/MacOS/OurNotch";
@@ -330,12 +330,12 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				DEVELOPMENT_TEAM = FFP4CMK386;
+				DEVELOPMENT_TEAM = HDFVQX8ZDA;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev.Tests;
+				PRODUCT_BUNDLE_IDENTIFIER = app.ournotch.OurNotchTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OurNotch.app/Contents/MacOS/OurNotch";
@@ -362,7 +362,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Apple Development";
-				DEVELOPMENT_TEAM = FFP4CMK386;
+				DEVELOPMENT_TEAM = HDFVQX8ZDA;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -381,11 +381,11 @@
 				);
 				MARKETING_VERSION = 0.1;
 				CODE_SIGN_ENTITLEMENTS = OurNotch/OurNotch.entitlements;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev;
+				PRODUCT_BUNDLE_IDENTIFIER = app.ournotch.OurNotch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "BETA $(inherited)";
 				SPARKLE_FEED_URL = "https://downloads.ournotch.app/beta/appcast.xml";
-				SPARKLE_PUBLIC_KEY = "";
+				SPARKLE_PUBLIC_KEY = "asZ8pannFzADstEOaDPw/QCZAfkKbtZ+OBMZLKtY5g8=";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Beta;
@@ -395,12 +395,12 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				DEVELOPMENT_TEAM = FFP4CMK386;
+				DEVELOPMENT_TEAM = HDFVQX8ZDA;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.kshitijbhardwaj.OurNotch.dev.Tests;
+				PRODUCT_BUNDLE_IDENTIFIER = app.ournotch.OurNotchTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OurNotch.app/Contents/MacOS/OurNotch";

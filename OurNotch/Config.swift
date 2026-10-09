@@ -15,7 +15,7 @@ enum Config {
 
     enum Cloud {
         /// Throwaway container on the company team; swap for your own account's container before selling.
-        static let containerId = "iCloud.com.kshitijbhardwaj.OurNotch.dev"
+        static let containerId = "iCloud.app.ournotch.OurNotch"
         /// Safety-net check when no ping arrives. Debug builds check every 3 s, because pings don't reach
         /// the Mac that made the change, so the notch and Partner Simulator on one Mac must poll each other.
         #if DEBUG

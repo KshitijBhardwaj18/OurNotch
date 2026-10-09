@@ -4,9 +4,9 @@ A cute little shared space for couples that lives in the MacBook notch: tap to s
 
 ## Run it
 
-Requirements: macOS 14+, Xcode 27, a Mac signed into iCloud, and Xcode signed into an Apple Developer team that can use the CloudKit container (currently the company team `FFP4CMK386`, bundle `com.kshitijbhardwaj.OurNotch.dev`, container `iCloud.com.kshitijbhardwaj.OurNotch.dev`).
+Requirements: macOS 14+, Xcode 27, a Mac signed into iCloud, and Xcode signed into an Apple Developer team that can use the CloudKit container (team `HDFVQX8ZDA`, bundle `app.ournotch.OurNotch`, container `iCloud.app.ournotch.OurNotch`; its schema is `cloudkit/schema.ckdb`).
 
-**Switching accounts later:** change `DEVELOPMENT_TEAM` and `PRODUCT_BUNDLE_IDENTIFIER` in the project, the container in `OurNotch/OurNotch.entitlements`, and `Config.Cloud.containerId`. In the new container's CloudKit Console, add a **Queryable** index on `Outbox.ownerId` so pings work. CloudKit data doesn't move between accounts; couples pair again.
+**Switching accounts later:** change `DEVELOPMENT_TEAM` and `PRODUCT_BUNDLE_IDENTIFIER` in the project, the container in `OurNotch/OurNotch.entitlements`, and `Config.Cloud.containerId`. Load the schema into the new container with `xcrun cktool import-schema --team-id <team> --container-id <container> --environment development --file cloudkit/schema.ckdb`, then deploy it to Production in CloudKit Console. CloudKit data doesn't move between accounts; couples pair again.
 
 1. Open `OurNotch.xcodeproj`.
 2. Select the **OurNotch** scheme and press ⌘R.
@@ -32,7 +32,7 @@ Get a test key by buying with card 4242 4242 4242 4242 at the gate's *Get OurNot
 
 **Languages:** English, French and German live in `OurNotch/Localizable.xcstrings`. Building in Xcode keeps it in step with the code; after a command-line build, run `python3 scripts/sync-strings.py --check` to add new strings and list any missing a translation. Settings → Language overrides the Mac's language for OurNotch only (it restarts). To see a language without switching: `xcodebuild test -testLanguage de`, or run with `-AppleLanguages "(de)"`.
 
-**Builds and releases:** *Debug* (Partner Simulator, 3 s checks), *Beta* (for test couples: diagnostics upload, Dodo test mode) and *Release* (the sold build: nothing uploaded). `scripts/release.sh [Release|Beta]` archives, exports with Developer ID, makes a DMG, notarizes it, writes the Sparkle appcast and uploads to R2; until a Developer ID certificate is installed it stops after a local, unsigned DMG in `build/release/`. Sparkle updates stay off until `SPARKLE_PUBLIC_KEY` is set (slice 11). Give testers Beta builds, not Release.
+**Builds and releases:** *Debug* (Partner Simulator, 3 s checks), *Beta* (for test couples: diagnostics upload, Dodo test mode) and *Release* (the sold build: nothing uploaded). `scripts/release.sh [Release|Beta]` archives, exports with Developer ID, makes a DMG, notarizes it, writes the Sparkle appcast and uploads to R2; until a Developer ID certificate is installed it stops after a local, unsigned DMG in `build/release/`. Sparkle signs updates with the EdDSA key in your keychain (account `ournotch`); keep its backup safe, a lost key means installed copies can never update again. Give testers Beta builds, not Release.
 
 Tests: `xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/DerivedData test`
 
