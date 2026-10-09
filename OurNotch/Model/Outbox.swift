@@ -2,8 +2,11 @@ import Foundation
 
 /// One partner's row in the shared mailbox. Only its owner writes it; the partner reads it.
 struct Outbox: Codable, Equatable {
-    /// Set by the inviter only; the joiner reads it from here.
+    /// Our anniversary: set by the inviter in onboarding, changeable by either of us in Settings.
     var togetherSince: Date?
+    /// When `togetherSince` was last changed in Settings, so the newer change wins on both Macs.
+    /// Nil for the onboarding answer (and outboxes from older builds).
+    var togetherSinceSetAt: Date?
     /// Running total of emojis this partner has sent. Never goes down.
     var emojisSent = 0
     /// The most recent emoji and how it should appear. Earlier ones aren't kept.

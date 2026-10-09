@@ -49,7 +49,7 @@ final class MenuState {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let menu = MenuState()
-    let updates = Updates()
+    let updates = Updates.shared
     let effects = EmojiEffect()
     #if DEBUG
     let partnerSimulator = PartnerSimulator()
@@ -364,9 +364,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// Off until the release key exists (slice 11 sets `SPARKLE_PUBLIC_KEY`), and in Debug builds.
 @MainActor
 final class Updates {
+    static let shared = Updates()
     private let controller: SPUStandardUpdaterController?
 
-    init() {
+    private init() {
         let key = Bundle.main.object(forInfoDictionaryKey: "SUPublicEDKey") as? String ?? ""
         #if DEBUG
         let enabled = false

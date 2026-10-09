@@ -337,6 +337,27 @@ struct PartnersTests {
         #expect(partner.banner == nil) // read: closing the notch doesn't scroll it 3 more times
     }
 
+    @Test func eitherOfUsCanChangeTheAnniversaryAndTheNewerChangeWins() async throws {
+        let people = TwoPartners()
+        let first = Date(timeIntervalSince1970: 1_676_332_800) // 2023-02-14
+        let (you, partner) = try await people.paired(togetherSince: first)
+        await you.sync(); await partner.sync()
+        #expect(partner.togetherSince == first)
+
+        // The joiner (partner) changes it: the inviter takes it.
+        let changed = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: 1_700_000_000))
+        partner.setTogetherSince(changed)
+        try await Task.sleep(for: .milliseconds(100))
+        await you.sync()
+        #expect(you.togetherSince == changed)
+
+        // A relaunch doesn't bring the old date back on either Mac.
+        try await Task.sleep(for: .milliseconds(100))
+        let relaunched = try #require(AppState(store: people.partner, mailbox: people.mailbox, photosRoot: people.photosRoot))
+        await relaunched.sync()
+        #expect(relaunched.togetherSince == changed)
+    }
+
     @Test func aRelaunchCarriesOnTheBannersPassesInsteadOfRestartingThem() async throws {
         let people = TwoPartners()
         let (you, partner) = try await people.paired()
@@ -443,6 +464,9 @@ struct MoodTests {
         #expect(partner.partnerOutbox.mood == "😴")
         #expect(Config.moodLabel("😴") == "Sleepy")
         #expect(partner.closedSideWidth == Config.Notch.closedSideWidthWithMood) // room for "😴 sleepy"
+        partner.showsMoodWord = false // Settings → Mood words off: just the emoji
+        #expect(partner.closedSideWidth == Config.Notch.closedSideWidth)
+        partner.showsMoodWord = true
 
         you.setMood(nil)
         try await Task.sleep(for: .milliseconds(100))

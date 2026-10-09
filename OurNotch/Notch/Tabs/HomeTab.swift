@@ -17,7 +17,7 @@ struct HomeTab: View {
                     card(.note, hint: String(localized: "Read your whispers and whisper back ♡"), below: true) { noteTile(now: context.date) }.frame(height: (side - 10) * 0.56)
                     HStack(spacing: 10) {
                         card(.stats, hint: String(localized: "Every second counts ♡ Click for more")) { togetherTile(now: context.date) }
-                        card(.mood, hint: String(localized: "Share your mood too ♡")) { moodTile }.frame(width: 116)
+                        card(.mood, hint: String(localized: "Share your mood too ♡")) { moodTile(now: context.date) }.frame(width: 116)
                     }
                 }
             }
@@ -136,8 +136,10 @@ struct HomeTab: View {
     // MARK: Mood
 
     /// A little widget, centred: "THEIR MOOD", their emoji big in a soft circle, its word underneath.
-    private var moodTile: some View {
-        let mood = state.partnerOutbox.mood
+    /// While they've hidden OurNotch: a moon, and "away" (until when, if they said).
+    private func moodTile(now: Date) -> some View {
+        let away = state.partnerIsAway(now: now)
+        let mood = away ? nil : state.partnerOutbox.mood
         return VStack(spacing: 6) {
             Text("Their mood")
                 .textCase(.uppercase)
@@ -148,16 +150,18 @@ struct HomeTab: View {
                 .minimumScaleFactor(0.8)
             ZStack {
                 Circle().fill(Color.notchField)
-                if let mood {
+                if away {
+                    Image(systemName: "moon.fill").font(.system(size: 17)).foregroundStyle(Color.notchBlush)
+                } else if let mood {
                     Text(mood).font(.system(size: 24)).transition(.scale.combined(with: .opacity))
                 } else {
                     Image(systemName: "heart").font(.system(size: 17, weight: .medium)).foregroundStyle(Color.tertiaryLabel)
                 }
             }
             .frame(width: 40, height: 40)
-            Text(mood.flatMap(Config.moodLabel)?.lowercased() ?? String(localized: "not set"))
+            Text(away ? awayLabel : mood.flatMap(Config.moodLabel)?.lowercased() ?? String(localized: "not set"))
                 .font(.system(size: 12.5, weight: .semibold, design: .rounded))
-                .foregroundStyle(mood == nil ? Color.secondaryLabel : .white)
+                .foregroundStyle(mood == nil && !away ? Color.secondaryLabel : .white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -165,6 +169,12 @@ struct HomeTab: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .tile()
         .animation(.spring(response: 0.35, dampingFraction: 0.6), value: mood)
+    }
+
+    /// "away till 6:00 AM", or just "away" for "until I'm back".
+    private var awayLabel: String {
+        guard let until = state.partnerOutbox.awayUntil, until != .distantFuture else { return String(localized: "away") }
+        return String(localized: "away till \(until.formatted(date: .omitted, time: .shortened))")
     }
 }
 

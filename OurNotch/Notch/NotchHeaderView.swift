@@ -30,11 +30,15 @@ struct NotchHeaderView: View {
             TimelineView(.everyMinute) { context in
                 Group {
                     if state.partnerIsAway(now: context.date) {
-                        Text("away").font(.system(size: 10, weight: .medium)).foregroundStyle(Color.secondaryLabel)
+                        HStack(spacing: 3) {
+                            Image(systemName: "moon.fill").font(.system(size: 10))
+                            Text("away").font(.system(size: 11, weight: .medium))
+                        }
+                        .foregroundStyle(.white.opacity(0.7))
                     } else if let mood = state.partnerOutbox.mood {
                         HStack(spacing: 3) {
                             Text(mood).font(.system(size: 13))
-                            if let word = Config.moodLabel(mood) {
+                            if state.showsMoodWord, let word = Config.moodLabel(mood) {
                                 Text(word.lowercased())
                                     .font(.system(size: 11, weight: .medium))
                                     .foregroundStyle(.white.opacity(0.85))

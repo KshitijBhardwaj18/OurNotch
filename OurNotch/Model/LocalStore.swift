@@ -76,6 +76,11 @@ struct LocalStore {
         get { defaults.object(forKey: "hiddenUntil") as? Date }
         nonmutating set { defaults.set(newValue, forKey: "hiddenUntil") }
     }
+    /// Settings → Mood words: "🍕 hungry" in the closed notch, or just 🍕.
+    var showsMoodWord: Bool {
+        get { defaults.object(forKey: "showsMoodWord") as? Bool ?? true }
+        nonmutating set { defaults.set(newValue, forKey: "showsMoodWord") }
+    }
     var banner: Message? {
         get { decode("banner") }
         nonmutating set { encode(newValue, "banner") }

@@ -446,6 +446,22 @@
         }
       }
     },
+    "Check for Updates" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher des mises à jour"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Updates suchen"
+          }
+        }
+      }
+    },
     "Check for Updates…" : {
       "localizations" : {
         "fr" : {
@@ -474,6 +490,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Foto auswählen …"
+          }
+        }
+      }
+    },
+    "Choose a date" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisir une date"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datum wählen"
           }
         }
       }
@@ -589,6 +621,39 @@
           }
         }
       }
+    },
+    "Counts your seconds together and the days to your anniversary, on both Macs." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compte vos secondes ensemble et les jours jusqu’à votre anniversaire, sur vos deux Mac."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zählt eure gemeinsamen Sekunden und die Tage bis zum Jahrestag, auf beiden Macs."
+          }
+        }
+      }
+    },
+    "Counts your seconds together, on both Macs." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compte vos secondes ensemble, sur vos deux Mac."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zählt eure gemeinsamen Sekunden, auf beiden Macs."
+          }
+        }
+      },
+      "extractionState" : "stale"
     },
     "Day to your anniversary" : {
       "localizations" : {
@@ -1058,6 +1123,23 @@
             "value" : "Herzen und Notizen warten auf dich. Deine Liebe sieht, dass du weg bist."
           }
         }
+      },
+      "extractionState" : "stale"
+    },
+    "Hearts and whispers wait for you. Your love sees you're away." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les cœurs et les murmures vous attendent. Votre amour voit que vous n'êtes pas là."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herzen und Flüstern warten auf dich. Dein Schatz sieht, dass du weg bist."
+          }
+        }
       }
     },
     "Hide OurNotch" : {
@@ -1449,6 +1531,22 @@
         }
       }
     },
+    "Like 🍕 hungry, next to their mood." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comme 🍕 faim, à côté de son humeur."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie 🍕 hungrig, neben der Stimmung."
+          }
+        }
+      }
+    },
     "Little notes, big feelings." : {
       "localizations" : {
         "fr" : {
@@ -1526,6 +1624,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Laune"
+          }
+        }
+      }
+    },
+    "Mood words" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mots d’humeur"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stimmungswörter"
           }
         }
       }
@@ -1839,8 +1953,40 @@
         }
       }
     },
+    "Our anniversary" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notre anniversaire"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unser Jahrestag"
+          }
+        }
+      }
+    },
     "OurNotch" : {
       "shouldTranslate" : false
+    },
+    "OurNotch %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch %@"
+          }
+        }
+      }
     },
     "OurNotch restarts to switch." : {
       "localizations" : {
@@ -2531,6 +2677,23 @@
         }
       }
     },
+    "Show “🍕 hungry” in the notch, not just 🍕." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Affiche « 🍕 faim » dans l’encoche, pas seulement 🍕."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeigt „🍕 hungrig“ in der Notch, nicht nur 🍕."
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
     "Shown next to your hearts and notes." : {
       "localizations" : {
         "fr" : {
@@ -3147,6 +3310,22 @@
         }
       }
     },
+    "Updates arrive by themselves. Questions or ideas? Write to us." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les mises à jour arrivent toutes seules. Une question, une idée ? Écrivez-nous."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updates kommen von selbst. Fragen oder Ideen? Schreib uns."
+          }
+        }
+      }
+    },
     "Waiting for %@ to say yes…" : {
       "localizations" : {
         "fr" : {
@@ -3437,6 +3616,22 @@
         }
       }
     },
+    "Your notch is there every time you open your Mac." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre encoche est là chaque fois que vous ouvrez votre Mac."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Notch ist da, jedes Mal wenn du deinen Mac öffnest."
+          }
+        }
+      }
+    },
     "Your notch will be there every time you open your Mac." : {
       "localizations" : {
         "fr" : {
@@ -3481,6 +3676,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "weg"
+          }
+        }
+      }
+    },
+    "away till %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pas là jusqu’à %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "weg bis %@"
           }
         }
       }

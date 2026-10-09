@@ -14,14 +14,16 @@ enum SyncSource: String {
 @Observable
 final class AppState {
     let pairing: Pairing
-    /// The inviter's answer to "How long have you been together?". The joiner receives it from the inviter's outbox.
+    /// Our anniversary: the inviter's onboarding answer, then whoever changed it last in Settings.
     private(set) var togetherSince: Date?
+    /// Settings → Mood words: the word beside my love's mood emoji in the closed notch.
+    var showsMoodWord = true { didSet { store.showsMoodWord = showsMoodWord } }
     private(set) var myOutbox: Outbox
     private(set) var partnerOutbox = Outbox()
 
     /// Width of each slot beside the camera in the closed notch: wider while my love's mood has a word to show.
     var closedSideWidth: CGFloat {
-        partnerOutbox.mood == nil ? Config.Notch.closedSideWidth : Config.Notch.closedSideWidthWithMood
+        partnerOutbox.mood == nil || !showsMoodWord ? Config.Notch.closedSideWidth : Config.Notch.closedSideWidthWithMood
     }
     /// The message currently scrolling under the notch, if any. Saved so `untilOpened` survives a restart.
     private(set) var banner: Message?
@@ -118,9 +120,8 @@ final class AppState {
         hiddenUntil = Hide.isHidden(until: store.hiddenUntil) ? store.hiddenUntil : nil
         if hiddenUntil == nil { myOutbox.awayUntil = nil } // came back while the app was closed
         togetherSince = store.togetherSince
-        if pairing.role == .inviter {
-            myOutbox.togetherSince = togetherSince // shared on the next save
-        }
+        if togetherSince != nil { myOutbox.togetherSince = togetherSince } // shared on the next save
+        showsMoodWord = store.showsMoodWord
         myOutbox.licenceKey = Self.sharedKey(store.licence) ?? myOutbox.licenceKey
     }
 
@@ -248,6 +249,21 @@ final class AppState {
         Task { await save() }
     }
 
+    // MARK: Anniversary
+
+    /// Settings → Our anniversary. Both Macs show the newer change.
+    func setTogetherSince(_ date: Date) {
+        let day = Calendar.current.startOfDay(for: date)
+        guard day != togetherSince else { return }
+        togetherSince = day
+        store.togetherSince = day
+        myOutbox.togetherSince = day
+        myOutbox.togetherSinceSetAt = .now
+        store.myOutbox = myOutbox
+        note("changed together-since date")
+        Task { await save() }
+    }
+
     // MARK: Hide
 
     /// Hides OurNotch until `date`; my love sees "away" meanwhile.
@@ -360,10 +376,15 @@ final class AppState {
         partnerOutbox = partner
         if hasFetchedPartner { logReceipts(old: previous, new: partner, source: source) }
         hasFetchedPartner = true
-        if pairing.role == .joiner, let date = partner.togetherSince, date != togetherSince {
+        if let date = partner.togetherSince, date != togetherSince,
+           togetherSince == nil || (partner.togetherSinceSetAt ?? .distantPast) > (myOutbox.togetherSinceSetAt ?? .distantPast) {
             togetherSince = date
             store.togetherSince = date
+            myOutbox.togetherSince = date
+            myOutbox.togetherSinceSetAt = partner.togetherSinceSetAt
+            store.myOutbox = myOutbox
             note("[\(source.rawValue)] got together-since date")
+            Task { await save() }
         }
 
         if let key = partner.licenceKey, Licence.adopts(key, over: store.licence) {
