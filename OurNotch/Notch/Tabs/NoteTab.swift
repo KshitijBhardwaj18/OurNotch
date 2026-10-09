@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Read your love's latest note and write one back, choosing how it scrolls on their notch.
+/// Your last notes to each other as a tiny conversation, and a field to write the next one,
+/// choosing how it scrolls on their notch.
 struct NoteTab: View {
     let state: AppState
     /// True while the field has focus, so the notch stays open while typing.
@@ -15,8 +16,7 @@ struct NoteTab: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            theirLatest
-            Spacer(minLength: 8)
+            conversation
             composer
             footer.padding(.top, 10)
         }
@@ -24,26 +24,50 @@ struct NoteTab: View {
         .onChange(of: focused) { _, now in isEditing = now }
     }
 
-    // MARK: Their latest
+    // MARK: Conversation
 
-    private var theirLatest: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            if let note = state.partnerOutbox.message {
-                TimelineView(.periodic(from: .now, by: 60)) { context in
-                    Text("From \(state.partnerName.lowercased()) · \(shortAgo(note.sentAt, now: context.date))")
-                }
-                .font(.system(size: 11, weight: .medium))
+    @ViewBuilder private var conversation: some View {
+        let lines = Conversation.lines(mine: state.myOutbox, theirs: state.partnerOutbox)
+        if lines.isEmpty {
+            Text("No notes from \(state.partnerName.lowercased()) yet ♡")
+                .font(.system(size: 13))
                 .foregroundStyle(Color.secondaryLabel)
-                Text(note.text)
-                    .font(.system(size: 16))
-                    .lineLimit(2)
-                    .foregroundStyle(.white)
-            } else {
-                Text("No notes from \(state.partnerName.lowercased()) yet ♡")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color.secondaryLabel)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        } else {
+            ScrollViewReader { reader in
+                ScrollView {
+                    TimelineView(.periodic(from: .now, by: 60)) { context in
+                        VStack(spacing: 5) {
+                            ForEach(lines) { line in bubble(line, now: context.date).id(line.id) }
+                        }
+                        .padding(.bottom, 8)
+                    }
+                }
+                .defaultScrollAnchor(.bottom) // newest at the bottom, like Messages
+                .scrollIndicators(.never)
+                // A new note, theirs or mine, scrolls into view.
+                .onChange(of: lines.last?.id) { _, last in
+                    withAnimation(.snappy(duration: 0.25)) { reader.scrollTo(last, anchor: .bottom) }
+                }
             }
         }
+    }
+
+    private func bubble(_ line: Conversation.Line, now: Date) -> some View {
+        let ago = Text(shortAgo(line.message.sentAt, now: now, suffix: false))
+            .font(.system(size: 10, weight: .medium).monospacedDigit())
+            .foregroundStyle(Color.tertiaryLabel)
+        return HStack(alignment: .bottom, spacing: 6) {
+            if line.isMine { Spacer(minLength: 60); ago }
+            Text(line.message.text)
+                .font(.system(size: 13))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(line.isMine ? Color.notchPink : .notchField, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            if !line.isMine { ago; Spacer(minLength: 60) }
+        }
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     // MARK: Composer

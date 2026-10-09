@@ -196,12 +196,12 @@ final class AppState {
         }
     }
 
-    /// Replaces my latest message and saves it right away. Returns false if the text breaks the message rules.
+    /// Makes this my latest message (earlier ones stay as history) and saves it right away. Returns false if the text breaks the message rules.
     @discardableResult
     func sendMessage(_ text: String, mode: BannerMode) -> Bool {
         guard case .valid(let clean) = MessageRules.check(text) else { return false }
         lastActivity = .now
-        myOutbox.message = Message(id: UUID(), text: clean, mode: mode, sentAt: .now)
+        myOutbox.send(Message(id: UUID(), text: clean, mode: mode, sentAt: .now))
         store.myOutbox = myOutbox
         note("tap: note (\(MessageRules.wordCount(clean)) words, \(mode.rawValue))")
         Task { await save() }

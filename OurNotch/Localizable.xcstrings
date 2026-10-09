@@ -712,7 +712,8 @@
             "value" : "Von %@ · %@"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Full screen" : {
       "localizations" : {

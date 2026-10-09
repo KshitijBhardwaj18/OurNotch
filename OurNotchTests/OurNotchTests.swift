@@ -494,3 +494,22 @@ struct LicenceTests {
         #expect(store.licence == nil)
     }
 }
+
+@MainActor
+struct NoteHistoryTests {
+    @Test func keepsTheLastTenAndInterleavesBothSides() async throws {
+        let (you, partner) = try await TwoPartners().paired()
+        for i in 1...12 { you.sendMessage("note \(i)", mode: .three) }
+        #expect(you.myOutbox.notes.map(\.text) == (3...12).map { "note \($0)" }) // oldest two dropped
+        #expect(you.myOutbox.message?.text == "note 12") // still the one that scrolls
+
+        partner.sendMessage("hi back", mode: .three)
+        try await Task.sleep(for: .milliseconds(200))
+        await partner.sync()
+        await you.sync()
+        let lines = Conversation.lines(mine: partner.myOutbox, theirs: partner.partnerOutbox)
+        #expect(lines.count == 11)
+        #expect(lines.last?.message.text == "hi back" && lines.last?.isMine == true)
+        #expect(lines.filter { !$0.isMine }.map(\.message.text) == (3...12).map { "note \($0)" })
+    }
+}

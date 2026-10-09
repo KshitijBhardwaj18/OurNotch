@@ -10,8 +10,11 @@ struct Outbox: Codable, Equatable {
     var lastEmoji: SentEmoji?
     /// The partner's `emojisSent` value this Mac has already shown. Tells the sender "delivered".
     var seenEmojis = 0
-    /// The latest note sent. Only the last one is kept; there's no history.
+    /// The latest note sent. This is the one that scrolls across the partner's notch.
     var message: Message?
+    /// The notes sent before `message`, oldest first, so together they make the last
+    /// `Config.Message.historyCount`. Optional, so outboxes from older builds still decode.
+    var earlierMessages: [Message]?
     /// The partner's note this Mac has already shown.
     var seenMessageId: UUID?
     /// The latest photo sent. The image itself travels separately, encrypted, as its own record.
@@ -24,6 +27,31 @@ struct Outbox: Codable, Equatable {
     var licenceKey: String?
     /// While I've hidden OurNotch: my partner's notch shows "away" until then, or until I'm back.
     var awayUntil: Date?
+}
+
+extension Outbox {
+    /// My last notes, oldest first.
+    var notes: [Message] { (earlierMessages ?? []) + (message.map { [$0] } ?? []) }
+
+    /// Makes `new` the latest note and keeps the previous ones, up to the history limit.
+    mutating func send(_ new: Message) {
+        earlierMessages = message.map { Array(((earlierMessages ?? []) + [$0]).suffix(Config.Message.historyCount - 1)) } ?? earlierMessages
+        message = new
+    }
+}
+
+/// Both partners' last notes as one conversation, oldest first.
+enum Conversation {
+    struct Line: Identifiable, Equatable {
+        let message: Message
+        let isMine: Bool
+        var id: UUID { message.id }
+    }
+
+    static func lines(mine: Outbox, theirs: Outbox) -> [Line] {
+        (mine.notes.map { Line(message: $0, isMine: true) } + theirs.notes.map { Line(message: $0, isMine: false) })
+            .sorted { $0.message.sentAt < $1.message.sentAt }
+    }
 }
 
 struct SentPhoto: Codable, Equatable {

@@ -102,6 +102,8 @@ enum Config {
         static let maxWords = 10
         static let maxCharacters = 60
         static let maxWordLength = 15
+        /// Notes each of you keeps, so the Note tab reads as a tiny conversation (older ones drop off).
+        static let historyCount = 10
         /// How fast the banner scrolls, in points per second.
         static let bannerSpeed: CGFloat = 40
         /// Height the closed notch grows by while a banner is showing.
