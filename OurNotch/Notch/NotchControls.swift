@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum NotchTab: CaseIterable {
-    case home, note, emoji, mood, photo, stats
+    case home, stats, note, emoji, mood, photo
 
     var label: String {
         switch self {
@@ -27,8 +27,8 @@ enum NotchTab: CaseIterable {
 
 }
 
-/// The tab bar at the bottom of the open notch: a small floating capsule of icons, where the chosen tab
-/// opens into a pill with its name. The pill slides between tabs.
+/// The tab bar at the bottom of the open notch: each tab is an icon with its name underneath, so it's
+/// always clear what it does; the chosen one sits on a soft pill (sliding between tabs) with a pink icon.
 struct NotchTabBar: View {
     @Binding var selection: NotchTab
     /// True while Settings covers the tabs, so no tab looks selected.
@@ -41,26 +41,26 @@ struct NotchTabBar: View {
             ForEach(NotchTab.allCases, id: \.self) { tab in
                 let selected = tab == selection && !dimmed
                 Button { selection = tab } label: {
-                    HStack(spacing: 6) {
+                    VStack(spacing: 2) {
                         Image(systemName: selected ? "\(tab.symbol).fill" : tab.symbol)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(selected ? Color.notchPink : hovered == tab ? .white : .secondaryLabel)
-                        if selected {
-                            Text(tab.label)
-                                .font(.system(size: 12.5, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
-                                .fixedSize()
-                                .transition(.opacity.combined(with: .scale(scale: 0.8, anchor: .leading)))
-                        }
+                            .frame(height: 17)
+                        Text(tab.label)
+                            .font(.system(size: 10, weight: selected ? .semibold : .medium, design: .rounded))
+                            .foregroundStyle(selected ? Color.white : hovered == tab ? .white : .secondaryLabel)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
-                    .padding(.horizontal, selected ? 14 : 12)
-                    .frame(height: 30)
+                    .frame(width: 70, height: 40)
                     .background {
                         if selected {
-                            Capsule().fill(.white.opacity(0.12)).matchedGeometryEffect(id: "pill", in: pill)
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(.white.opacity(0.12))
+                                .matchedGeometryEffect(id: "pill", in: pill)
                         }
                     }
-                    .contentShape(Capsule())
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 // The icon-only tabs still have a name (not the symbol's, like "Chart Column").
@@ -70,9 +70,9 @@ struct NotchTabBar: View {
                 .onHover { hovered = $0 ? tab : (hovered == tab ? nil : hovered) }
             }
         }
-        .padding(4)
-        .background(.white.opacity(0.06), in: Capsule())
-        .overlay(Capsule().strokeBorder(.white.opacity(0.06), lineWidth: 0.5))
+        .padding(3)
+        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).strokeBorder(.white.opacity(0.06), lineWidth: 0.5))
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selection)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: dimmed)
         .animation(.easeOut(duration: 0.12), value: hovered)
