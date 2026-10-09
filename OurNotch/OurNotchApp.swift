@@ -45,6 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var panel: NotchPanel?
     private var geometry: NotchGeometry?
     private var onboardingWindow: NSWindow?
+    private var onboarding: OnboardingModel?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Unit tests run inside the app; they don't need a notch on screen.
@@ -68,6 +69,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
         NSApp.registerForRemoteNotifications()
+    }
+
+    // MARK: Activation link
+
+    /// `ournotch://activate?key=…` from the thank-you page. Ignored once this Mac is paired
+    /// (the buyer is already active, and a partner is covered through the pairing).
+    func application(_ application: NSApplication, open urls: [URL]) {
+        for url in urls where url.scheme == "ournotch" && url.host() == "activate" {
+            guard let key = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?.first(where: { $0.name == "key" })?.value, !key.isEmpty else { continue }
+            Diagnostics.shared.record("activation link opened")
+            guard let onboarding else { continue }
+            onboarding.activate(key: key)
+            onboardingWindow?.showInFront()
+        }
     }
 
     // MARK: Pings
@@ -167,6 +183,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// A regular window that needs typing, so the app briefly becomes a regular app (Dock icon, ⌘-Tab).
     private func showOnboarding() {
         let model = OnboardingModel(store: store, mailbox: mailbox) { [weak self] in self?.finishOnboarding() }
+        onboarding = model
         let window = NSWindow(contentViewController: NSHostingController(rootView: OnboardingView(model: model)))
         window.title = "Welcome to OurNotch"
         window.styleMask = [.titled, .closable]
@@ -189,6 +206,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         startNotch()
         onboardingWindow?.close()
         onboardingWindow = nil
+        onboarding = nil
         NSApp.setActivationPolicy(.accessory)
     }
 

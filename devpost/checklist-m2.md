@@ -22,7 +22,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
   Learner check: Reset OurNotch and launch it. On the gate, try a made-up key and read the error, then paste the test key and watch it continue into onboarding. Turn Wi-Fi off, relaunch, and confirm it still opens.
   Commit: `Add licence gate and key activation through Dodo`
 
-- [ ] **2. Buy on the website and Open OurNotch activates it**
+- [x] **2. Buy on the website and Open OurNotch activates it**
   Becomes usable: On `localhost:3000`, the price shows for your country (₹200 / €3 / $4.50, no strikethrough); *Buy* opens Dodo's test checkout; after paying with 4242 4242 4242 4242 you land on the **thank-you page** — ① Download → ② **Open OurNotch** → ③ Invite your love, key underneath with Copy. Clicking *Open OurNotch* activates the app with no key typed. *Get OurNotch* in the app's gate opens the same checkout.
   Why now: This is the milestone's "oh, that's cool" path — pay, click once, it's yours. It reuses slice 1's activation, so it adds only the website pages and the `ournotch://` link, and it checks whether Dodo really hands the key to the thank-you page (verify item 2) before anything else depends on it.
   PRD ref: `prd-m2.md > The Core Journey` (steps 1–4), `prd-m2.md > Buying and Prices`, `prd-m2.md > Activation`
@@ -140,3 +140,8 @@ Activity mode:
 - The activation is named after the Mac's computer name ("Kshitij's MacBook Pro") instead of "<name>'s <Mac model>" — the name step comes after the gate, and the computer name is usually exactly that.
 - Debug builds accept `OURNOTCH_PROFILE=<name>` to run a separate fresh identity beside the real one — fresh-install checks no longer need *Reset Everything*, which would wipe the learner's real pairing with their partner.
 - The gate's path decides joining: the "I Have a Code" link left the invite screen, since partners now choose *I Have an Invite Code* at the gate.
+- Verify item 2 confirmed: a test purchase from `localhost:3000` (Dodo checkout detected India → ₹200.00 incl. GST; Dodo's published Indian test card and the gateway simulator) returned to `/thanks?…&license_key=<uuid>`, so test mode does issue keys and the redirect carries them. Dodo's keys are UUIDs, not short codes.
+- The website (`website/`, built by the other agent from the approved pop design) is committed with this slice and owned by the build from here on (learner: "let's just build what we can").
+- `/download` redirects to the GitHub releases page until slice 9 puts signed DMGs on R2. The app's *Get OurNotch* returns to `localhost:3000/thanks` in Debug and `ournotch.app/thanks` otherwise.
+- The URL scheme lives in a small `OurNotch-Info.plist` at the repo root, merged into the generated Info.plist: build settings can't express `CFBundleURLTypes`, and a plist inside the synced `OurNotch/` folder would be copied as a resource.
+- Clicking *Open OurNotch* into a fresh app wasn't driven live (the learner was on a call, and two installed copies share the `ournotch://` scheme); the purchased key was activated through the same `OnboardingModel.activate(key:)` the link calls, and the built app's Info.plist was checked for the scheme. The learner's check covers the real click.

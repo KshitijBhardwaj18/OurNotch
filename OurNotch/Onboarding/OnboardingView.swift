@@ -75,6 +75,14 @@ final class OnboardingModel {
         go(to: start)
     }
 
+    /// The website's "Open OurNotch" button: fills in the key and activates, showing any error on the key step.
+    func activate(key: String) {
+        guard !isWorking, step == .gate || step == .licenceKey || step == .welcome else { return }
+        typedKey = key
+        step = .licenceKey
+        activate()
+    }
+
     /// Switches the pasted key on for this Mac, then carries on as a buyer.
     func activate() {
         run {
