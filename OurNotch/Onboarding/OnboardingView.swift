@@ -17,8 +17,14 @@ final class OnboardingModel {
     var typedCode = ""
     var togetherSince = Calendar.current.startOfDay(for: .now)
     private(set) var inviteCode: String?
-    /// The invite found from a typed code, shown as "nikki ♥ invited you" before joining.
+    /// The invite found from a typed code, shown as "kshitij invited you, is that right?" before asking.
     private(set) var foundInvite: Invite?
+    /// Joiner: asked to join, waiting for the inviter's yes.
+    private(set) var awaitingAnswer = false
+    /// Inviter: someone asked to join; "is this your love?"
+    private(set) var pendingJoin: Join?
+    /// Inviter: joiners declined on this code, so their request isn't asked about again.
+    @ObservationIgnored private var declined: Set<String> = []
     private(set) var pairing: Pairing?
     private(set) var error: String?
     private(set) var isWorking = false
@@ -124,14 +130,47 @@ final class OnboardingModel {
                     return
                 }
             }
-            guard let inviteCode else { return }
-            waitTask?.cancel()
-            waitTask = Task {
-                guard let pairing = try? await service.waitForJoin(code: inviteCode) else { return }
-                self.pairing = pairing
-                go(to: .date)
-            }
+            waitForJoinRequest()
         }
+    }
+
+    /// Waits in the background until someone asks to join, then asks "is this your love?".
+    private func waitForJoinRequest() {
+        guard let inviteCode else { return }
+        waitTask?.cancel()
+        waitTask = Task {
+            guard let join = try? await service.waitForJoinRequest(code: inviteCode, declined: declined) else { return }
+            pendingJoin = join
+        }
+    }
+
+    /// "Yes, this is my love."
+    func approveJoin() {
+        guard let join = pendingJoin, let inviteCode else { return }
+        run {
+            self.pairing = try await self.service.approve(join, code: inviteCode)
+            self.pendingJoin = nil
+            self.go(to: .date)
+        }
+    }
+
+    /// "No": they're told gently, and the code keeps waiting for the right person.
+    func declineJoin() {
+        guard let join = pendingJoin, let inviteCode else { return }
+        run {
+            try await self.service.decline(join, code: inviteCode)
+            self.declined.insert(join.joinerId)
+            self.pendingJoin = nil
+            self.waitForJoinRequest()
+        }
+    }
+
+    /// A fresh code, e.g. after the old one expired (24 h) or went to the wrong person.
+    func newCode() {
+        inviteCode = nil
+        pendingJoin = nil
+        declined = []
+        startInvite()
     }
 
     func copyCode() {
@@ -144,16 +183,20 @@ final class OnboardingModel {
     func sendInviteEmail() {
         guard let inviteCode else { return }
         let body = """
-        I'd love for us to share a little space in our notches ♡
+        \(trimmedName) planned a surprise for you, sweetheart ♡
 
-        1. Download OurNotch: \(Config.Pairing.downloadURL)
-        2. Choose "I Have a Code" and type: \(inviteCode)
+        A little place in your Mac's notch where things from both of us arrive.
+
+        1. Download OurNotch (free for you): \(Config.Pairing.downloadURL)
+        2. Open it, choose "I Have an Invite Code" and type: \(inviteCode)
+
+        The code works for 24 hours.
 
         love, \(trimmedName)
         """
         var mail = URLComponents()
         mail.scheme = "mailto"
-        mail.queryItems = [URLQueryItem(name: "subject", value: "come live in my notch ♡"),
+        mail.queryItems = [URLQueryItem(name: "subject", value: "I planned a surprise for you ♡"),
                            URLQueryItem(name: "body", value: body)]
         if let url = mail.url { NSWorkspace.shared.open(url) }
     }
@@ -166,9 +209,20 @@ final class OnboardingModel {
         }
     }
 
+    /// "Yes, that's my love": asks to join, then waits for the inviter's yes.
     func join() {
+        guard let invite = foundInvite else { return }
+        let code = typedCode
         run {
-            self.pairing = try await self.service.join(code: self.typedCode, name: self.trimmedName)
+            try await self.service.requestJoin(code: code, name: self.trimmedName)
+            self.awaitingAnswer = true
+            defer { self.awaitingAnswer = false }
+            do {
+                self.pairing = try await self.service.waitForAnswer(code: code, invite: invite)
+            } catch {
+                self.foundInvite = nil // declined, used or expired: back to typing a code
+                throw error
+            }
             self.go(to: .login)
         }
     }
@@ -271,8 +325,19 @@ struct OnboardingView: View {
                     .onSubmit(continueAction)
             }
         case .invite:
-            Screen(symbol: "envelope", title: "Invite your love",
-                   message: "Share this code — it's just for the two of you.") { inviteCode }
+            if let join = model.pendingJoin {
+                Screen(symbol: "heart.fill", title: "\(join.joinerName) wants to join",
+                       message: "Is this your love? Only say yes if it's them.") {
+                    HStack {
+                        Button("No", action: model.declineJoin).controlSize(.large)
+                        Button("Yes, It's My Love", action: model.approveJoin).buttonStyle(PinkProminentButtonStyle())
+                    }
+                    .disabled(model.isWorking)
+                }
+            } else {
+                Screen(symbol: "envelope", title: "Invite your love",
+                       message: "Share this code — it's just for the two of you, and works for 24 hours.") { inviteCode }
+            }
         case .join:
             joinScreen
         case .date:
@@ -338,6 +403,7 @@ struct OnboardingView: View {
             HStack {
                 Button("Copy Code", action: model.copyCode)
                 Button("Send Email…", action: model.sendInviteEmail)
+                Button("New Code", action: model.newCode)
             }
             HStack(spacing: 6) {
                 ProgressView().controlSize(.small)
@@ -351,8 +417,15 @@ struct OnboardingView: View {
 
     @ViewBuilder private var joinScreen: some View {
         if let invite = model.foundInvite {
-            Screen(symbol: "heart.fill", title: "\(invite.inviterName.lowercased()) ♥ invited you",
-                   message: "Code \(PairingService.normalize(model.typedCode))") {}
+            Screen(symbol: "heart.fill", title: "\(invite.inviterName) invited you",
+                   message: model.awaitingAnswer ? "" : "Is that right? Only continue if it's your love.") {
+                if model.awaitingAnswer {
+                    HStack(spacing: 6) {
+                        ProgressView().controlSize(.small)
+                        Text("Waiting for \(invite.inviterName) to say yes…").font(.system(size: 12)).foregroundStyle(.secondary)
+                    }
+                }
+            }
         } else {
             Screen(symbol: "heart.fill", title: "Enter your code",
                    message: "The 6 letters from your love's invite.") {
@@ -408,7 +481,7 @@ struct OnboardingView: View {
         case .welcome: "Get Started"
         case .icloud: "Try Again"
         case .invite: nil // advances by itself when your love joins
-        case .join: model.foundInvite.map { "Join \($0.inviterName.lowercased())" } ?? "Continue"
+        case .join: model.awaitingAnswer ? nil : (model.foundInvite == nil ? "Continue" : "Yes, Ask to Join")
         case .done: "Done"
         default: "Continue"
         }
@@ -443,7 +516,7 @@ struct OnboardingView: View {
         switch model.step {
         case .licenceKey, .icloud, .name: model.backToStart
         case .invite: { model.go(to: .name) }
-        case .join: model.foundInvite == nil ? { model.go(to: .name) } : model.editCode
+        case .join: model.awaitingAnswer ? nil : (model.foundInvite == nil ? { model.go(to: .name) } : model.editCode)
         case .done: { model.go(to: .login) }
         default: nil // the welcome screen, and steps after pairing that can't be undone
         }

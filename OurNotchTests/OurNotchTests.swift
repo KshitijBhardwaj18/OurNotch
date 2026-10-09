@@ -105,8 +105,11 @@ private struct TwoPartners {
     func paired(togetherSince: Date? = nil) async throws -> (you: AppState, partner: AppState) {
         you.togetherSince = togetherSince
         let code = try await yourService.createInvite(name: "Kshitij")
-        _ = try await partnerService.join(code: code.lowercased(), name: "Nikki")
-        _ = try #require(try await yourService.checkForJoin(code: code))
+        let invite = try await partnerService.lookUpInvite(code: code.lowercased())
+        try await partnerService.requestJoin(code: code.lowercased(), name: "Nikki")
+        let join = try #require(try await yourService.pendingJoins(code: code, declined: []).first)
+        _ = try await yourService.approve(join, code: code)
+        _ = try #require(try await partnerService.checkAnswer(code: code, invite: invite))
         return (try #require(AppState(store: you, mailbox: mailbox, photosRoot: photosRoot)),
                 try #require(AppState(store: partner, mailbox: mailbox, photosRoot: photosRoot)))
     }
@@ -137,31 +140,60 @@ struct PairingTests {
         #expect(PairingService.normalize(" abc-234 ") == "ABC234")
     }
 
-    @Test func joinShowsWhoInvitedAndPairsBothSides() async throws {
+    @Test func bothSidesSayYesBeforePairing() async throws {
         let people = TwoPartners()
         let code = try await people.yourService.createInvite(name: "Kshitij")
-        #expect(try await people.yourService.checkForJoin(code: code) == nil) // still waiting
+        #expect(try await people.yourService.pendingJoins(code: code, declined: []).isEmpty) // still waiting
 
-        let joined = try await people.partnerService.join(code: code, name: "Nikki")
-        #expect(joined.partnerName == "Kshitij")
-        #expect(joined.role == .joiner)
+        let invite = try await people.partnerService.lookUpInvite(code: code)
+        #expect(invite.inviterName == "Kshitij") // "Kshitij invited you, is that right?"
+        try await people.partnerService.requestJoin(code: code, name: "Nikki")
+        #expect(try await people.partnerService.checkAnswer(code: code, invite: invite) == nil)
+        #expect(people.you.pairing == nil && people.partner.pairing == nil) // nothing until the inviter says yes
 
-        let inviter = try #require(try await people.yourService.checkForJoin(code: code))
-        #expect(inviter.partnerName == "Nikki")
-        #expect(inviter.partnerId == people.partner.myId)
+        let join = try #require(try await people.yourService.pendingJoins(code: code, declined: []).first)
+        #expect(join.joinerName == "Nikki") // "Nikki wants to join, is this your love?"
+        let inviter = try await people.yourService.approve(join, code: code)
+        #expect(inviter.partnerId == people.partner.myId && inviter.role == .inviter)
+
+        let joined = try #require(try await people.partnerService.checkAnswer(code: code, invite: invite))
+        #expect(joined.partnerName == "Kshitij" && joined.role == .joiner)
     }
 
-    @Test func madeUpAndUsedCodesAreRejected() async throws {
+    @Test func aDeclinedStrangerDoesntUseUpTheCode() async throws {
+        let people = TwoPartners()
+        let code = try await people.yourService.createInvite(name: "Kshitij")
+        let stranger = PairingService(mailbox: people.mailbox, store: LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!))
+        let invite = try await stranger.lookUpInvite(code: code)
+        try await stranger.requestJoin(code: code, name: "Stranger")
+        try await people.partnerService.requestJoin(code: code, name: "Nikki")
+
+        let first = try #require(try await people.yourService.pendingJoins(code: code, declined: []).first)
+        #expect(first.joinerName == "Stranger")
+        try await people.yourService.decline(first, code: code)
+        await #expect(throws: PairingError.declined) { try await stranger.checkAnswer(code: code, invite: invite) }
+
+        let next = try #require(try await people.yourService.pendingJoins(code: code, declined: [first.joinerId]).first)
+        #expect(next.joinerName == "Nikki") // the code still works for the right person
+        _ = try await people.yourService.approve(next, code: code)
+        #expect(try await people.partnerService.checkAnswer(code: code, invite: invite) != nil)
+
+        let late = PairingService(mailbox: people.mailbox, store: LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!))
+        try await late.requestJoin(code: code, name: "Late")
+        await #expect(throws: PairingError.usedCode) { try await late.checkAnswer(code: code, invite: invite) }
+    }
+
+    @Test func madeUpAndExpiredCodesAreRejected() async throws {
         let people = TwoPartners()
         await #expect(throws: PairingError.invalidCode) {
-            try await people.partnerService.join(code: "ZZZZZZ", name: "Nikki")
+            try await people.partnerService.lookUpInvite(code: "ZZZZZZ")
         }
         let code = try await people.yourService.createInvite(name: "Kshitij")
-        _ = try await people.partnerService.join(code: code, name: "Nikki")
-        let stranger = PairingService(mailbox: people.mailbox, store: LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!))
-        await #expect(throws: PairingError.usedCode) {
-            try await stranger.join(code: code, name: "Stranger")
+        let tomorrow = Date.now.addingTimeInterval(Config.Pairing.codeLifetime + 60)
+        await #expect(throws: PairingError.expiredCode) {
+            try await people.partnerService.lookUpInvite(code: code, now: tomorrow)
         }
+        _ = try await people.partnerService.lookUpInvite(code: code, now: .now.addingTimeInterval(23 * 3600)) // still fine
     }
 }
 
