@@ -44,14 +44,14 @@ final class OnboardingModel {
         let start: Step = store.licence?.status == .active ? .welcome : .gate
         self.start = start
         step = start
-        name = store.myName ?? ""
+        name = store.myName ?? String(localized: "")
     }
 
     /// The first screen: the gate, or welcome for a Mac that already has a licence.
     let start: Step
 
     var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
-    var partnerName: String { (pairing?.partnerName ?? foundInvite?.inviterName ?? "your love").lowercased() }
+    var partnerName: String { (pairing?.partnerName ?? foundInvite?.inviterName ?? String(localized: "your love")).lowercased() }
 
     /// The steps on the current path, for the page dots.
     var path: [Step] {
@@ -118,7 +118,7 @@ final class OnboardingModel {
     private func startInvite() {
         // Only the buyer invites; a partner is covered through the pairing (`spec-m2.md > Partner Coverage`).
         guard store.licence?.isBuyer == true, store.licence?.status == .active else {
-            error = "Only the person who bought OurNotch can invite. Go back and choose I Have an Invite Code."
+            error = String(localized: "Only the person who bought OurNotch can invite. Go back and choose I Have an Invite Code.")
             return
         }
         Task {
@@ -126,7 +126,7 @@ final class OnboardingModel {
                 do {
                     inviteCode = try await service.createInvite(name: trimmedName)
                 } catch {
-                    self.error = "Couldn't create an invite. Try again."
+                    self.error = String(localized: "Couldn't create an invite. Try again.")
                     return
                 }
             }
@@ -182,7 +182,7 @@ final class OnboardingModel {
     /// Opens the user's own Mail app with a pre-written invite. No email server needed.
     func sendInviteEmail() {
         guard let inviteCode else { return }
-        let body = """
+        let body = String(localized: """
         \(trimmedName) planned a surprise for you, sweetheart ♡
 
         A little place in your Mac's notch where things from both of us arrive.
@@ -193,10 +193,10 @@ final class OnboardingModel {
         The code works for 24 hours.
 
         love, \(trimmedName)
-        """
+        """)
         var mail = URLComponents()
         mail.scheme = "mailto"
-        mail.queryItems = [URLQueryItem(name: "subject", value: "I planned a surprise for you ♡"),
+        mail.queryItems = [URLQueryItem(name: "subject", value: String(localized: "I planned a surprise for you ♡")),
                            URLQueryItem(name: "body", value: body)]
         if let url = mail.url { NSWorkspace.shared.open(url) }
     }
@@ -244,7 +244,7 @@ final class OnboardingModel {
             } catch let licenceError as LicenceError {
                 error = licenceError.errorDescription
             } catch {
-                self.error = "Something went wrong. Try again."
+                self.error = String(localized: "Something went wrong. Try again.")
             }
         }
     }
@@ -261,7 +261,7 @@ final class OnboardingModel {
             try LoginItem.set(enabled)
             error = nil
         } catch {
-            self.error = "Couldn't change this right now. You can turn it on later in Settings."
+            self.error = String(localized: "Couldn't change this right now. You can turn it on later in Settings.")
         }
         opensAtLogin = LoginItem.isEnabled
     }
@@ -341,7 +341,7 @@ struct OnboardingView: View {
         case .join:
             joinScreen
         case .date:
-            Screen(symbol: "calendar", title: "When did you get together?", message: "") {
+            Screen(symbol: "calendar", title: "When did you get together?") {
                 DatePicker("Together since", selection: $model.togetherSince, in: ...Date.now, displayedComponents: .date)
                     .datePickerStyle(.stepperField)
                     .labelsHidden()
@@ -379,7 +379,8 @@ struct OnboardingView: View {
                     .buttonStyle(PinkProminentButtonStyle())
                 Text("One purchase for the two of you · local price shown at checkout")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
-                HStack(spacing: 18) {
+                // Stacked, so they fit in every language ("Ich habe einen Einladungscode").
+                VStack(spacing: 6) {
                     Button("I Have a Licence Key") { model.go(to: .licenceKey) }
                     Button("I Have an Invite Code", action: model.joinWithCode)
                 }
@@ -418,7 +419,7 @@ struct OnboardingView: View {
     @ViewBuilder private var joinScreen: some View {
         if let invite = model.foundInvite {
             Screen(symbol: "heart.fill", title: "\(invite.inviterName) invited you",
-                   message: model.awaitingAnswer ? "" : "Is that right? Only continue if it's your love.") {
+                   message: model.awaitingAnswer ? nil : "Is that right? Only continue if it's your love.") {
                 if model.awaitingAnswer {
                     HStack(spacing: 6) {
                         ProgressView().controlSize(.small)
@@ -474,7 +475,7 @@ struct OnboardingView: View {
         }
     }
 
-    private var continueTitle: String? {
+    private var continueTitle: LocalizedStringKey? {
         switch model.step {
         case .gate: nil // the gate's own buttons choose the path
         case .licenceKey: "Activate"
@@ -527,8 +528,8 @@ struct OnboardingView: View {
 struct Screen<Content: View>: View {
     var icon: AnyView? = nil
     var symbol: String? = nil
-    let title: String
-    let message: String
+    let title: LocalizedStringKey
+    var message: LocalizedStringKey? = nil
     @ViewBuilder let content: Content
 
     var body: some View {
@@ -542,7 +543,7 @@ struct Screen<Content: View>: View {
                 .font(.system(size: 22, weight: .bold))
                 .tracking(-0.3)
                 .multilineTextAlignment(.center)
-            if !message.isEmpty {
+            if let message {
                 Text(message)
                     .font(.system(size: 13))
                     .foregroundStyle(.secondary)

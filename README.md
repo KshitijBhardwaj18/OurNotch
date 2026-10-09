@@ -30,6 +30,8 @@ OURNOTCH_PROFILE=gate1 build/DerivedData/Build/Products/Debug/OurNotch.app/Conte
 
 Get a test key by buying with card 4242 4242 4242 4242 at the gate's *Get OurNotch*, or ask the agent to create one through Dodo's API.
 
+**Languages:** English, French and German live in `OurNotch/Localizable.xcstrings`. Building in Xcode keeps it in step with the code; after a command-line build, run `python3 scripts/sync-strings.py --check` to add new strings and list any missing a translation. Settings → Language overrides the Mac's language for OurNotch only (it restarts). To see a language without switching: `xcodebuild test -testLanguage de`, or run with `-AppleLanguages "(de)"`.
+
 Tests: `xcodebuild -project OurNotch.xcodeproj -scheme OurNotch -derivedDataPath build/DerivedData test`
 
 ## Project layout

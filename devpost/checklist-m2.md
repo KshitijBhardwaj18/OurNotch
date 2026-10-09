@@ -82,7 +82,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
   Learner check: Walk the same screens again and say what still feels wrong.
   Commit: `Polish onboarding and notch from the walk-through`
 
-- [ ] **8. OurNotch speaks French and German**
+- [x] **8. OurNotch speaks French and German**
   Becomes usable: On a Mac set to French, every screen is in French; Settings → *Language* (System / English / Français / Deutsch) switches OurNotch alone and restarts it. Nothing clips or wraps in German.
   Why now: After the UI/UX pass so translations cover final text.
   PRD ref: `prd-m2.md > Languages`
@@ -121,6 +121,7 @@ Milestone 1's checklist (`checklist.md`) stays as the record of Milestone 1. Its
 
 - [ ] **Learner action before pairing through CloudKit:** in CloudKit Console (Development), add a **Queryable** index on `Join.code` — without it the buyer's Mac can't see join requests. (Production gets it in slice 9.)
 - [ ] **Learner action, admin page with real data:** put your Dodo **test-mode** API key in `website/.env.local` as `DODO_API_KEY=…` (ignored by git), restart the dev server, open http://localhost:3000/admin, and confirm the ₹200 test purchase and its key show. Revoke / Restore / Free slot were verified against a stand-in with Dodo's real response shapes, not yet against Dodo with your key.
+- [ ] **Native-speaker check** of the French and German (`OurNotch/Localizable.xcstrings`; drafted by the agent with informal *tu* / *du*) before launch — who checks them is still an open question.
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
@@ -165,3 +166,9 @@ Activity mode:
 - Slice 6 verified by tests (hide timing incl. "until tomorrow" = next 6 am; two emojis and a note sent while hidden don't play, then play once together on show; the partner's notch shows "away" and clears; hidden survives a restart and ends if its time passed while closed) and by rendering the Settings row and the closed notch's "away". Showing and hiding the real notch window and the ♡ menu wasn't driven live (the learner was on a call); that's in the learner check.
 - Held emojis are marked seen when they arrive, so the sender sees *Delivered* while their love is away; the "away" label tells them why nothing reacted yet. Holding the delivery back too would need a second "seen" counter.
 - "away" is a small text label in the mood slot, re-checked each minute so it clears on time even without a new sync.
+- Slice 8 built before slice 7 (order revised): slice 7 waits on the learner's walk-through, and the learner asked to build everything that doesn't need them. Text the polish pass adds or changes goes straight into the catalog with French and German, and `scripts/sync-strings.py --check` fails until it's translated.
+- `xcodebuild` doesn't update the String Catalog (only building in the Xcode app does), so `scripts/sync-strings.py` merges the compiler's extracted strings into `Localizable.xcstrings` and lists missing translations. The Debug-only Partner Simulator stays English.
+- Strings shown through plain `String` values (tab names, labels, errors, moods, "2m ago", the invite email) now use `String(localized:)`, and onboarding's `Screen` takes `LocalizedStringKey` — SwiftUI shows a `String` verbatim, so these would otherwise have stayed English.
+- Fit verified by rendering every onboarding screen, the licence window, each notch tab, Settings and the closed header in German and French (`xcodebuild test -testLanguage`), instead of Xcode's double-length pseudo-language. Fixes found: German tab "Stimmung" → "Laune"; "Wochenenden" / "Week-ends" shrink to fit their tile; the Note tab's word counter wasn't localized; French "Envoyer un e-mail…" → "E-mail…"; German gate link shortened, and the gate's two links now stack in every language.
+- French and German use the informal *tu* / *du* (a playful app for couples) and Apple's words for the notch ("encoche", "Notch"); moods are gender-neutral words ("Amour", "Joie", "Pas dispo") because French adjectives would need a gender.
+- Settings → Language writes `AppleLanguages` for OurNotch only and relaunches it; the live relaunch wasn't driven (the learner was on a call) and is in the learner check.

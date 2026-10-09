@@ -5,11 +5,11 @@ enum NotchTab: CaseIterable {
 
     var label: String {
         switch self {
-        case .home: "Home"
-        case .note: "Note"
-        case .emoji: "Emoji"
-        case .mood: "Mood"
-        case .photo: "Photo"
+        case .home: String(localized: "Home")
+        case .note: String(localized: "Note")
+        case .emoji: String(localized: "Emoji")
+        case .mood: String(localized: "Mood")
+        case .photo: String(localized: "Photo")
         }
     }
 
@@ -133,11 +133,13 @@ extension View {
 /// "now", "2m ago", "1h ago", "3d ago" — or "2m", "1h", "3d" without the suffix.
 func shortAgo(_ date: Date, now: Date = .now, suffix: Bool = true) -> String {
     let seconds = max(0, Int(now.timeIntervalSince(date)))
-    let ago = suffix ? " ago" : ""
-    switch seconds {
-    case ..<60: return "now"
-    case ..<3600: return "\(seconds / 60)m\(ago)"
-    case ..<86_400: return "\(seconds / 3600)h\(ago)"
-    default: return "\(seconds / 86_400)d\(ago)"
+    switch (seconds, suffix) {
+    case (..<60, _): return String(localized: "now")
+    case (..<3600, true): return String(localized: "\(seconds / 60)m ago")
+    case (..<3600, false): return String(localized: "\(seconds / 60)m")
+    case (..<86_400, true): return String(localized: "\(seconds / 3600)h ago")
+    case (..<86_400, false): return String(localized: "\(seconds / 3600)h")
+    case (_, true): return String(localized: "\(seconds / 86_400)d ago")
+    case (_, false): return String(localized: "\(seconds / 86_400)d")
     }
 }

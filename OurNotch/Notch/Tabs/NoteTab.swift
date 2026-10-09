@@ -108,8 +108,8 @@ struct NoteTab: View {
             }
             if case .invalid(let hint) = verdict { return (hint, .notchPink) }
             let words = MessageRules.wordCount(draft)
-            return words > 0 ? ("\(words) of \(Config.Message.maxWords) words", .tertiaryLabel)
-                             : ("Up to \(Config.Message.maxWords) words", .tertiaryLabel)
+            return words > 0 ? (String(localized: "\(words) of \(Config.Message.maxWords) words"), .tertiaryLabel)
+                             : (String(localized: "Up to \(Config.Message.maxWords) words"), .tertiaryLabel)
         }()
         return Text(text)
             .font(.system(size: 11.5, weight: .medium).monospacedDigit())

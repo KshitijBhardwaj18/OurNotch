@@ -9,8 +9,8 @@ enum Config {
     static let emojis = ["❤️", "🥰", "😘", "🫶", "🤗", "🌹"]
     /// Moods for the Mood tab: the emoji travels; the label explains it.
     static let moods: [(emoji: String, label: String)] = [
-        ("🥰", "In love"), ("😊", "Happy"), ("🥺", "Missing you"), ("🎉", "Excited"), ("☕️", "On a break"), ("🍕", "Hungry"),
-        ("💻", "Busy"), ("🎧", "Focused"), ("🏃", "Out"), ("😴", "Sleepy"), ("😔", "Low"), ("🤒", "Unwell"),
+        ("🥰", String(localized: "In love")), ("😊", String(localized: "Happy")), ("🥺", String(localized: "Missing you")), ("🎉", String(localized: "Excited")), ("☕️", String(localized: "On a break")), ("🍕", String(localized: "Hungry")),
+        ("💻", String(localized: "Busy")), ("🎧", String(localized: "Focused")), ("🏃", String(localized: "Out")), ("😴", String(localized: "Sleepy")), ("😔", String(localized: "Low")), ("🤒", String(localized: "Unwell")),
     ]
 
     enum Cloud {

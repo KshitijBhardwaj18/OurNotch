@@ -6,9 +6,9 @@ enum PhotoStyle: String, CaseIterable {
 
     var label: String {
         switch self {
-        case .soft: "Soft"
-        case .mono: "Mono"
-        case .original: "Original"
+        case .soft: String(localized: "Soft")
+        case .mono: String(localized: "Mono")
+        case .original: String(localized: "Original")
         }
     }
 

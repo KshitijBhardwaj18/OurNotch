@@ -10,6 +10,42 @@ enum LoginItem {
     }
 }
 
+/// OurNotch's own language: the Mac's, or one chosen in Settings. macOS picks an app's language at launch,
+/// so choosing one restarts OurNotch (`spec-m2.md > Languages`).
+enum AppLanguage: String, CaseIterable {
+    case system, en, fr, de
+
+    /// Each language in its own words, so it's findable whatever the current language.
+    var label: String {
+        switch self {
+        case .system: String(localized: "System")
+        case .en: "English"
+        case .fr: "Français"
+        case .de: "Deutsch"
+        }
+    }
+
+    /// Only an override set for OurNotch itself counts; the Mac's own list lives in the global domain.
+    static var current: AppLanguage {
+        let mine = Bundle.main.bundleIdentifier.flatMap { UserDefaults.standard.persistentDomain(forName: $0) }
+        return (mine?["AppleLanguages"] as? [String])?.first.flatMap(AppLanguage.init(rawValue:)) ?? .system
+    }
+
+    func applyAndRestart() {
+        guard self != Self.current else { return }
+        if self == .system {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        } else {
+            UserDefaults.standard.set([rawValue], forKey: "AppleLanguages")
+        }
+        let config = NSWorkspace.OpenConfiguration()
+        config.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: config) { _, _ in
+            DispatchQueue.main.async { NSApp.terminate(nil) }
+        }
+    }
+}
+
 /// Settings live inside the notch, in place of the current tab; the gear opens and closes them.
 struct SettingsPanel: View {
     let state: AppState
@@ -26,7 +62,7 @@ struct SettingsPanel: View {
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Open at Login").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
-                        Text(error ?? "Your notch will be there every time you open your Mac.")
+                        Text(error ?? String(localized: "Your notch will be there every time you open your Mac."))
                             .font(.system(size: 11.5))
                             .foregroundStyle(error == nil ? Color.secondaryLabel : .notchPink)
                     }
@@ -76,6 +112,21 @@ struct SettingsPanel: View {
                 .padding(12)
                 .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
 
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Language").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
+                        Text("OurNotch restarts to switch.")
+                            .font(.system(size: 11.5))
+                            .foregroundStyle(Color.secondaryLabel)
+                    }
+                    Spacer()
+                    SmallSegmented(options: AppLanguage.allCases,
+                                   selection: Binding(get: { AppLanguage.current }, set: { $0.applyAndRestart() }),
+                                   label: \.label)
+                }
+                .padding(12)
+                .background(Color.notchField, in: RoundedRectangle(cornerRadius: 10))
+
                 if state.licence?.isBuyer == true {
                     LicenceRow(state: state)
                 }
@@ -90,7 +141,7 @@ struct SettingsPanel: View {
             try LoginItem.set(enabled)
             error = nil
         } catch {
-            self.error = "Couldn't change this right now. Try again later."
+            self.error = String(localized: "Couldn't change this right now. Try again later.")
         }
         opensAtLogin = LoginItem.isEnabled
     }
@@ -107,7 +158,7 @@ private struct LicenceRow: View {
         HStack(spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Licence").font(.system(size: 13, weight: .medium)).foregroundStyle(.white)
-                Text(error ?? "Active · covers you both")
+                Text(error ?? String(localized: "Active · covers you both"))
                     .font(.system(size: 11.5))
                     .foregroundStyle(error == nil ? Color.secondaryLabel : .notchPink)
                     .lineLimit(1)
@@ -141,7 +192,7 @@ private struct LicenceRow: View {
             do {
                 try await state.removeLicence()
             } catch {
-                self.error = (error as? LicenceError)?.errorDescription ?? "Couldn't remove it right now."
+                self.error = (error as? LicenceError)?.errorDescription ?? String(localized: "Couldn't remove it right now.")
             }
         }
     }

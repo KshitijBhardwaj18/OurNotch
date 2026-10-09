@@ -36,10 +36,10 @@ enum PairingError: LocalizedError, Equatable {
 
     var errorDescription: String? {
         switch self {
-        case .invalidCode: "that code doesn't look right ♡ check it and try again"
-        case .usedCode: "that code was already used ♡ ask your love for a new one"
-        case .expiredCode: "this code has expired ♡ ask your love for a new one"
-        case .declined: "that didn't work ♡ ask your love for a new code"
+        case .invalidCode: String(localized: "that code doesn't look right ♡ check it and try again")
+        case .usedCode: String(localized: "that code was already used ♡ ask your love for a new one")
+        case .expiredCode: String(localized: "this code has expired ♡ ask your love for a new one")
+        case .declined: String(localized: "that didn't work ♡ ask your love for a new code")
         }
     }
 }

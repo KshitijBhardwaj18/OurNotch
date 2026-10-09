@@ -6,9 +6,9 @@ enum Hide: CaseIterable {
 
     var label: String {
         switch self {
-        case .hour: "1 Hour"
-        case .untilTomorrow: "Until Tomorrow"
-        case .untilBack: "Until I'm Back"
+        case .hour: String(localized: "1 Hour")
+        case .untilTomorrow: String(localized: "Until Tomorrow")
+        case .untilBack: String(localized: "Until I'm Back")
         }
     }
 

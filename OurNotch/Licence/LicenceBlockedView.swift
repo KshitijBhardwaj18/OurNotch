@@ -35,7 +35,7 @@ final class LicenceBlockedModel {
         var mail = URLComponents()
         mail.scheme = "mailto"
         mail.path = Config.Licence.supportEmail
-        mail.queryItems = [URLQueryItem(name: "subject", value: "My OurNotch licence")]
+        mail.queryItems = [URLQueryItem(name: "subject", value: String(localized: "My OurNotch licence"))]
         if let url = mail.url { NSWorkspace.shared.open(url) }
     }
 
@@ -47,13 +47,13 @@ final class LicenceBlockedModel {
             do {
                 try await work()
             } catch {
-                self.error = (error as? LicenceError)?.errorDescription ?? "Something went wrong. Try again."
+                self.error = (error as? LicenceError)?.errorDescription ?? String(localized: "Something went wrong. Try again.")
                 return
             }
             if store.licence?.isLocked == false {
                 onUnlocked()
             } else if self.error == nil {
-                self.error = "Still not active. If you think this is a mistake, write to us."
+                self.error = String(localized: "Still not active. If you think this is a mistake, write to us.")
             }
         }
     }
