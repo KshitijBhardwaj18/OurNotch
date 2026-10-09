@@ -33,7 +33,7 @@ const en = {
     p: "It's closed most of the day, and still shows you a little bit of them. Hover over it to send something back.",
   },
   bento: {
-    noteTitle: 'Ten words or fewer.', noteBody: 'A short note scrolls across their notch three times, or until they open it.',
+    noteTitle: 'Little notes, big feelings.', noteBody: 'Say something sweet. It scrolls across their notch three times, or until they open it.',
     ticker: "lunch at 1? i'll bring dumplings 🥟",
     heartTitle: 'One tap, many hearts.', heartBody: 'Tap an emoji and it pours out of their notch, or floats up across their whole screen.',
     moodTitle: 'How you are, at a glance.', moodBody: 'Pick one of twelve moods. It sits next to your face in their notch.', moodsLabel: 'Moods',
@@ -192,7 +192,7 @@ const fr: Copy = {
     p: 'Elle reste fermée presque toute la journée, et te montre quand même un peu de ta personne. Survole-la pour répondre.',
   },
   bento: {
-    noteTitle: 'Dix mots ou moins.', noteBody: 'Un petit mot défile trois fois dans son encoche, ou jusqu’à ce qu’elle l’ouvre.',
+    noteTitle: 'Petits mots, grands sentiments.', noteBody: 'Dis-lui un mot doux. Il défile trois fois dans son encoche, ou jusqu’à ce qu’elle l’ouvre.',
     ticker: 'déj à 13 h ? j’apporte des raviolis 🥟',
     heartTitle: 'Un clic, plein de cœurs.', heartBody: 'Choisis un emoji : il coule de son encoche, ou s’envole sur tout son écran.',
     moodTitle: 'Comment tu vas, en un coup d’œil.', moodBody: 'Choisis une humeur parmi douze. Elle s’affiche à côté de ton visage dans son encoche.', moodsLabel: 'Humeurs',
@@ -349,7 +349,7 @@ const de: Copy = {
     p: 'Die meiste Zeit ist sie zu und zeigt dir trotzdem ein bisschen von deinem Menschen. Fahr darüber, um etwas zurückzuschicken.',
   },
   bento: {
-    noteTitle: 'Zehn Wörter oder weniger.', noteBody: 'Eine kurze Notiz läuft dreimal durch die Notch – oder bis sie geöffnet wird.',
+    noteTitle: 'Kleine Notizen, große Gefühle.', noteBody: 'Schreib etwas Süßes. Es läuft dreimal durch die Notch, oder bis es geöffnet wird.',
     ticker: 'mittag um 1? ich bring dumplings mit 🥟',
     heartTitle: 'Ein Klick, viele Herzen.', heartBody: 'Wähl ein Emoji: Es fließt aus der Notch oder schwebt über den ganzen Bildschirm.',
     moodTitle: 'Wie’s dir geht, auf einen Blick.', moodBody: 'Wähl eine von zwölf Launen. Sie erscheint neben deinem Gesicht in der Notch.', moodsLabel: 'Launen',

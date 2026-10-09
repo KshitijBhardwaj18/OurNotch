@@ -40,7 +40,7 @@ const CARDS: Record<string, () => React.ReactNode> = {
     </Frame>
   ),
   note: () => (
-    <Frame size="feed" bg="y-butter" kicker="Notes" title={<>Ten words or fewer.<br /><em>Straight to their notch.</em></>}>
+    <Frame size="feed" bg="y-butter" kicker="Notes" title={<>Little notes,<br /><em>big feelings.</em></>}>
       <Notch zoom={3.4} mood="🥰" tall ticker={t.bento.ticker} />
       <p className="s-body">{t.bento.noteBody}</p>
       <div className="s-pals s-one"><Char kind="pip" className="is-happy" /></div>
