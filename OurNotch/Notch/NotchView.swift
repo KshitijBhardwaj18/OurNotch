@@ -61,6 +61,7 @@ struct NotchView: View {
         .clipShape(NotchShape(topRadius: radii.top, bottomRadius: radii.bottom))
         .compositingGroup()
         .animation(Config.Notch.spring, value: isOpen)
+        .animation(Config.Notch.spring, value: size)
         .animation(Config.Notch.spring, value: state.visibleBanner?.id)
         .animation(Config.Notch.spring, value: state.closedSideWidth)
         .contentShape(Rectangle())
@@ -84,7 +85,10 @@ struct NotchView: View {
     private var closedHeight: CGFloat { geometry.notchSize.height + Config.Notch.closedExtraHeight }
 
     private var size: CGSize {
-        if isOpen { return Config.Notch.openSize }
+        if isOpen {
+            let extra = tab == .note && !showsSettings ? Config.Notch.noteExtraHeight : 0
+            return CGSize(width: Config.Notch.openSize.width, height: Config.Notch.openSize.height + extra)
+        }
         let width = geometry.notchSize.width + state.closedSideWidth * 2 + Self.closedRadii.top * 2
         let bannerRoom = state.visibleBanner == nil ? 0 : Config.Message.bannerHeight
         return CGSize(width: width, height: closedHeight + bannerRoom)

@@ -119,6 +119,8 @@ enum Config {
         /// so the black body is this much narrower on each side.
         static let openEarRadius: CGFloat = 14
         static let openSize = CGSize(width: contentSize.width + (margin + openEarRadius) * 2, height: 296)
+        /// The Note tab grows the open notch this much taller, so the conversation has room.
+        static let noteExtraHeight: CGFloat = 90
         /// Width of the slots on each side of the camera in the closed notch: avatar + mood on the left, ♥ on the right.
         static let closedSideWidth: CGFloat = 60
         /// The same slots while your love has a mood, so its word fits next to the emoji ("🥺 Missing you").

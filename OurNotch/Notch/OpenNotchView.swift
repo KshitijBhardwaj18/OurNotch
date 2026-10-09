@@ -22,7 +22,8 @@ struct OpenNotchView: View {
                     }
                 }
             }
-            .frame(width: Config.Notch.contentSize.width, height: Config.Notch.contentSize.height)
+            .frame(width: Config.Notch.contentSize.width,
+                   height: Config.Notch.contentSize.height + (tab == .note && !showsSettings ? Config.Notch.noteExtraHeight : 0))
 
             Spacer(minLength: 0)
             // Picking a tab also leaves Settings.

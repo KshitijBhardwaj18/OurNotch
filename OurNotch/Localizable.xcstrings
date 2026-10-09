@@ -1294,6 +1294,22 @@
         }
       }
     },
+    "No notes yet. Say something sweet to %@ ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas encore de mots. Dis quelque chose de doux à %@ ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine Notizen. Schreib %@ etwas Süßes ♡"
+          }
+        }
+      }
+    },
     "No photo from %@ yet" : {
       "localizations" : {
         "fr" : {
@@ -1747,6 +1763,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sekunden"
+          }
+        }
+      }
+    },
+    "Send" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Senden"
           }
         }
       }
@@ -2691,6 +2723,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "jetzt"
+          }
+        }
+      }
+    },
+    "our little notes ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nos petits mots ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unsere kleinen Notizen ♡"
           }
         }
       }
