@@ -1,7 +1,8 @@
 import SwiftUI
 
 /// The left half of onboarding: a slow carousel of what OurNotch does, starring Pip and Bun from the
-/// website. Each slide is a little scene on a Mac screen card, the notch doing what the slide is about. It moves on every 8 s; a swipe picks a slide and restarts the clock.
+/// website. Each slide is a little scene on a Mac screen card, the notch doing what the slide is about. It moves on
+/// after the slide's duration (8 s, Whispers 12 s); a swipe picks a slide and restarts the clock.
 /// The onboarding window owns `index` so the steps side can take on the slide's colour.
 struct OnboardingStory: View {
     @Binding var index: Int
@@ -21,7 +22,7 @@ struct OnboardingStory: View {
             if drag.translation.width < -30 { show(index + 1) } else if drag.translation.width > 30 { show(index - 1) }
         })
         .task(id: index) {
-            try? await Task.sleep(for: .seconds(8))
+            try? await Task.sleep(for: .seconds(Slide.allCases[index].duration))
             guard !Task.isCancelled else { return }
             show(index + 1)
         }
@@ -92,6 +93,9 @@ struct OnboardingStory: View {
             }
         }
 
+        /// How long the slide stays: Whispers plays its whole little story once.
+        var duration: Double { self == .whispers ? 12 : 8 }
+
         var color: Color {
             switch self {
             case .love: Color(hex: 0xFFD3DC)
@@ -144,7 +148,7 @@ private struct Scene: View {
     /// Bun lights up when love arrives; in Whispers, once the conversation opens.
     private var bunMood: String {
         switch slide {
-        case .whispers: whisperP > 0.7 && whisperP < 0.95 ? "love" : "happy"
+        case .whispers: local > 8.9 ? "love" : "happy"
         case .together: "happy"
         default: "love"
         }
@@ -209,14 +213,11 @@ private struct Scene: View {
 
     // MARK: Whispers: one arrives scrolling under the notch, then the same notch opens on your conversation.
 
-    /// One loop of the Whispers scene, 0 to 1.
-    private var whisperP: Double { (local / 7.6).truncatingRemainder(dividingBy: 1) }
-
     @ViewBuilder private func whispers(width w: CGFloat) -> some View {
-        let p = whisperP
-        let back = smooth(p, 0.93, 1)                          // eases closed again before the loop
-        let grow = smooth(p, 0.06, 0.16) * (1 - back)          // the banner row slides open
-        let open = smooth(p, 0.58, 0.68) * (1 - back)          // the notch morphs open
+        // Plays once and rests on the open conversation, so the slide leaves from a calm state.
+        let s = local
+        let grow = smooth(s, 0.6, 1.2)                         // the banner row eases open
+        let open = smooth(s, 7.9, 8.6)                         // then the notch morphs open
         let width = 206 + 30 * open
         let height = (28 + 22 * grow) * (1 - open) + 104 * open
         UnevenRoundedRectangle(bottomLeadingRadius: 13 + 5 * open, bottomTrailingRadius: 13 + 5 * open)
@@ -226,12 +227,12 @@ private struct Scene: View {
                 ZStack(alignment: .top) {
                     VStack(spacing: 0) {
                         closedRow
-                        banner(progress: (p - 0.16) / 0.42)
+                        banner(progress: (s - 1.2) / 6.6)          // ~60 pt/s, close to the real banner
                             .frame(width: width - 26, height: 18)
                             .opacity(grow)
                     }
                     .opacity(1 - open)
-                    conversation(progress: (p - 0.68) / 0.25).opacity(open)
+                    conversation(progress: (s - 8.7) / 2.2).opacity(open)
                 }
             }
             .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 13 + 5 * open, bottomTrailingRadius: 13 + 5 * open))
