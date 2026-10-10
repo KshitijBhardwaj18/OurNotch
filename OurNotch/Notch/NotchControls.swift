@@ -33,6 +33,8 @@ struct NotchTabBar: View {
     @Binding var selection: NotchTab
     /// True while Settings covers the tabs, so no tab looks selected.
     var dimmed = false
+    /// Tabs with something new: a small pink dot on the icon.
+    var badges: Set<NotchTab> = []
     @State private var hovered: NotchTab?
     @Namespace private var pill
 
@@ -46,6 +48,15 @@ struct NotchTabBar: View {
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(selected ? Color.notchPink : hovered == tab ? .white : .secondaryLabel)
                             .frame(height: 17)
+                            .overlay(alignment: .topTrailing) {
+                                if badges.contains(tab) && !selected {
+                                    Circle().fill(Color.notchPink)
+                                        .frame(width: 7, height: 7)
+                                        .overlay(Circle().strokeBorder(.black, lineWidth: 1.5))
+                                        .offset(x: 6, y: -2)
+                                        .transition(.scale.combined(with: .opacity))
+                                }
+                            }
                         Text(tab.label)
                             .font(.system(size: 10, weight: selected ? .semibold : .medium, design: .rounded))
                             .foregroundStyle(selected ? Color.white : hovered == tab ? .white : .secondaryLabel)
@@ -66,6 +77,7 @@ struct NotchTabBar: View {
                 // The icon-only tabs still have a name (not the symbol's, like "Chart Column").
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(tab.label)
+                .accessibilityValue(badges.contains(tab) ? String(localized: "new") : "")
                 .accessibilityAddTraits(.isButton)
                 .onHover { hovered = $0 ? tab : (hovered == tab ? nil : hovered) }
             }
@@ -75,6 +87,7 @@ struct NotchTabBar: View {
         .overlay(RoundedRectangle(cornerRadius: 15, style: .continuous).strokeBorder(.white.opacity(0.06), lineWidth: 0.5))
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selection)
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: dimmed)
+        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: badges)
         .animation(.easeOut(duration: 0.12), value: hovered)
     }
 }

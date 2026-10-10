@@ -28,10 +28,12 @@ struct OpenNotchView: View {
             Spacer(minLength: 0)
             // Picking a tab also leaves Settings.
             NotchTabBar(selection: Binding(get: { tab }, set: { tab = $0; showsSettings = false }),
-                        dimmed: showsSettings)
+                        dimmed: showsSettings, badges: state.unseen)
         }
         .padding(.top, 8)
         .padding(.bottom, 14)
         .overlayPreferenceValue(HintKey.self) { HintLayer(hint: $0) } // on top of every card and the tab bar
+        .onChange(of: showsSettings ? nil : tab, initial: true) { _, shown in state.show(tab: shown) }
+        .onDisappear { state.show(tab: nil) }
     }
 }

@@ -139,7 +139,7 @@ enum Config {
         static let closedInset: CGFloat = 10
         /// How far the closed shape reaches below the menu bar, so it fully covers the camera housing.
         static let closedExtraHeight: CGFloat = 2
-        /// Used on Macs without a notch.
+        /// Used on Macs without a notch. Its height is the menu bar's; this one only while the menu bar hides itself.
         static let pillSize = CGSize(width: 180, height: 32)
         /// Extra transparent room around the open shape, so springs can overshoot without clipping.
         static let windowPadding: CGFloat = 20
@@ -149,7 +149,10 @@ enum Config {
         static let hoverOpenDelay: Duration = .milliseconds(300)
         /// Hover intent: the notch waits this long after the pointer leaves before closing.
         static let hoverCloseDelay: Duration = .milliseconds(350)
+        /// Growing: a little bounce.
         static let spring = Animation.spring(response: 0.45, dampingFraction: 0.7)
+        /// Shrinking: no overshoot, which would pull the shape smaller than the camera and show the real notch.
+        static let settle = Animation.spring(response: 0.35, dampingFraction: 1)
     }
 }
 

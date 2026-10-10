@@ -62,9 +62,10 @@ struct NotchView: View {
         .background(.black)
         .clipShape(NotchShape(topRadius: radii.top, bottomRadius: radii.bottom))
         .compositingGroup()
-        .animation(Config.Notch.spring, value: isOpen)
-        .animation(Config.Notch.spring, value: state.visibleBanner?.id)
-        .animation(Config.Notch.spring, value: state.closedSideWidth)
+        // Evaluated after the change, so each picks the bounce for growing and the settle for shrinking.
+        .animation(isOpen ? Config.Notch.spring : Config.Notch.settle, value: isOpen)
+        .animation(state.visibleBanner == nil ? Config.Notch.settle : Config.Notch.spring, value: state.visibleBanner?.id)
+        .animation(Config.Notch.settle, value: state.closedSideWidth)
         .contentShape(Rectangle())
         .onHover(perform: hoverChanged)
         .sensoryFeedback(.alignment, trigger: isOpen)
@@ -83,7 +84,7 @@ struct NotchView: View {
         return state.visibleBanner == nil ? Self.closedRadii : Self.bannerRadii
     }
 
-    private var closedHeight: CGFloat { geometry.notchSize.height + Config.Notch.closedExtraHeight }
+    private var closedHeight: CGFloat { geometry.closedHeight }
 
     private var size: CGSize {
         if isOpen { return Config.Notch.openSize }

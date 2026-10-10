@@ -3809,6 +3809,22 @@
         }
       }
     },
+    "new" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nouveau"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "neu"
+          }
+        }
+      }
+    },
     "no mood yet" : {
       "localizations" : {
         "fr" : {

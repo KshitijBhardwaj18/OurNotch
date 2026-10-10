@@ -29,6 +29,10 @@ final class AppState {
     private(set) var banner: Message?
     /// When `banner` first scrolled on screen; nil until it does.
     private(set) var bannerStartedAt: Date?
+    /// Tabs with something new that arrived out of sight (a pink dot in the tab bar), cleared when shown.
+    private(set) var unseen: Set<NotchTab> = []
+    /// The tab on screen while the notch is open; nil while closed or in Settings.
+    @ObservationIgnored private var visibleTab: NotchTab?
     /// While set and in the future, OurNotch is hidden: no notch, and arrivals wait.
     private(set) var hiddenUntil: Date?
     var isHidden: Bool { Hide.isHidden(until: hiddenUntil) }
@@ -325,6 +329,15 @@ final class AppState {
         isNotchOpen = false
     }
 
+    /// The open notch shows this tab (nil: Settings, or closed). Showing a tab clears its dot;
+    /// showing Whispers also ends a banner waiting for the notch to close.
+    func show(tab: NotchTab?) {
+        visibleTab = tab
+        guard let tab else { return }
+        unseen.remove(tab)
+        if tab == .note { setBanner(nil) }
+    }
+
     /// The banner is on screen: its passes count from the first time it was, even across relaunches.
     func bannerAppeared() {
         guard banner != nil, bannerStartedAt == nil else { return }
@@ -394,7 +407,11 @@ final class AppState {
         }
 
         var found: [String] = []
-        if partner.mood != previous.mood, hasFetchedPartner { found.append("mood \(partner.mood ?? "cleared")") }
+        if partner.mood != previous.mood, hasFetchedPartner {
+            found.append("mood \(partner.mood ?? "cleared")")
+            // Closed, the mood shows beside the camera; open, only on Home and Mood.
+            if isNotchOpen, partner.mood != nil, visibleTab != .home, visibleTab != .mood { unseen.insert(.home) }
+        }
         let newEmojis = Arrival.newCount(partnerSent: partner.emojisSent, lastShown: myOutbox.seenEmojis)
         if newEmojis > 0, let emoji = partner.lastEmoji {
             myOutbox.seenEmojis = partner.emojisSent
@@ -409,12 +426,19 @@ final class AppState {
         }
         if let message = partner.message, message.id != myOutbox.seenMessageId {
             myOutbox.seenMessageId = message.id
-            setBanner(message)
+            if isNotchOpen, visibleTab == .note || visibleTab == .home {
+                // Read as it arrived: no banner afterwards.
+            } else {
+                setBanner(message) // scrolls once the notch closes
+                if isNotchOpen { unseen.insert(.note) }
+            }
             found.append("note (\(message.mode.rawValue), sent \(Self.ms(since: message.sentAt)) ago)")
             arrived("note", sentAt: message.sentAt, source: source)
         }
         if let photo = partner.photo, photo.id != myOutbox.seenPhotoId, await downloadPartnerPhoto() {
             myOutbox.seenPhotoId = photo.id
+            // It shows on Home, and nowhere in the closed notch.
+            if !(isNotchOpen && visibleTab == .home) { unseen.insert(.home) }
             found.append("photo (sent \(Self.ms(since: photo.sentAt)) ago)")
             arrived("photo", sentAt: photo.sentAt, source: source)
         }

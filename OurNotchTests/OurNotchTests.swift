@@ -358,6 +358,32 @@ struct PartnersTests {
         #expect(relaunched.togetherSince == changed)
     }
 
+    @Test func somethingArrivingOutOfSightInTheOpenNotchGetsADot() async throws {
+        let (you, partner) = try await TwoPartners().paired()
+        partner.notchOpened()
+        partner.show(tab: .emoji)
+        #expect(you.sendMessage("look up", mode: .three))
+        try await Task.sleep(for: .milliseconds(100))
+        await partner.sync()
+        #expect(partner.unseen == [.note])                  // a dot on Whispers
+        #expect(partner.banner?.text == "look up")          // and it scrolls once the notch closes
+        partner.show(tab: .note)
+        #expect(partner.unseen.isEmpty && partner.banner == nil)
+
+        // Arriving on screen: no dot, no banner afterwards.
+        #expect(you.sendMessage("hi again", mode: .three))
+        try await Task.sleep(for: .milliseconds(100))
+        await partner.sync()
+        #expect(partner.unseen.isEmpty && partner.banner == nil)
+
+        // A mood seen from another tab marks Home.
+        partner.show(tab: .photo)
+        you.setMood("🥰")
+        try await Task.sleep(for: .milliseconds(100))
+        await partner.sync()
+        #expect(partner.unseen == [.home])
+    }
+
     @Test func aRelaunchCarriesOnTheBannersPassesInsteadOfRestartingThem() async throws {
         let people = TwoPartners()
         let (you, partner) = try await people.paired()
