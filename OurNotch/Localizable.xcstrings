@@ -749,6 +749,23 @@
             "value" : "Keinen? Hol dir OurNotch"
           }
         }
+      },
+      "extractionState" : "stale"
+    },
+    "Don't have one? Try it free" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu n’en as pas ? Essaie gratuitement"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keinen? Gratis testen"
+          }
+        }
       }
     },
     "Done" : {
@@ -1045,6 +1062,22 @@
         }
       }
     },
+    "Get OurNotch Again" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprendre OurNotch"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch wieder holen"
+          }
+        }
+      }
+    },
     "Get OurNotch for %@" : {
       "localizations" : {
         "fr" : {
@@ -1059,7 +1092,8 @@
             "value" : "OurNotch für %@ holen"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Get Started" : {
       "localizations" : {
@@ -1855,7 +1889,8 @@
             "value" : "Ein Kauf für euch beide · lokaler Preis an der Kasse"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "One tap, many hearts." : {
       "localizations" : {
@@ -1984,6 +2019,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OurNotch %@"
+          }
+        }
+      }
+    },
+    "OurNotch is switched off" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch est désactivé"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch ist ausgeschaltet"
           }
         }
       }
@@ -3100,6 +3151,22 @@
         }
       }
     },
+    "Then %@ once for the two of you · cancel before day 3 and pay nothing" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puis %@ une seule fois pour vous deux · annule avant le 3e jour et tu ne paies rien"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Danach einmalig %@ für euch beide · vor dem 3. Tag kündigen und nichts zahlen"
+          }
+        }
+      }
+    },
     "This happens when a purchase is refunded, or when a licence is misused (shared publicly or used with a modified copy), as our terms explain. If you think this is a mistake, write to us at %@." : {
       "localizations" : {
         "fr" : {
@@ -3112,6 +3179,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Das passiert, wenn ein Kauf erstattet wurde oder eine Lizenz missbraucht wird (öffentlich geteilt oder mit einer veränderten Kopie genutzt), wie unsere AGB erklären. Wenn du denkst, dass das ein Fehler ist, schreib uns an %@."
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
+    "This happens when the free trial was cancelled, a payment didn't go through, a purchase was refunded, or a licence was misused, as our terms explain. Start again anytime, or write to us at %@." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cela arrive quand l’essai gratuit a été annulé, qu’un paiement n’est pas passé, qu’un achat a été remboursé ou qu’une licence a été mal utilisée, comme l’expliquent nos conditions. Tu peux recommencer quand tu veux, ou nous écrire à %@."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das passiert, wenn der Gratis-Test gekündigt wurde, eine Zahlung nicht geklappt hat, ein Kauf erstattet wurde oder eine Lizenz missbraucht wurde, wie unsere Bedingungen erklären. Du kannst jederzeit neu starten oder uns an %@ schreiben."
           }
         }
       }
@@ -3226,6 +3310,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erneut versuchen"
+          }
+        }
+      }
+    },
+    "Try It Free for 3 Days" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Essayer gratuitement 3 jours"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Tage gratis testen"
           }
         }
       }
@@ -3532,7 +3632,8 @@
             "value" : "Deine Lizenz wurde entzogen"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Your life together, in numbers" : {
       "localizations" : {
