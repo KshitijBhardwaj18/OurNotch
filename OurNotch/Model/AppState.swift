@@ -539,10 +539,11 @@ final class AppState {
 
 /// How often to check the partner's row, kept pure for tests.
 enum CheckPace {
-    /// Fast while the notch is open or soon after sending or receiving, when a reply is likely; otherwise `idle`.
+    /// Fastest while the notch is open, fast soon after sending or receiving (a reply is likely), otherwise `idle`.
     static func interval(notchOpen: Bool, lastActivity: Date?, idle: Duration, now: Date = .now) -> Duration {
+        if notchOpen { return min(idle, Config.Cloud.openPollInterval) }
         let recent = lastActivity.map { now.timeIntervalSince($0) < Config.Cloud.activeWindow } ?? false
-        return notchOpen || recent ? min(idle, Config.Cloud.activePollInterval) : idle
+        return recent ? min(idle, Config.Cloud.activePollInterval) : idle
     }
 }
 
