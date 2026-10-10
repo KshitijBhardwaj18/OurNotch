@@ -61,15 +61,19 @@ enum Config {
         // ponytail: every build uses Dodo's test mode until slice 9 adds the sold Release build with live values.
         /// Dodo's public licence endpoints (activate / validate / deactivate need no API key).
         static let baseURL = URL(string: "https://test.dodopayments.com")!
-        static let productId = "pdt_0Np1n3lC4hykWhTwMaNVV"
+        /// The 3-day free trial: a Dodo subscription that charges the one-time price once, on day 3, and lasts
+        /// 20 years. Its key works from the first day; Dodo switches it off if the trial is cancelled or the
+        /// payment fails, and the hourly check then locks both Macs.
+        static let productId = "pdt_0NpQhZeQ6pJ3R92rDOQAr"
         #if DEBUG
         static let website = "http://localhost:3000"
         #else
         static let website = "https://ournotch.app"
         #endif
-        /// Dodo's hosted checkout; it picks $4.50 / ₹499 / €3 from the buyer's currency, then returns to the
-        /// thank-you page with `license_key`, whose Open OurNotch button activates this app.
-        static let checkoutURL = URL(string: "https://test.checkout.dodopayments.com/buy/\(productId)?quantity=1&redirect_url=\(website)/thanks")!
+        /// The website starts Dodo's checkout for the trial (with India's ₹499 card limit); it picks $4.50 / ₹499 / €3
+        /// from the buyer's currency, then returns to the thank-you page with `license_key`, whose Open OurNotch
+        /// button activates this app.
+        static let checkoutURL = URL(string: "\(website)/buy")!
         /// The price on the gate. The Mac doesn't know the buyer's country, so checkout shows the local price.
         static let priceLabel = "$4.50"
         /// Dodo's customer portal: the buyer enters their purchase email and sees their key.

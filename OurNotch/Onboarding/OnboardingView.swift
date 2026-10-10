@@ -334,7 +334,7 @@ struct OnboardingView: View {
                     .font(.system(size: 13, design: .monospaced))
                     .frame(width: 300)
                     .onSubmit(continueAction)
-                Button("Don't have one? Get OurNotch", action: model.getOurNotch).buttonStyle(.link)
+                Button("Don't have one? Try it free", action: model.getOurNotch).buttonStyle(.link)
             }
         case .welcome:
             Screen(icon: AnyView(AppIcon()), title: "Welcome to OurNotch",
@@ -398,14 +398,14 @@ struct OnboardingView: View {
         }
     }
 
-    /// Feels like opening a gift: the price and one big button lead; the key and the code are secondary.
+    /// Feels like opening a gift: the free trial and one big button lead; the key and the code are secondary.
     private var gate: some View {
         Screen(icon: AnyView(AppIcon()), title: "Welcome to OurNotch",
                message: "A little place in your notch where things from both of you arrive.") {
             VStack(spacing: 10) {
-                Button("Get OurNotch for \(Config.Licence.priceLabel)", action: model.getOurNotch)
+                Button("Try It Free for 3 Days", action: model.getOurNotch)
                     .buttonStyle(PinkProminentButtonStyle())
-                Text("One purchase for the two of you · local price shown at checkout")
+                Text("Then \(Config.Licence.priceLabel) once for the two of you · cancel before day 3 and pay nothing")
                     .font(.system(size: 11)).foregroundStyle(.secondary)
                 // Stacked, so they fit in every language ("Ich habe einen Einladungscode").
                 VStack(spacing: 6) {
