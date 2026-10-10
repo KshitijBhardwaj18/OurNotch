@@ -3,7 +3,7 @@
 
 // ponytail: Dodo test mode until launch (slice 10 sets the live base URL).
 const BASE = process.env.DODO_API_BASE ?? 'https://test.dodopayments.com';
-const PRODUCT = 'pdt_0Np1n3lC4hykWhTwMaNVV';
+import { PRODUCT } from './prices';
 
 export const hasKey = () => Boolean(process.env.DODO_API_KEY);
 
@@ -44,6 +44,13 @@ export async function keys(): Promise<Key[]> {
       .map(i => ({ id: i.id, name: i.name, created: i.created_at })),
   })));
 }
+
+// A checkout for the free trial. Indian cards approve a bank mandate for ₹499, not Dodo's ₹15,000 default.
+export const checkoutSession = (returnUrl: string) =>
+  dodo<{ checkout_url: string }>('/checkouts', {
+    method: 'POST',
+    body: JSON.stringify({ product_cart: [{ product_id: PRODUCT, quantity: 1 }], mandate_min_amount_inr_paise: 49900, return_url: returnUrl }),
+  });
 
 // The kill switch: a disabled key answers "not valid", so both Macs of the pair lock at their next check.
 export const setDisabled = (id: string, disabled: boolean) =>

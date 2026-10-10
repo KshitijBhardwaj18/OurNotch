@@ -21,12 +21,12 @@ const en = {
     description: 'OurNotch puts your person in your MacBook notch: their face, their mood, their whispers, kisses and photos. One license works for you both.',
     ogDescription: 'Whispers, kisses and photos that appear in your person’s MacBook notch. One license works for you both.',
   },
-  nav: { features: 'Features', pricing: 'Pricing', faq: 'FAQ', get: 'Get OurNotch' },
+  nav: { features: 'Features', pricing: 'Pricing', faq: 'FAQ', get: 'Try it free' },
   hero: {
     h1a: 'Send love,', h1b: 'notch to notch.',
     sub: 'OurNotch keeps your person at the top of your MacBook screen. Send them a whisper, a kiss or a photo, and it appears in their notch.',
-    cta: 'Get it for {price}', how: 'See how it works',
-    underB: 'One-time purchase.', under: 'Works on both your Macs.',
+    cta: 'Try it free', how: 'See how it works',
+    underB: '3 days free.', under: 'Then {price} once, for both your Macs.',
   },
   fits: {
     kicker: 'What fits in a notch', h2: 'Tiny things. Big feelings.',
@@ -61,10 +61,11 @@ const en = {
     ] as [string, string, string][],
   },
   buy: {
-    tag: '1 license · 2 Macs', kicker: 'Pricing', h2: 'One license for both of you.',
-    p: "Buy it once and install it on your Mac and your person's. No subscription.", once: 'one time',
+    tag: '3 days free · 2 Macs', kicker: 'Pricing', h2: 'Try it free for 3 days.',
+    p: "Start free on your Mac and your person's. Keep it and you pay once, on day 3. Never again.",
+    free: 'Free', forDays: 'for 3 days', then: 'then {price} once · cancel before day 3 and pay nothing',
     points: ["Your Mac and your person's", 'Whispers, kisses, moods and photos', 'Your time together, counted live'],
-    cta: 'Get OurNotch',
+    cta: 'Start my 3 free days',
     fine: 'Needs macOS 14 Sonoma or later on both Macs. Your love can {download} and join with your invite.',
     downloadFree: 'download it free',
   },
@@ -72,7 +73,8 @@ const en = {
     kicker: 'FAQ', h2: 'Good questions.',
     items: [
       ['Do we both need to buy it?', "No. One license covers your Mac and your person's."],
-      ['Is it a subscription?', "No. It's a one-time purchase: pay once and it's yours on both Macs, with no monthly fees."],
+      ['Is it really free?', 'Yes, for 3 days. You add a payment method to start, and nothing is charged during those days. Keep it and you pay once on day 3, then never again. Cancel before day 3 and you pay nothing.'],
+      ['How do I cancel during the trial?', "Open My licence on this site, sign in with your email and cancel at the next billing date. OurNotch keeps working until day 3 and you're never charged."],
       ['What do we need?', 'Two Macs with macOS 14 Sonoma or later, each signed in with an Apple Account.'],
       ['Can anyone else see what we send?', "No. It's end-to-end encrypted, so only your two Macs can read it."],
       ['Do we keep our whispers?', "Your last few stay as a tiny conversation in the notch. There's no endless history to scroll."],
@@ -80,7 +82,7 @@ const en = {
       ['Is there an iPhone app?', 'Not yet. OurNotch is Mac-only for now.'],
     ] as [string, string][],
   },
-  end: { h2: 'Give your notch someone to love.', cta: 'Get it for {price}' },
+  end: { h2: 'Give your notch someone to love.', cta: 'Try it free' },
   footer: { made: 'OurNotch · made for two', madeForTwo: 'made for two', legal: 'Help and legal', apple: 'Not affiliated with Apple.', licence: 'My licence', privacy: 'Privacy', terms: 'Terms', refunds: 'Refunds', contact: 'Contact' },
   demo: {
     aria: 'Demo: Bun sends Pip a note, hearts and a photo through the MacBook notch, and Pip writes back',
@@ -112,7 +114,7 @@ const en = {
     ],
   },
   thanks: {
-    title: 'Thank you ♡ OurNotch', kicker: 'Thank you', h1: 'Your gift is ready.', p: 'Three little steps and the first heart is on its way.',
+    title: 'Thank you ♡ OurNotch', kicker: 'Thank you', h1: 'Your 3 free days have started.', p: 'Three little steps and the first heart is on its way. Nothing is charged until day 3.',
     s1: 'Download OurNotch', s1p: 'Open the download and drag OurNotch into Applications.', s1b: 'Download',
     s2: 'Open OurNotch', s2p: 'It switches itself on with your licence. Nothing to type.', s2b: 'Open OurNotch',
     s2note: 'Your licence key is in your receipt email. Paste it in OurNotch under {b}.', s2noteB: 'I Have a Licence Key',
@@ -134,7 +136,7 @@ const en = {
   refunds: {
     title: 'Refunds · OurNotch', kicker: 'Refund policy', h1: 'Refunds and cancellations.', updated: 'Last updated: October 2026',
     sections: [
-      { h: 'Nothing to cancel', p: ['OurNotch is a one-time purchase, not a subscription. There is nothing to cancel, and you are never charged again.'] },
+      { h: 'Free trial and cancelling', p: ['OurNotch starts with 3 free days. You add a payment method at the start, and nothing is charged during those days.', 'To stop before paying, open **My licence**, sign in with your email and cancel at the next billing date before the 3 days end. OurNotch keeps working until then, and you are never charged.', 'If you keep it, you are charged the one-time price once when the 3 days end, and never again.'] },
       { h: 'Refunds', p: ['Because OurNotch is a digital product you can use right away, sales are final and we don\'t offer refunds, except where the law where you live gives you a right to one (for example consumer rules in the EU or the UK).'] },
       { h: 'Something not working?', p: ['Write to us first. Most problems (activating, moving to a new Mac, pairing with your love) are quick to fix, and **My licence** covers the common ones.'] },
       { h: 'Asking for a refund', p: ['If the law gives you a right to a refund, write to us from the email you paid with and include your receipt. Refunds are made by Dodo Payments, our seller of record, to the payment method you used. A refunded licence stops working on both Macs of the pair.'] },
@@ -166,7 +168,7 @@ const en = {
     title: 'Terms · OurNotch', kicker: 'Terms', h1: 'The short, fair version.', updated: 'Last updated: October 2026',
     sections: [
       { h: 'One licence per couple', p: ['One purchase covers two Macs: the buyer\'s, which holds the licence, and their partner\'s while the two are paired. The licence belongs to the buyer and can move to a new Mac (one Mac at a time).'] },
-      { h: 'Paying', p: ['OurNotch is a one-time purchase, not a subscription. Dodo Payments is the seller of record: it takes the payment, charges any tax and sends your receipt.'] },
+      { h: 'Free trial and paying', p: ['OurNotch starts with a 3-day free trial. You add a payment method at the start. Unless you cancel before the trial ends, you are charged the one-time price once when it ends, and never again.', 'Dodo Payments, the seller of record, runs this as a subscription that bills once and lasts 20 years, so your receipt may use that word. It takes the payment, charges any tax and sends your receipt.'] },
       { h: 'Refunds', p: ['Because OurNotch is a digital product you can use right away, sales are final and we don\'t offer refunds, except where the law where you live gives you a right to one (for example consumer rules in the EU). A refunded licence stops working.'] },
       { h: 'Fair use and revocation', p: ['Please don\'t share your key publicly, resell it, or use OurNotch with a modified copy. If we notice abuse, we may revoke the licence, which stops OurNotch on both Macs of the pair.'] },
       { h: 'What OurNotch needs', p: ['macOS 14 Sonoma or later and iCloud on both Macs. OurNotch relies on Apple\'s iCloud; we can\'t control outages there.'] },
@@ -185,12 +187,12 @@ const fr: Copy = {
     description: 'OurNotch met ta personne dans l’encoche de ton MacBook : son visage, son humeur, ses murmures, bisous et photos. Une seule licence pour vous deux.',
     ogDescription: 'Des murmures, bisous et photos qui apparaissent dans l’encoche du MacBook de ta personne. Une seule licence pour vous deux.',
   },
-  nav: { features: 'Fonctions', pricing: 'Prix', faq: 'FAQ', get: 'Obtenir OurNotch' },
+  nav: { features: 'Fonctions', pricing: 'Prix', faq: 'FAQ', get: 'Essayer gratuitement' },
   hero: {
     h1a: 'De l’amour,', h1b: 'd’encoche à encoche.',
     sub: 'OurNotch garde ta personne tout en haut de l’écran de ton MacBook. Envoie-lui un murmure, un bisou ou une photo, et ça apparaît dans son encoche.',
-    cta: 'Obtenir pour {price}', how: 'Voir comment ça marche',
-    underB: 'Achat unique.', under: 'Fonctionne sur vos deux Mac.',
+    cta: 'Essayer gratuitement', how: 'Voir comment ça marche',
+    underB: '3 jours gratuits.', under: 'Puis {price} une seule fois, pour vos deux Mac.',
   },
   fits: {
     kicker: 'Ce qui tient dans une encoche', h2: 'Petites choses. Grands sentiments.',
@@ -225,10 +227,11 @@ const fr: Copy = {
     ],
   },
   buy: {
-    tag: '1 licence · 2 Mac', kicker: 'Prix', h2: 'Une licence pour vous deux.',
-    p: 'Achète-le une fois et installe-le sur ton Mac et celui de ta personne. Pas d’abonnement.', once: 'une fois',
+    tag: '3 jours gratuits · 2 Mac', kicker: 'Prix', h2: 'Essaie-le gratuitement 3 jours.',
+    p: 'Commence gratuitement sur ton Mac et celui de ta personne. Tu le gardes ? Tu paies une seule fois, le 3e jour. Plus jamais ensuite.',
+    free: 'Gratuit', forDays: 'pendant 3 jours', then: 'puis {price} une fois · annule avant le 3e jour et tu ne paies rien',
     points: ['Ton Mac et celui de ta personne', 'Murmures, bisous, humeurs et photos', 'Votre temps ensemble, compté en direct'],
-    cta: 'Obtenir OurNotch',
+    cta: 'Commencer mes 3 jours gratuits',
     fine: 'Nécessite macOS 14 Sonoma ou plus récent sur les deux Mac. Ton amour peut {download} et te rejoindre avec ton invitation.',
     downloadFree: 'le télécharger gratuitement',
   },
@@ -236,7 +239,8 @@ const fr: Copy = {
     kicker: 'FAQ', h2: 'Bonnes questions.',
     items: [
       ['Faut-il l’acheter tous les deux ?', 'Non. Une licence couvre ton Mac et celui de ta personne.'],
-      ['C’est un abonnement ?', 'Non. C’est un achat unique : tu paies une fois et il est à vous sur vos deux Mac, sans frais mensuels.'],
+      ['C’est vraiment gratuit ?', 'Oui, pendant 3 jours. Tu ajoutes un moyen de paiement pour commencer, et rien n’est débité pendant ces jours. Tu le gardes : tu paies une fois le 3e jour, puis plus jamais. Annule avant le 3e jour et tu ne paies rien.'],
+      ['Comment annuler pendant l’essai ?', 'Ouvre Ma licence sur ce site, connecte-toi avec ton e-mail et annule à la prochaine date de facturation. OurNotch fonctionne jusqu’au 3e jour et tu n’es jamais débité.'],
       ['De quoi avons-nous besoin ?', 'Deux Mac avec macOS 14 Sonoma ou plus récent, chacun connecté avec un compte Apple.'],
       ['Quelqu’un d’autre peut-il voir ce que nous envoyons ?', 'Non. C’est chiffré de bout en bout : seuls vos deux Mac peuvent le lire.'],
       ['Gardons-nous nos murmures ?', 'Vos derniers restent comme une mini conversation dans l’encoche. Pas d’historique sans fin à faire défiler.'],
@@ -244,7 +248,7 @@ const fr: Copy = {
       ['Y a-t-il une app iPhone ?', 'Pas encore. OurNotch est pour Mac uniquement pour l’instant.'],
     ],
   },
-  end: { h2: 'Donne à ton encoche quelqu’un à aimer.', cta: 'Obtenir pour {price}' },
+  end: { h2: 'Donne à ton encoche quelqu’un à aimer.', cta: 'Essayer gratuitement' },
   footer: { made: 'OurNotch · fait pour deux', madeForTwo: 'fait pour deux', legal: 'Aide et mentions légales', apple: 'Non affilié à Apple.', licence: 'Ma licence', privacy: 'Confidentialité', terms: 'Conditions', refunds: 'Remboursements', contact: 'Contact' },
   demo: {
     aria: 'Démo : Bun envoie à Pip un mot, des cœurs et une photo via l’encoche du MacBook, et Pip répond',
@@ -276,7 +280,7 @@ const fr: Copy = {
     ],
   },
   thanks: {
-    title: 'Merci ♡ OurNotch', kicker: 'Merci', h1: 'Ton cadeau est prêt.', p: 'Trois petites étapes, et le premier cœur est en route.',
+    title: 'Merci ♡ OurNotch', kicker: 'Merci', h1: 'Tes 3 jours gratuits ont commencé.', p: 'Trois petites étapes, et le premier cœur est en route. Rien n’est débité avant le 3e jour.',
     s1: 'Télécharge OurNotch', s1p: 'Ouvre le téléchargement et glisse OurNotch dans Applications.', s1b: 'Télécharger',
     s2: 'Ouvre OurNotch', s2p: 'Il s’active tout seul avec ta licence. Rien à taper.', s2b: 'Ouvrir OurNotch',
     s2note: 'Ta clé de licence est dans ton reçu par e-mail. Colle-la dans OurNotch sous {b}.', s2noteB: 'J’ai une clé de licence',
@@ -298,7 +302,7 @@ const fr: Copy = {
   refunds: {
     title: 'Remboursements · OurNotch', kicker: 'Politique de remboursement', h1: 'Remboursements et annulations.', updated: 'Dernière mise à jour : octobre 2026',
     sections: [
-      { h: 'Rien à annuler', p: ['OurNotch est un achat unique, pas un abonnement. Il n’y a rien à annuler, et tu n’es jamais débité à nouveau.'] },
+      { h: 'Essai gratuit et annulation', p: ['OurNotch commence par 3 jours gratuits. Tu ajoutes un moyen de paiement au début, et rien n’est débité pendant ces jours.', 'Pour arrêter sans payer, ouvre **Ma licence**, connecte-toi avec ton e-mail et annule à la prochaine date de facturation avant la fin des 3 jours. OurNotch fonctionne jusque-là, et tu n’es jamais débité.', 'Si tu le gardes, le prix unique est débité une seule fois à la fin des 3 jours, puis plus jamais.'] },
       { h: 'Remboursements', p: ['OurNotch étant un produit numérique utilisable immédiatement, les ventes sont définitives et nous ne remboursons pas, sauf lorsque la loi de ton pays te donne droit à un remboursement (par exemple les règles de consommation de l’UE ou du Royaume-Uni).'] },
       { h: 'Un problème ?', p: ['Écris-nous d’abord. La plupart des soucis (activation, passage à un nouveau Mac, association avec ton amour) se règlent vite, et **Ma licence** explique les plus courants.'] },
       { h: 'Demander un remboursement', p: ['Si la loi te donne droit à un remboursement, écris-nous depuis l’e-mail utilisé pour payer, avec ton reçu. Les remboursements sont effectués par Dodo Payments, notre vendeur officiel, sur le moyen de paiement utilisé. Une licence remboursée cesse de fonctionner sur les deux Mac du couple.'] },
@@ -330,7 +334,7 @@ const fr: Copy = {
     title: 'Conditions · OurNotch', kicker: 'Conditions', h1: 'La version courte et honnête.', updated: 'Dernière mise à jour : octobre 2026',
     sections: [
       { h: 'Une licence par couple', p: ['Un achat couvre deux Mac : celui de l’acheteur, qui détient la licence, et celui de son partenaire tant qu’ils sont associés. La licence appartient à l’acheteur et peut passer à un nouveau Mac (un Mac à la fois).'] },
-      { h: 'Paiement', p: ['OurNotch est un achat unique, pas un abonnement. Dodo Payments est le vendeur officiel : il encaisse le paiement, applique les taxes et envoie ton reçu.'] },
+      { h: 'Essai gratuit et paiement', p: ['OurNotch commence par un essai gratuit de 3 jours. Tu ajoutes un moyen de paiement au début. Sauf si tu annules avant la fin de l’essai, le prix unique est débité une seule fois à la fin, puis plus jamais.', 'Dodo Payments, le vendeur officiel, gère cela comme un abonnement qui ne facture qu’une fois et dure 20 ans : ton reçu peut donc employer ce mot. Il encaisse le paiement, applique les taxes et envoie ton reçu.'] },
       { h: 'Remboursements', p: ['OurNotch étant un produit numérique utilisable immédiatement, les ventes sont définitives et nous ne remboursons pas, sauf lorsque la loi de ton pays te donne droit à un remboursement (par exemple les règles de consommation de l’UE). Une licence remboursée cesse de fonctionner.'] },
       { h: 'Usage loyal et révocation', p: ['Merci de ne pas partager ta clé publiquement, de ne pas la revendre et de ne pas utiliser OurNotch avec une copie modifiée. En cas d’abus, nous pouvons révoquer la licence, ce qui arrête OurNotch sur les deux Mac du couple.'] },
       { h: 'Ce dont OurNotch a besoin', p: ['macOS 14 Sonoma ou plus récent et iCloud sur les deux Mac. OurNotch s’appuie sur iCloud d’Apple ; nous ne maîtrisons pas ses pannes.'] },
@@ -347,12 +351,12 @@ const de: Copy = {
     description: 'OurNotch holt deinen Menschen in die Notch deines MacBooks: Gesicht, Stimmung, Flüstern, Küsse und Fotos. Eine Lizenz für euch beide.',
     ogDescription: 'Flüstern, Küsse und Fotos, die in der MacBook-Notch deines Menschen erscheinen. Eine Lizenz für euch beide.',
   },
-  nav: { features: 'Funktionen', pricing: 'Preis', faq: 'FAQ', get: 'OurNotch holen' },
+  nav: { features: 'Funktionen', pricing: 'Preis', faq: 'FAQ', get: 'Gratis testen' },
   hero: {
     h1a: 'Liebe senden,', h1b: 'von Notch zu Notch.',
     sub: 'OurNotch hält deinen Menschen ganz oben auf deinem MacBook-Bildschirm. Schick ein Flüstern, einen Kuss oder ein Foto – und es erscheint in der Notch.',
-    cta: 'Für {price} holen', how: 'So funktioniert’s',
-    underB: 'Einmaliger Kauf.', under: 'Läuft auf euren beiden Macs.',
+    cta: 'Gratis testen', how: 'So funktioniert’s',
+    underB: '3 Tage gratis.', under: 'Danach einmalig {price}, für eure beiden Macs.',
   },
   fits: {
     kicker: 'Was in eine Notch passt', h2: 'Kleine Dinge. Große Gefühle.',
@@ -387,10 +391,11 @@ const de: Copy = {
     ],
   },
   buy: {
-    tag: '1 Lizenz · 2 Macs', kicker: 'Preis', h2: 'Eine Lizenz für euch beide.',
-    p: 'Einmal kaufen und auf deinem Mac und dem deines Menschen installieren. Kein Abo.', once: 'einmalig',
+    tag: '3 Tage gratis · 2 Macs', kicker: 'Preis', h2: '3 Tage gratis testen.',
+    p: 'Starte gratis auf deinem Mac und dem deines Menschen. Behältst du es, zahlst du einmal, am 3. Tag. Danach nie wieder.',
+    free: 'Gratis', forDays: '3 Tage lang', then: 'danach einmalig {price} · vor dem 3. Tag kündigen und nichts zahlen',
     points: ['Dein Mac und der deines Menschen', 'Flüstern, Küsse, Launen und Fotos', 'Eure gemeinsame Zeit, live gezählt'],
-    cta: 'OurNotch holen',
+    cta: 'Meine 3 Gratis-Tage starten',
     fine: 'Benötigt macOS 14 Sonoma oder neuer auf beiden Macs. Deine Liebe kann {download} und mit deiner Einladung beitreten.',
     downloadFree: 'es kostenlos laden',
   },
@@ -398,7 +403,8 @@ const de: Copy = {
     kicker: 'FAQ', h2: 'Gute Fragen.',
     items: [
       ['Müssen wir es beide kaufen?', 'Nein. Eine Lizenz gilt für deinen Mac und den deines Menschen.'],
-      ['Ist das ein Abo?', 'Nein. Es ist ein einmaliger Kauf: einmal zahlen, und es gehört euch auf beiden Macs, ohne monatliche Kosten.'],
+      ['Ist es wirklich gratis?', 'Ja, 3 Tage lang. Zum Start fügst du eine Zahlungsmethode hinzu, und in diesen Tagen wird nichts abgebucht. Behältst du es, zahlst du einmal am 3. Tag, danach nie wieder. Kündigst du vor dem 3. Tag, zahlst du nichts.'],
+      ['Wie kündige ich während des Tests?', 'Öffne Meine Lizenz auf dieser Seite, melde dich mit deiner E-Mail an und kündige zum nächsten Abrechnungsdatum. OurNotch läuft bis zum 3. Tag, und es wird nichts abgebucht.'],
       ['Was brauchen wir?', 'Zwei Macs mit macOS 14 Sonoma oder neuer, beide mit einem Apple Account angemeldet.'],
       ['Kann sonst jemand sehen, was wir schicken?', 'Nein. Es ist Ende-zu-Ende-verschlüsselt, nur eure zwei Macs können es lesen.'],
       ['Behalten wir unser Flüstern?', 'Eure letzten bleiben als kleine Unterhaltung in der Notch. Kein endloser Verlauf zum Scrollen.'],
@@ -406,7 +412,7 @@ const de: Copy = {
       ['Gibt es eine iPhone-App?', 'Noch nicht. OurNotch gibt es vorerst nur für den Mac.'],
     ],
   },
-  end: { h2: 'Gib deiner Notch jemanden zum Liebhaben.', cta: 'Für {price} holen' },
+  end: { h2: 'Gib deiner Notch jemanden zum Liebhaben.', cta: 'Gratis testen' },
   footer: { made: 'OurNotch · für zwei gemacht', madeForTwo: 'für zwei gemacht', legal: 'Hilfe und Rechtliches', apple: 'Nicht mit Apple verbunden.', licence: 'Meine Lizenz', privacy: 'Datenschutz', terms: 'AGB', refunds: 'Erstattungen', contact: 'Kontakt' },
   demo: {
     aria: 'Demo: Bun schickt Pip über die MacBook-Notch eine Notiz, Herzen und ein Foto, und Pip schreibt zurück',
@@ -438,7 +444,7 @@ const de: Copy = {
     ],
   },
   thanks: {
-    title: 'Danke ♡ OurNotch', kicker: 'Danke', h1: 'Dein Geschenk ist bereit.', p: 'Drei kleine Schritte, und das erste Herz ist unterwegs.',
+    title: 'Danke ♡ OurNotch', kicker: 'Danke', h1: 'Deine 3 Gratis-Tage laufen.', p: 'Drei kleine Schritte, und das erste Herz ist unterwegs. Bis zum 3. Tag wird nichts abgebucht.',
     s1: 'OurNotch laden', s1p: 'Öffne den Download und zieh OurNotch in den Ordner „Programme“.', s1b: 'Laden',
     s2: 'OurNotch öffnen', s2p: 'Es aktiviert sich mit deiner Lizenz von selbst. Nichts zu tippen.', s2b: 'OurNotch öffnen',
     s2note: 'Dein Lizenzschlüssel steht in deiner Beleg-E-Mail. Füg ihn in OurNotch unter {b} ein.', s2noteB: 'Ich habe einen Schlüssel',
@@ -460,7 +466,7 @@ const de: Copy = {
   refunds: {
     title: 'Erstattungen · OurNotch', kicker: 'Erstattungsrichtlinie', h1: 'Erstattungen und Kündigungen.', updated: 'Zuletzt aktualisiert: Oktober 2026',
     sections: [
-      { h: 'Nichts zu kündigen', p: ['OurNotch ist ein einmaliger Kauf, kein Abo. Es gibt nichts zu kündigen, und es wird nie wieder etwas abgebucht.'] },
+      { h: 'Gratis-Test und Kündigen', p: ['OurNotch startet mit 3 Gratis-Tagen. Zu Beginn fügst du eine Zahlungsmethode hinzu, und in diesen Tagen wird nichts abgebucht.', 'Um vor dem Zahlen aufzuhören, öffne **Meine Lizenz**, melde dich mit deiner E-Mail an und kündige vor Ende der 3 Tage zum nächsten Abrechnungsdatum. OurNotch läuft bis dahin, und es wird nichts abgebucht.', 'Behältst du es, wird der einmalige Preis am Ende der 3 Tage einmal abgebucht, danach nie wieder.'] },
       { h: 'Erstattungen', p: ['Da OurNotch ein digitales Produkt ist, das du sofort nutzen kannst, sind Käufe endgültig und wir erstatten nicht, außer wenn dir das Recht deines Landes einen Anspruch gibt (zum Beispiel Verbraucherregeln in der EU oder im Vereinigten Königreich).'] },
       { h: 'Klappt etwas nicht?', p: ['Schreib uns zuerst. Die meisten Probleme (Aktivieren, Umzug auf einen neuen Mac, Verbinden mit deiner Liebe) sind schnell gelöst, und **Meine Lizenz** erklärt die häufigsten.'] },
       { h: 'Eine Erstattung anfragen', p: ['Wenn dir das Gesetz eine Erstattung zusteht, schreib uns von der E-Mail-Adresse, mit der du bezahlt hast, und schick deinen Beleg mit. Erstattungen macht Dodo Payments, unser Verkäufer (Merchant of Record), auf die Zahlungsart, die du genutzt hast. Eine erstattete Lizenz funktioniert auf beiden Macs des Paares nicht mehr.'] },
@@ -492,7 +498,7 @@ const de: Copy = {
     title: 'AGB · OurNotch', kicker: 'Nutzungsbedingungen', h1: 'Die kurze, faire Fassung.', updated: 'Zuletzt aktualisiert: Oktober 2026',
     sections: [
       { h: 'Eine Lizenz pro Paar', p: ['Ein Kauf gilt für zwei Macs: den des Käufers, der die Lizenz hält, und den seines Partners, solange beide verbunden sind. Die Lizenz gehört dem Käufer und kann auf einen neuen Mac umziehen (ein Mac gleichzeitig).'] },
-      { h: 'Bezahlung', p: ['OurNotch ist ein einmaliger Kauf, kein Abo. Dodo Payments ist der Verkäufer (Merchant of Record): Es nimmt die Zahlung entgegen, berechnet Steuern und schickt deinen Beleg.'] },
+      { h: 'Gratis-Test und Bezahlung', p: ['OurNotch startet mit einem 3-tägigen Gratis-Test. Zu Beginn fügst du eine Zahlungsmethode hinzu. Wenn du nicht vor Ende des Tests kündigst, wird der einmalige Preis an dessen Ende einmal abgebucht, danach nie wieder.', 'Dodo Payments, der Verkäufer (Merchant of Record), führt das als Abo, das nur einmal abrechnet und 20 Jahre läuft, daher kann dein Beleg dieses Wort verwenden. Es nimmt die Zahlung entgegen, berechnet Steuern und schickt deinen Beleg.'] },
       { h: 'Erstattungen', p: ['Da OurNotch ein digitales Produkt ist, das du sofort nutzen kannst, sind Käufe endgültig und wir erstatten nicht – außer wenn dir das Recht deines Landes einen Anspruch gibt (zum Beispiel Verbraucherregeln in der EU). Eine erstattete Lizenz funktioniert nicht mehr.'] },
       { h: 'Faire Nutzung und Entzug', p: ['Bitte teile deinen Schlüssel nicht öffentlich, verkaufe ihn nicht weiter und nutze OurNotch nicht mit einer veränderten Kopie. Bei Missbrauch können wir die Lizenz entziehen; dann stoppt OurNotch auf beiden Macs des Paares.'] },
       { h: 'Was OurNotch braucht', p: ['macOS 14 Sonoma oder neuer und iCloud auf beiden Macs. OurNotch baut auf Apples iCloud; Ausfälle dort liegen nicht in unserer Hand.'] },
