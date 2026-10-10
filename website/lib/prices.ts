@@ -11,13 +11,16 @@ export function priceFor(country?: string | null): string {
   return '$4.50';
 }
 
-// ponytail: Dodo test mode until launch (slice 10 switches to the live product and checkout host).
-const PRODUCT = 'pdt_0Np1n3lC4hykWhTwMaNVV';
+// ponytail: Dodo test mode until launch, then the live product and checkout host.
+// The 3-day free trial: a subscription that charges the one-time price once, on day 3, and lasts 20 years
+// (Dodo's longest), so keeping it means paying once.
+export const PRODUCT = 'pdt_0NpQhZeQ6pJ3R92rDOQAr';
+export const CHECKOUT_HOST = 'https://test.checkout.dodopayments.com';
 
-// Dodo's hosted checkout. After paying, Dodo sends the buyer to the thank-you page in their language
-// (`/thanks`, `/fr/thanks`, `/de/thanks`) with `license_key` added.
-export function checkoutUrl(origin: string, thanksPath = '/thanks'): string {
-  return `https://test.checkout.dodopayments.com/buy/${PRODUCT}?quantity=1&redirect_url=${encodeURIComponent(origin + thanksPath)}`;
+// Every "Try it free" button: our /buy route starts the checkout, then Dodo returns the buyer to the
+// thank-you page in their language (`/thanks`, `/fr/thanks`, `/de/thanks`) with `license_key` added.
+export function checkoutUrl(thanksPath = '/thanks'): string {
+  return `/buy?thanks=${encodeURIComponent(thanksPath)}`;
 }
 
 // The site's own address, from the request (localhost in development, ournotch.app live).
