@@ -13,6 +13,7 @@ struct NoteTab: View {
     @State private var isLocked = false
     @State private var showsSendStatus = false
     @FocusState private var focused: Bool
+    @Environment(\.isShownTab) private var isShown
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -26,6 +27,8 @@ struct NoteTab: View {
         }
         .cardStyle()
         .onChange(of: focused) { _, now in isEditing = now }
+        // Kept built while another tab shows: let go of the keyboard so typing never goes somewhere unseen.
+        .onChange(of: isShown) { _, shown in if !shown { focused = false } }
     }
 
     // MARK: Conversation

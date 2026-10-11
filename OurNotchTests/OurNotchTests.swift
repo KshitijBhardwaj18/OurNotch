@@ -412,14 +412,36 @@ struct PartnersTests {
         you.sendEmoji("❤️", mode: .notch)
         you.sendEmoji("😘", mode: .fullScreen)
         you.sendEmoji("🌹", mode: .notch)
-        #expect(you.emojiStatus == .sending) // bundled, not saved yet
-        try await Task.sleep(for: Config.emojiBundleDelay + .milliseconds(200))
+        #expect(you.emojiStatus == .sending) // the first tap's save carries all three
+        try await Task.sleep(for: .milliseconds(300))
 
         await partner.sync()
         #expect(arrived == 3)
         await you.sync()
         #expect(latest?.char == "🌹" && latest?.mode == .notch && latest?.sentAt != nil)
         #expect(you.emojiStatus == .delivered)
+    }
+
+    @Test func aBurstOfEmojisGoesOutAsFewSavesAndSeenDoesntTouchTheOutbox() async throws {
+        let people = TwoPartners()
+        let (you, partner) = try await people.paired()
+        you.sendEmoji("❤️", mode: .notch)
+        try await Task.sleep(for: .milliseconds(300))          // the first tap saves at once
+        you.sendEmoji("😘", mode: .notch)
+        try await Task.sleep(for: .milliseconds(300))          // the next waits for the gap
+        await partner.sync()
+        #expect(partner.emojisReceived == 1)
+
+        // Showing it saves a receipt, not the partner's outbox, so it doesn't ping me.
+        let outboxBefore = try await people.mailbox.fetchOutbox(owner: people.partner.myId)
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(try await people.mailbox.fetchOutbox(owner: people.partner.myId) == outboxBefore)
+        await you.sync()
+        #expect(you.partnerOutbox.seenEmojis == 1)              // "delivered" still reaches me
+
+        try await Task.sleep(for: .seconds(Config.emojiSaveGap))
+        await partner.sync()
+        #expect(partner.emojisReceived == 2)
     }
 
     @Test func invalidMessageIsNotSent() async throws {

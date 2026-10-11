@@ -3,8 +3,8 @@ import SwiftUI
 /// Values that tune the app. Everything that might need adjusting lives here.
 /// Sizes, colors and timings follow `devpost/design_handoff/README.md`.
 enum Config {
-    /// Rapid emoji taps within this pause are bundled into one save.
-    static let emojiBundleDelay: Duration = .seconds(1)
+    /// After an emoji save, further taps wait this long and go out together in one save (one ping).
+    static let emojiSaveGap: TimeInterval = 3
     /// The one-tap emojis on the Emoji tab.
     static let emojis = ["❤️", "🥰", "😘", "💋", "🫶", "🤗", "🌹"]
     /// Moods for the Mood tab: the emoji travels; the label explains it.

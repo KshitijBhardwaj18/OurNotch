@@ -4,13 +4,14 @@ import SwiftUI
 /// the top, and below it your time together and their mood. Each card opens its tab.
 struct HomeTab: View {
     let state: AppState
+    @Environment(\.isShownTab) private var isShown
     /// Opens another tab (a card was clicked).
     let go: (NotchTab) -> Void
 
     var body: some View {
         let side = Config.Notch.contentSize.height
         // Ticks every second, only while the notch is open on Home.
-        TimelineView(.periodic(from: .now, by: 1)) { context in
+        TimelineView(.periodic(from: .now, by: isShown ? 1 : 3600)) { context in
             HStack(spacing: 10) {
                 card(.photo, hint: String(localized: "Send \(state.partnerName.lowercased()) a photo back ♡"), leading: true) { photoTile(now: context.date) }.frame(width: side, height: side)
                 VStack(spacing: 10) {

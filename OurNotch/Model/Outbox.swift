@@ -32,7 +32,35 @@ struct Outbox: Codable, Equatable {
     var awayUntil: Date?
 }
 
+/// What I've seen of my partner's things, saved apart from my outbox (see `Mailbox.saveReceipts`).
+struct Receipts: Codable, Equatable {
+    var seenEmojis = 0
+    var seenMessageId: UUID?
+    var seenPhotoId: UUID?
+}
+
 extension Outbox {
+    var receipts: Receipts { Receipts(seenEmojis: seenEmojis, seenMessageId: seenMessageId, seenPhotoId: seenPhotoId) }
+
+    /// Everything but the receipts: what's worth saving (and pinging the partner for).
+    var content: Outbox {
+        var content = self
+        content.seenEmojis = 0
+        content.seenMessageId = nil
+        content.seenPhotoId = nil
+        return content
+    }
+
+    /// The partner's outbox with their newest receipts. Builds before 1.0.7 keep receipts in the outbox only.
+    func with(_ receipts: Receipts?) -> Outbox {
+        guard let receipts else { return self }
+        var merged = self
+        merged.seenEmojis = max(seenEmojis, receipts.seenEmojis)
+        merged.seenMessageId = receipts.seenMessageId ?? seenMessageId
+        merged.seenPhotoId = receipts.seenPhotoId ?? seenPhotoId
+        return merged
+    }
+
     /// My last notes, oldest first.
     var notes: [Message] { (earlierMessages ?? []) + (message.map { [$0] } ?? []) }
 

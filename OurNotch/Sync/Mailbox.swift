@@ -14,6 +14,11 @@ protocol Mailbox: Sendable {
 
     func saveOutbox(_ payload: Data, owner: String) async throws
     func fetchOutbox(owner: String) async throws -> Data?
+    /// What the owner has seen of their partner's things (the partner's "delivered" ticks). Kept out of the
+    /// outbox so saving it doesn't ping the partner: Apple holds back silent pings an app sends too many of.
+    func saveReceipts(_ payload: Data, owner: String) async throws
+    /// The owner's outbox and receipts, in one request.
+    func fetchOutboxAndReceipts(owner: String) async throws -> (outbox: Data?, receipts: Data?)
 
     /// The owner's latest photo, already encrypted. One per owner; a new one replaces the old.
     func savePhoto(_ sealed: Data, owner: String) async throws
@@ -66,6 +71,14 @@ struct LocalFileMailbox: Mailbox {
 
     func fetchOutbox(owner: String) async throws -> Data? {
         try read(name: "outbox-\(owner)")
+    }
+
+    func saveReceipts(_ payload: Data, owner: String) async throws {
+        try write(payload, name: "receipts-\(owner)")
+    }
+
+    func fetchOutboxAndReceipts(owner: String) async throws -> (outbox: Data?, receipts: Data?) {
+        (try read(name: "outbox-\(owner)"), try read(name: "receipts-\(owner)"))
     }
 
     func savePhoto(_ sealed: Data, owner: String) async throws {

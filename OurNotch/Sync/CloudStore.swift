@@ -41,6 +41,34 @@ struct CloudStore: Mailbox {
         try await fetch("outbox-\(owner)")?["payload"] as? Data
     }
 
+    /// An Outbox record too (no schema change), but its `ownerId` isn't the owner's, so the partner's ping
+    /// subscription (`ownerId == owner`) doesn't fire for it.
+    func saveReceipts(_ payload: Data, owner: String) async throws {
+        let record = CKRecord(recordType: "Outbox", recordID: .init(recordName: "receipts-\(owner)"))
+        record["ownerId"] = "\(owner).receipts"
+        record["payload"] = payload
+        try await upsert(record)
+    }
+
+    func fetchOutboxAndReceipts(owner: String) async throws -> (outbox: Data?, receipts: Data?) {
+        let outbox = CKRecord.ID(recordName: "outbox-\(owner)"), receipts = CKRecord.ID(recordName: "receipts-\(owner)")
+        let config = CKOperation.Configuration()
+        config.timeoutIntervalForRequest = Config.Cloud.requestTimeout
+        let results = try await retrying {
+            try await database.configuredWith(configuration: config) { try await $0.records(for: [outbox, receipts]) }
+        }
+        // A record that doesn't exist yet comes back as an unknownItem error for that ID only.
+        func payload(_ id: CKRecord.ID) throws -> Data? {
+            switch results[id] {
+            case .success(let record): return record["payload"] as? Data
+            case .failure(let error as CKError) where error.code == .unknownItem: return nil
+            case .failure(let error): throw error
+            case nil: return nil
+            }
+        }
+        return (try payload(outbox), try payload(receipts))
+    }
+
     // MARK: Photo
 
     func savePhoto(_ sealed: Data, owner: String) async throws {

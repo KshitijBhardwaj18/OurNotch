@@ -6,22 +6,24 @@ struct OpenNotchView: View {
     @Binding var tab: NotchTab
     @Binding var showsSettings: Bool
     @Binding var isEditing: Bool
+    /// Tabs shown since the notch opened. They stay built (hidden) so switching back costs nothing:
+    /// building a tab took 30 to 40 ms, a few dropped frames on every switch.
+    @State private var built: Set<NotchTab> = []
 
     var body: some View {
         VStack(spacing: 0) {
-            Group {
-                if showsSettings {
-                    SettingsPanel(state: state)
-                } else {
-                    switch tab {
-                    case .home: HomeTab(state: state) { tab = $0 }
-                    case .note: NoteTab(state: state, isEditing: $isEditing)
-                    case .emoji: EmojiTab(state: state)
-                    case .mood: MoodTab(state: state)
-                    case .photo: PhotoTab(state: state)
-                    case .stats: StatsTab(state: state)
+            ZStack {
+                ForEach(NotchTab.allCases, id: \.self) { each in
+                    if built.contains(each) || each == tab {
+                        let shown = each == tab && !showsSettings
+                        page(each)
+                            .opacity(shown ? 1 : 0)
+                            .allowsHitTesting(shown)
+                            .accessibilityHidden(!shown)
+                            .environment(\.isShownTab, shown)
                     }
                 }
+                if showsSettings { SettingsPanel(state: state) }
             }
             .frame(width: Config.Notch.contentSize.width, height: Config.Notch.contentSize.height)
 
@@ -34,6 +36,23 @@ struct OpenNotchView: View {
         .padding(.bottom, 14)
         .overlayPreferenceValue(HintKey.self) { HintLayer(hint: $0) } // on top of every card and the tab bar
         .onChange(of: showsSettings ? nil : tab, initial: true) { _, shown in state.show(tab: shown) }
+        .onChange(of: tab, initial: true) { _, tab in built.insert(tab) }
         .onDisappear { state.show(tab: nil) }
     }
+
+    @ViewBuilder private func page(_ tab: NotchTab) -> some View {
+        switch tab {
+        case .home: HomeTab(state: state) { self.tab = $0 }
+        case .note: NoteTab(state: state, isEditing: $isEditing)
+        case .emoji: EmojiTab(state: state)
+        case .mood: MoodTab(state: state)
+        case .photo: PhotoTab(state: state)
+        case .stats: StatsTab(state: state)
+        }
+    }
+}
+
+extension EnvironmentValues {
+    /// False while a tab is kept built but hidden, so its once-a-second clock can rest.
+    @Entry var isShownTab = true
 }

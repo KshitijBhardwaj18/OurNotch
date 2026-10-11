@@ -84,6 +84,10 @@ final class AppState {
     /// Labels this identity's lines in the diagnostics log ("me", or "sim" for the Partner Simulator).
     @ObservationIgnored private let who: String
     @ObservationIgnored private var saveTask: Task<Void, Never>?
+    /// When the last emoji save started, so a burst of taps goes out as one save every few seconds.
+    @ObservationIgnored private var lastEmojiSave = Date.distantPast
+    /// The receipts the mailbox has; starts as the outbox's (builds before 1.0.7 kept them there).
+    @ObservationIgnored private var savedReceipts = Receipts()
     @ObservationIgnored private var syncTask: Task<Void, Never>?
     @ObservationIgnored private var isSyncing = false
     /// A ping or wake that arrived mid-check; it runs right after, so a fresh change isn't missed.
@@ -114,6 +118,7 @@ final class AppState {
         partnerPhoto = photos.load(.partner).flatMap(NSImage.init(data:))
         myOutbox = store.myOutbox ?? Outbox()
         savedOutbox = store.savedOutbox ?? Outbox()
+        savedReceipts = savedOutbox.receipts
         banner = store.banner
         bannerStartedAt = store.bannerStartedAt
         // Quit mid-scroll and reopened after its passes would have ended: it's done, don't flash it.
@@ -193,19 +198,23 @@ final class AppState {
 
     // MARK: Sending
 
-    /// Counts the emoji locally right away; rapid taps are bundled into one save.
+    /// Counts the emoji locally right away. The first tap saves at once; taps within `Config.emojiSaveGap`
+    /// of that save go out together in the next one. Every save pings the partner, and Apple holds silent
+    /// pings back when an app sends too many (Beta 1.0.6: one save per tap, none delivered for 30 min).
     func sendEmoji(_ char: String, mode: EmojiMode) {
         lastActivity = .now
         myOutbox.emojisSent += 1
         myOutbox.lastEmoji = SentEmoji(char: char, mode: mode, sentAt: .now)
         store.myOutbox = myOutbox
         note("tap: emoji #\(myOutbox.emojisSent) \(char) (\(mode.rawValue))")
-        saveTask?.cancel()
+        guard saveTask == nil else { return } // the save already waiting carries this tap too
+        let wait = Config.emojiSaveGap - Date.now.timeIntervalSince(lastEmojiSave)
         saveTask = Task { [weak self] in
-            try? await Task.sleep(for: Config.emojiBundleDelay)
-            guard !Task.isCancelled, let self else { return }
+            if wait > 0 { try? await Task.sleep(for: .seconds(wait)) }
+            guard let self else { return }
+            self.lastEmojiSave = .now
+            self.saveTask = nil // taps from here on wait for the next save
             await self.save()
-            self.saveTask = nil
         }
     }
 
@@ -368,16 +377,19 @@ final class AppState {
                 Task { await sync(next) }
             }
         }
-        if saveTask == nil, myOutbox != savedOutbox { await save() }
+        if saveTask == nil, myOutbox.content != savedOutbox.content { await save() }
 
         let started = Date.now
         let partner: Outbox
         do {
-            guard let sealed = try await mailbox.fetchOutbox(owner: pairing.partnerId) else {
+            let fetched = try await mailbox.fetchOutboxAndReceipts(owner: pairing.partnerId)
+            guard fetched.outbox != nil || fetched.receipts != nil else {
                 if source != .poll { note("[\(source.rawValue)] partner has no outbox yet") }
                 return
             }
-            partner = try JSONDecoder().decode(Outbox.self, from: Crypto.open(sealed, with: key))
+            let receipts = try fetched.receipts.map { try JSONDecoder().decode(Receipts.self, from: Crypto.open($0, with: key)) }
+            let outbox = try fetched.outbox.map { try JSONDecoder().decode(Outbox.self, from: Crypto.open($0, with: key)) }
+            partner = (outbox ?? Outbox()).with(receipts)
         } catch {
             note("[\(source.rawValue)] fetch FAILED: \(error.diagnosticDescription)",
                  metric: Metric(kind: .cloud, name: "fetch", ms: Metric.ms(since: started), detail: "\(source.rawValue) FAILED \(error.diagnosticDescription)"))
@@ -450,12 +462,9 @@ final class AppState {
         } else if source != .poll {
             note("[\(source.rawValue)] no change found; fetch \(fetchTime)", metric: fetchMetric)
         }
-        let seenSomethingNew = myOutbox.seenEmojis != savedOutbox.seenEmojis
-            || myOutbox.seenMessageId != savedOutbox.seenMessageId
-            || myOutbox.seenPhotoId != savedOutbox.seenPhotoId
-        guard seenSomethingNew else { return }
+        guard myOutbox.receipts != savedReceipts else { return }
         store.myOutbox = myOutbox
-        await save() // tells the partner "delivered"
+        await saveReceipts() // tells the partner "delivered"
     }
 
     /// The partner's tap → shown on this Mac.
@@ -512,6 +521,22 @@ final class AppState {
         } catch {
             note("save FAILED (\(changes)), will retry: \(error.diagnosticDescription)",
                  metric: Metric(kind: .cloud, name: "save", ms: Metric.ms(since: started), detail: "FAILED \(error.diagnosticDescription)"))
+        }
+    }
+
+    /// "Seen" goes in its own record, which doesn't ping the partner; their next check reads it.
+    private func saveReceipts() async {
+        let receipts = myOutbox.receipts
+        let started = Date.now
+        do {
+            let sealed = try Crypto.seal(JSONEncoder().encode(receipts), with: key)
+            try await mailbox.saveReceipts(sealed, owner: pairing.myId)
+            savedReceipts = receipts
+            note("saved receipts (seen emojis \(receipts.seenEmojis)) in \(Self.ms(since: started))",
+                 metric: Metric(kind: .cloud, name: "save", ms: Metric.ms(since: started), detail: "receipts"))
+        } catch {
+            note("receipts save FAILED, will retry: \(error.diagnosticDescription)",
+                 metric: Metric(kind: .cloud, name: "save", ms: Metric.ms(since: started), detail: "receipts FAILED \(error.diagnosticDescription)"))
         }
     }
 

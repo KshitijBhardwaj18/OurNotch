@@ -3,12 +3,13 @@ import SwiftUI
 /// The Together tab: your life together in numbers, as six equal cards, the seconds counting up live in pink.
 struct StatsTab: View {
     let state: AppState
+    @Environment(\.isShownTab) private var isShown
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 10), count: 3)
 
     var body: some View {
         // Ticks every second, only while the notch is open on Stats.
-        TimelineView(.periodic(from: .now, by: 1)) { context in
+        TimelineView(.periodic(from: .now, by: isShown ? 1 : 3600)) { context in
             let since = state.togetherSince
             let height = (Config.Notch.contentSize.height - 10) / 2
             let value = { (compute: (Date) -> Int) in since.map { compute($0).formatted() } ?? "…" }
