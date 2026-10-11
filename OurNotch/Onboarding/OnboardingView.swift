@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 /// Drives the first-launch steps, starting at the licence gate (`spec-m2.md > Licence Gate`).
 /// Buyer: gate → licence key → name → invite → date → login → done. Partner: gate → name → join → login → done.
@@ -7,7 +8,7 @@ import SwiftUI
 @MainActor
 @Observable
 final class OnboardingModel {
-    enum Step { case gate, licenceKey, welcome, icloud, name, invite, join, date, login, done }
+    enum Step { case gate, licenceKey, welcome, icloud, name, invite, join, date, notifications, login, done }
 
     var step: Step {
         didSet {
@@ -66,8 +67,8 @@ final class OnboardingModel {
     /// The steps on the current path, for the page dots.
     var path: [Step] {
         joining || pairing?.role == .joiner
-            ? [start, .name, .join, .login, .done]
-            : (start == .gate ? [.gate, .licenceKey] : [.welcome]) + [.name, .invite, .date, .login, .done]
+            ? [start, .name, .join, .notifications, .login, .done]
+            : (start == .gate ? [.gate, .licenceKey] : [.welcome]) + [.name, .invite, .date, .notifications, .login, .done]
     }
 
     func go(to step: Step) {
@@ -75,6 +76,7 @@ final class OnboardingModel {
         if step != .invite { waitTask?.cancel() }
         self.step = step
         if step == .invite { startInvite() }
+        if step == .notifications { skipNotificationsIfAnswered() }
     }
 
     // MARK: Licence gate
@@ -233,7 +235,7 @@ final class OnboardingModel {
                 self.foundInvite = nil // declined, used or expired: back to typing a code
                 throw error
             }
-            self.go(to: .login)
+            self.go(to: .notifications)
         }
     }
 
@@ -270,7 +272,58 @@ final class OnboardingModel {
 
     func saveTogetherSince() {
         store.togetherSince = togetherSince
-        go(to: .login)
+        go(to: .notifications)
+    }
+
+    // MARK: Notifications
+
+    /// Required: badge pings reach the Mac within a second (silent ones Apple holds back), and a badge needs
+    /// notification permission. OurNotch never shows a banner.
+    func allowNotifications() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.badge]) { granted, _ in
+            Task { @MainActor in
+                Diagnostics.shared.record("onboarding: notifications \(granted ? "allowed" : "not allowed")")
+                if granted { self.go(to: .login) } else { self.waitForNotificationsInSettings() }
+            }
+        }
+    }
+
+    /// Turned off before (a "Don't Allow", or a reinstall): macOS won't ask again, so it's System Settings.
+    private(set) var notificationsOff = false
+    @ObservationIgnored private var settingsWatch: Task<Void, Never>?
+
+    func openNotificationSettings() {
+        let id = Bundle.main.bundleIdentifier ?? ""
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=\(id)")!)
+    }
+
+    /// Already allowed: nothing to ask. Turned off: say where to turn them on.
+    private func skipNotificationsIfAnswered() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let status = settings.authorizationStatus
+            Task { @MainActor in
+                guard self.step == .notifications else { return }
+                if status == .authorized { self.go(to: .login) } else if status == .denied { self.waitForNotificationsInSettings() }
+            }
+        }
+    }
+
+    /// Checks every second while this step shows, and carries on as soon as they're switched on.
+    private func waitForNotificationsInSettings() {
+        notificationsOff = true
+        settingsWatch?.cancel()
+        settingsWatch = Task {
+            while !Task.isCancelled, step == .notifications {
+                let status = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+                if status == .authorized {
+                    Diagnostics.shared.record("onboarding: notifications switched on in System Settings")
+                    notificationsOff = false
+                    go(to: .login)
+                    return
+                }
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
     }
 
     func setOpensAtLogin(_ enabled: Bool) {
@@ -377,6 +430,11 @@ struct OnboardingView: View {
                     .font(.system(size: 13, weight: .medium).monospacedDigit())
                     .foregroundStyle(Color.accentPink)
             }
+        case .notifications:
+            Screen(symbol: "bell.badge.fill", title: "Let love arrive instantly",
+                   message: model.notificationsOff
+                       ? "Notifications are off for OurNotch. Turn them on in System Settings, under Notifications, then OurNotch. This screen moves on by itself. OurNotch never shows banners or sounds."
+                       : "OurNotch needs notifications so your Mac hears the moment something arrives, and it's in your notch within a second. It never shows banners or sounds.") {}
         case .login:
             Screen(symbol: "laptopcomputer", title: "Keep your love close",
                    message: "Your notch will be there every time you open your Mac.") {
@@ -495,7 +553,7 @@ struct OnboardingView: View {
     @ViewBuilder private var footerLeading: some View {
         switch model.step {
         case .date:
-            Button("Skip for Now") { model.go(to: .login) }.buttonStyle(.link)
+            Button("Skip for Now") { model.go(to: .notifications) }.buttonStyle(.link)
         default:
             HStack(spacing: 6) {
                 ForEach(model.path, id: \.self) { step in
@@ -515,6 +573,7 @@ struct OnboardingView: View {
         case .icloud: "Try Again"
         case .invite: nil // advances by itself when your love joins
         case .join: model.awaitingAnswer ? nil : (model.foundInvite == nil ? "Continue" : "Yes, Ask to Join")
+        case .notifications: model.notificationsOff ? "Open System Settings" : "Allow Notifications"
         case .done: "Done"
         default: "Continue"
         }
@@ -540,6 +599,7 @@ struct OnboardingView: View {
         case .invite: break
         case .join: model.foundInvite == nil ? model.lookUpCode() : model.join()
         case .date: model.saveTogetherSince()
+        case .notifications: model.notificationsOff ? model.openNotificationSettings() : model.allowNotifications()
         case .login: model.go(to: .done)
         case .done: model.finish()
         }

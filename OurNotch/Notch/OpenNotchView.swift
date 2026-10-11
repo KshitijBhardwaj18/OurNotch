@@ -48,6 +48,7 @@ struct OpenNotchView: View {
         case .mood: MoodTab(state: state)
         case .photo: PhotoTab(state: state)
         case .stats: StatsTab(state: state)
+        case .pet: PetTab(state: state, isEditing: $isEditing)
         }
     }
 }

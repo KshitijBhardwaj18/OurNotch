@@ -30,17 +30,33 @@ struct Outbox: Codable, Equatable {
     var licenceKey: String?
     /// While I've hidden OurNotch: my partner's notch shows "away" until then, or until I'm back.
     var awayUntil: Date?
+    /// Our pet (`Pet`): set by whoever adopted it, its look as I last chose it, and my latest care.
+    var petAdoption: PetAdoption?
+    var petLook: PetLook?
+    var petCare: [PetAction]?
+    /// When this Mac last said "I'm here" (every few minutes while OurNotch runs), so my partner can tell
+    /// when it's asleep or off.
+    var lastSeen: Date?
 }
 
-/// What I've seen of my partner's things, saved apart from my outbox (see `Mailbox.saveReceipts`).
+/// What doesn't need a ping, saved apart from my outbox (see `Mailbox.saveReceipts`): what I've seen of my
+/// partner's things, and our pet, which they see on their next check (every 3 s while their notch is open).
+/// Apple allows only a few silent pings an hour; Beta 1.0.10's pet play spent them all.
 struct Receipts: Codable, Equatable {
     var seenEmojis = 0
     var seenMessageId: UUID?
     var seenPhotoId: UUID?
+    var petAdoption: PetAdoption?
+    var petLook: PetLook?
+    var petCare: [PetAction]?
+    var lastSeen: Date?
 }
 
 extension Outbox {
-    var receipts: Receipts { Receipts(seenEmojis: seenEmojis, seenMessageId: seenMessageId, seenPhotoId: seenPhotoId) }
+    var receipts: Receipts {
+        Receipts(seenEmojis: seenEmojis, seenMessageId: seenMessageId, seenPhotoId: seenPhotoId,
+                 petAdoption: petAdoption, petLook: petLook, petCare: petCare, lastSeen: lastSeen)
+    }
 
     /// Everything but the receipts: what's worth saving (and pinging the partner for).
     var content: Outbox {
@@ -48,16 +64,25 @@ extension Outbox {
         content.seenEmojis = 0
         content.seenMessageId = nil
         content.seenPhotoId = nil
+        content.petAdoption = nil
+        content.petLook = nil
+        content.petCare = nil
+        content.lastSeen = nil
         return content
     }
 
-    /// The partner's outbox with their newest receipts. Builds before 1.0.7 keep receipts in the outbox only.
+    /// The partner's outbox with their newest receipts. Builds before 1.0.7 keep receipts in the outbox only,
+    /// and before 1.0.11 the pet too.
     func with(_ receipts: Receipts?) -> Outbox {
         guard let receipts else { return self }
         var merged = self
         merged.seenEmojis = max(seenEmojis, receipts.seenEmojis)
         merged.seenMessageId = receipts.seenMessageId ?? seenMessageId
         merged.seenPhotoId = receipts.seenPhotoId ?? seenPhotoId
+        merged.petAdoption = receipts.petAdoption ?? petAdoption
+        merged.petLook = receipts.petLook ?? petLook
+        merged.petCare = receipts.petCare ?? petCare
+        merged.lastSeen = [lastSeen, receipts.lastSeen].compactMap { $0 }.max()
         return merged
     }
 

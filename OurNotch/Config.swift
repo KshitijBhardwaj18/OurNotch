@@ -5,12 +5,20 @@ import SwiftUI
 enum Config {
     /// After an emoji save, further taps wait this long and go out together in one save (one ping).
     static let emojiSaveGap: TimeInterval = 3
-    /// The one-tap emojis on the Emoji tab.
-    static let emojis = ["❤️", "🥰", "😘", "💋", "🫶", "🤗", "🌹"]
+    /// The one-tap emojis on the Emoji tab: a row of love, a row of fun and frustration.
+    static let emojis = ["❤️", "🥰", "😘", "💋", "🫶", "🤗", "🌹",
+                         "😂", "🤪", "🥳", "🙈", "🙄", "😤", "😡"]
     /// Moods for the Mood tab: the emoji travels; the label explains it.
     static let moods: [(emoji: String, label: String)] = [
-        ("🥰", String(localized: "In love")), ("😊", String(localized: "Happy")), ("🥺", String(localized: "Missing you")), ("🎉", String(localized: "Excited")), ("☕️", String(localized: "On a break")), ("🍕", String(localized: "Hungry")),
-        ("💻", String(localized: "Busy")), ("🎧", String(localized: "Focused")), ("🏃", String(localized: "Out")), ("😴", String(localized: "Sleepy")), ("😔", String(localized: "Low")), ("🤒", String(localized: "Unwell")),
+        // Good vibes
+        ("🥰", String(localized: "In love")), ("😊", String(localized: "Happy")), ("🥺", String(localized: "Missing you")), ("🎉", String(localized: "Excited")),
+        ("🤪", String(localized: "Silly")), ("🥳", String(localized: "Partying")), ("😌", String(localized: "Calm")),
+        // What I'm up to
+        ("☕️", String(localized: "On a break")), ("🍕", String(localized: "Hungry")), ("💻", String(localized: "Busy")), ("🎧", String(localized: "Focused")),
+        ("🏃", String(localized: "Out")), ("🎮", String(localized: "Gaming")), ("😴", String(localized: "Sleepy")),
+        // Rough moments
+        ("🥱", String(localized: "Bored")), ("😔", String(localized: "Low")), ("🤒", String(localized: "Unwell")), ("😩", String(localized: "Stressed")),
+        ("🙄", String(localized: "Annoyed")), ("😤", String(localized: "Frustrated")), ("😡", String(localized: "Angry")),
     ]
 
     /// The word for a mood emoji, in this Mac's language (only the emoji travels between Macs).
@@ -106,6 +114,30 @@ enum Config {
         #else
         static let downloadURL = "\(Licence.website)/download"
         #endif
+    }
+
+    enum Presence {
+        /// How often each Mac says "I'm here" (quietly: no ping).
+        static let heartbeat: TimeInterval = 5 * 60
+        /// No word for this long and my love's Mac counts as asleep or off.
+        static let asleepAfter: TimeInterval = 15 * 60
+    }
+
+    enum Pet {
+        /// From just fed to hungry (fullness 1 → 0), and from cuddled to lonely.
+        static let hungerTime: TimeInterval = 24 * 3600
+        static let lonelyTime: TimeInterval = 36 * 3600
+        /// Two days without food and it falls sick; a meal nurses it back over a few hours.
+        static let sickAfter: TimeInterval = 48 * 3600
+        static let recoveringFor: TimeInterval = 6 * 3600
+        /// It sleeps through the night, in this Mac's time.
+        static let bedtime = 23
+        static let wakeUp = 7
+        /// Days since adoption when it becomes young, grown up, and wise.
+        static let stageDays = (young: 3, grown: 14, wise: 60)
+        /// Care each of you keeps in your outbox; older care drops off.
+        static let careKept = 12
+        static let names: [PetKind: String] = [.cat: "Mochi", .dog: "Biscuit"]
     }
 
     enum Message {

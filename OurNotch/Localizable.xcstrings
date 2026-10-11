@@ -7,6 +7,38 @@
     "  %@" : {
       "shouldTranslate" : false
     },
+    "%@ cuddled %@ %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ a câliné %2$@ %3$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat %2$@ gekuschelt %3$@"
+          }
+        }
+      }
+    },
+    "%@ fed %@ %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ a nourri %2$@ %3$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat %2$@ gefüttert %3$@"
+          }
+        }
+      }
+    },
     "%@ invited you" : {
       "localizations" : {
         "fr" : {
@@ -23,6 +55,118 @@
         }
       }
     },
+    "%@ is doing fine" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ va bien"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ geht es gut"
+          }
+        }
+      }
+    },
+    "%@ is fast asleep, shh" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ dort profondément, chut"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ schläft tief, psst"
+          }
+        }
+      }
+    },
+    "%@ is getting better" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ va mieux"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ geht es besser"
+          }
+        }
+      }
+    },
+    "%@ is hungry" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ a faim"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ hat Hunger"
+          }
+        }
+      }
+    },
+    "%@ is poorly ♡ a meal will help" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est malade ♡ un repas l’aidera"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ist krank ♡ eine Mahlzeit hilft"
+          }
+        }
+      }
+    },
+    "%@ is so happy" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ est tellement heureux"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ist so glücklich"
+          }
+        }
+      }
+    },
+    "%@ misses you both" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ vous attend tous les deux"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ vermisst euch beide"
+          }
+        }
+      }
+    },
     "%@ planned a surprise for you, sweetheart ♡\n\nA little place in your Mac's notch where things from both of us arrive.\n\n1. Download OurNotch (free for you): %@\n2. Open it, choose \"I Have an Invite Code\" and type: %@\n\nThe code works for 24 hours.\n\nlove, %@" : {
       "localizations" : {
         "fr" : {
@@ -35,6 +179,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ hat eine Überraschung für dich geplant, Schatz ♡\n\nEin kleiner Ort in der Notch deines Macs, an dem Dinge von uns beiden ankommen.\n\n1. Lade OurNotch herunter (für dich kostenlos): %2$@\n2. Öffne es, wähle „Ich habe einen Einladungscode“ und gib ein: %3$@\n\nDer Code gilt 24 Stunden.\n\nIn Liebe, %4$@"
+          }
+        }
+      }
+    },
+    "%@ played with %@ %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ a joué avec %2$@ %3$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat mit %2$@ gespielt %3$@"
+          }
+        }
+      }
+    },
+    "%@ sent you %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ t’a envoyé %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat dir %2$@ geschickt"
+          }
+        }
+      }
+    },
+    "%@ sent you %@ %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ t’a envoyé %2$@ %3$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat dir %2$@ geschickt · %3$@"
+          }
+        }
+      }
+    },
+    "%@ taught %@ a trick %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ a appris un tour à %2$@ %3$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat %2$@ einen Trick beigebracht %3$@"
           }
         }
       }
@@ -57,6 +265,38 @@
     },
     "%@ · %@" : {
       "shouldTranslate" : false
+    },
+    "%@ · %lld days with you" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$lld jours avec vous"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · %2$lld Tage bei euch"
+          }
+        }
+      }
+    },
+    "%@ · new today" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · arrivé aujourd’hui"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · heute neu"
+          }
+        }
+      }
     },
     "%@'s mood" : {
       "localizations" : {
@@ -331,6 +571,71 @@
         }
       }
     },
+    "Adopt" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adopter"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adoptieren"
+          }
+        }
+      }
+    },
+    "Adopt a little one together" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adoptez un petit ensemble"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adoptiert gemeinsam einen Kleinen"
+          }
+        }
+      }
+    },
+    "Allow Notifications" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser les notifications"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen erlauben"
+          }
+        }
+      }
+    },
+    "Allow notifications so your Mac hears the moment something arrives, and it's in your notch within a second. OurNotch never shows banners or sounds." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorise les notifications pour que ton Mac sache dès qu’une chose arrive : elle est dans ton encoche en une seconde. OurNotch n’affiche jamais de bannière ni de son."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaube Mitteilungen, damit dein Mac sofort merkt, wenn etwas ankommt: Es ist in einer Sekunde in deiner Notch. OurNotch zeigt nie Banner und macht keine Töne."
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
     "And not one of them wasted ♡" : {
       "localizations" : {
         "fr" : {
@@ -347,6 +652,38 @@
         }
       },
       "extractionState" : "stale"
+    },
+    "Angry" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En colère"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wütend"
+          }
+        }
+      }
+    },
+    "Annoyed" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agacé"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genervt"
+          }
+        }
+      }
     },
     "Appears" : {
       "localizations" : {
@@ -381,6 +718,38 @@
         }
       }
     },
+    "Bored" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ennuyé"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelangweilt"
+          }
+        }
+      }
+    },
+    "Bow" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nœud"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schleife"
+          }
+        }
+      }
+    },
     "Busy" : {
       "localizations" : {
         "fr" : {
@@ -397,6 +766,22 @@
         }
       }
     },
+    "Calm" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calme"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entspannt"
+          }
+        }
+      }
+    },
     "Can't reach the shop right now. Check your internet and try again." : {
       "localizations" : {
         "fr" : {
@@ -409,6 +794,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Der Shop ist gerade nicht erreichbar. Prüf deine Internetverbindung und versuch es noch mal."
+          }
+        }
+      }
+    },
+    "Cap" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Casquette"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kappe"
+          }
+        }
+      }
+    },
+    "Cat" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chat"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Katze"
           }
         }
       }
@@ -506,6 +923,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Datum wählen"
+          }
+        }
+      }
+    },
+    "Coat" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pelage"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fell"
           }
         }
       }
@@ -735,6 +1168,22 @@
         }
       }
     },
+    "Dog" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chien"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hund"
+          }
+        }
+      }
+    },
     "Don't have one? Get OurNotch" : {
       "localizations" : {
         "fr" : {
@@ -763,6 +1212,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fertig"
+          }
+        }
+      }
+    },
+    "Dress up" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Habiller"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anziehen"
           }
         }
       }
@@ -980,6 +1445,38 @@
         }
       }
     },
+    "Feed" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nourrir"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füttern"
+          }
+        }
+      }
+    },
+    "Feed it, cuddle it, teach it tricks, from both your Macs. It grows up with you two." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nourrissez-le, câlinez-le, apprenez-lui des tours depuis vos deux Mac. Il grandit avec vous."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Füttert, kuschelt und bringt ihm Tricks bei, von beiden Macs aus. Es wächst mit euch auf."
+          }
+        }
+      }
+    },
     "Find My Licence" : {
       "localizations" : {
         "fr" : {
@@ -996,6 +1493,22 @@
         }
       }
     },
+    "Flower" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fleur"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blume"
+          }
+        }
+      }
+    },
     "Focused" : {
       "localizations" : {
         "fr" : {
@@ -1008,6 +1521,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Konzentriert"
+          }
+        }
+      }
+    },
+    "Food" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repas"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Futter"
           }
         }
       }
@@ -1029,6 +1558,22 @@
       },
       "extractionState" : "stale"
     },
+    "Frustrated" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frustré"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frustriert"
+          }
+        }
+      }
+    },
     "Full screen" : {
       "localizations" : {
         "fr" : {
@@ -1041,6 +1586,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vollbild"
+          }
+        }
+      }
+    },
+    "Gaming" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je joue"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am Zocken"
           }
         }
       }
@@ -1482,6 +2043,22 @@
         }
       }
     },
+    "Later" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus tard"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Später"
+          }
+        }
+      }
+    },
     "Lazy Sundays included ♡" : {
       "localizations" : {
         "fr" : {
@@ -1498,6 +2075,22 @@
         }
       },
       "extractionState" : "stale"
+    },
+    "Let love arrive instantly" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que l’amour arrive tout de suite"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit Liebe sofort ankommt"
+          }
+        }
+      }
     },
     "Licence" : {
       "localizations" : {
@@ -1563,6 +2156,22 @@
         }
       },
       "extractionState" : "stale"
+    },
+    "Love" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amour"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liebe"
+          }
+        }
+      }
     },
     "Low" : {
       "localizations" : {
@@ -1775,6 +2384,23 @@
         }
       }
     },
+    "Not Now" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas maintenant"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht jetzt"
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
     "Not set yet" : {
       "localizations" : {
         "fr" : {
@@ -1807,6 +2433,38 @@
         }
       },
       "extractionState" : "stale"
+    },
+    "Nothing" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nichts"
+          }
+        }
+      }
+    },
+    "Notifications are off for OurNotch. Turn them on in System Settings, under Notifications, then OurNotch. This screen moves on by itself. OurNotch never shows banners or sounds." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les notifications sont désactivées pour OurNotch. Active-les dans Réglages Système, sous Notifications, puis OurNotch. Cet écran avance tout seul. OurNotch n’affiche jamais de bannière ni de son."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen sind für OurNotch aus. Schalte sie in den Systemeinstellungen unter Mitteilungen, dann OurNotch, ein. Dieser Bildschirm geht von selbst weiter. OurNotch zeigt nie Banner und macht keine Töne."
+          }
+        }
+      }
     },
     "Now %@ %@" : {
       "localizations" : {
@@ -1905,6 +2563,22 @@
         }
       }
     },
+    "Open System Settings" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Réglages Système"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen öffnen"
+          }
+        }
+      }
+    },
     "Open System Settings…" : {
       "localizations" : {
         "fr" : {
@@ -1984,6 +2658,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OurNotch %@"
+          }
+        }
+      }
+    },
+    "OurNotch needs notifications so your Mac hears the moment something arrives, and it's in your notch within a second. It never shows banners or sounds." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch a besoin des notifications pour que ton Mac sache dès qu’une chose arrive : elle est dans ton encoche en une seconde. Jamais de bannière ni de son."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch braucht Mitteilungen, damit dein Mac sofort merkt, wenn etwas ankommt: Es ist in einer Sekunde in deiner Notch. Nie Banner, nie Töne."
           }
         }
       }
@@ -2071,6 +2761,22 @@
     "Partner Simulator…" : {
       "shouldTranslate" : false
     },
+    "Partying" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fête"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Party"
+          }
+        }
+      }
+    },
     "Paste your licence key to use OurNotch here again." : {
       "localizations" : {
         "fr" : {
@@ -2083,6 +2789,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Füge deinen Lizenzschlüssel ein, um OurNotch hier wieder zu nutzen."
+          }
+        }
+      }
+    },
+    "Pet" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Animal"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haustier"
           }
         }
       }
@@ -2168,6 +2890,22 @@
         }
       },
       "extractionState" : "stale"
+    },
+    "Play" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouer"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spielen"
+          }
+        }
+      }
     },
     "Quit OurNotch" : {
       "localizations" : {
@@ -2298,6 +3036,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sag etwas Süßes …"
+          }
+        }
+      }
+    },
+    "Scarf" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écharpe"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schal"
           }
         }
       }
@@ -2758,6 +3512,22 @@
         }
       }
     },
+    "Silly" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fou-fou"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albern"
+          }
+        }
+      }
+    },
     "Skip for Now" : {
       "localizations" : {
         "fr" : {
@@ -2786,6 +3556,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Müde"
+          }
+        }
+      }
+    },
+    "So hearts and whispers reach you within a second. OurNotch never shows banners or sounds." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour que les cœurs et les murmures t’arrivent en une seconde. OurNotch n’affiche jamais de bannière ni de son."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit Herzen und Flüstern dich in einer Sekunde erreichen. OurNotch zeigt nie Banner und macht keine Töne."
           }
         }
       }
@@ -2851,6 +3637,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Immer noch nicht aktiv. Wenn du denkst, dass das ein Fehler ist, schreib uns."
+          }
+        }
+      }
+    },
+    "Stressed" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stressé"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestresst"
           }
         }
       }
@@ -3214,6 +4016,22 @@
         }
       }
     },
+    "Trick" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trick"
+          }
+        }
+      }
+    },
     "Try Again" : {
       "localizations" : {
         "fr" : {
@@ -3226,6 +4044,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erneut versuchen"
+          }
+        }
+      }
+    },
+    "Turn on notifications for OurNotch" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active les notifications pour OurNotch"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen für OurNotch einschalten"
           }
         }
       }
@@ -3354,6 +4188,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Warten auf deine Liebe …"
+          }
+        }
+      }
+    },
+    "Wear" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Porter"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tragen"
           }
         }
       }
@@ -3664,6 +4514,22 @@
         }
       }
     },
+    "all grown up" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tout grand"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ganz groß"
+          }
+        }
+      }
+    },
     "away" : {
       "localizations" : {
         "fr" : {
@@ -3761,6 +4627,22 @@
         }
       }
     },
+    "just now" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "à l’instant"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gerade eben"
+          }
+        }
+      }
+    },
     "just you two" : {
       "localizations" : {
         "fr" : {
@@ -3773,6 +4655,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "nur ihr zwei"
+          }
+        }
+      }
+    },
+    "kitten" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "chaton"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kätzchen"
+          }
+        }
+      }
+    },
+    "little one" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "petit"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kleines"
           }
         }
       }
@@ -3874,6 +4788,22 @@
         }
       }
     },
+    "puppy" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "chiot"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Welpe"
+          }
+        }
+      }
+    },
     "seconds of us, and counting" : {
       "localizations" : {
         "fr" : {
@@ -3970,6 +4900,22 @@
         }
       }
     },
+    "wise old friend" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "vieux sage"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "weiser alter Freund"
+          }
+        }
+      }
+    },
     "yes please!! ❤️" : {
       "localizations" : {
         "fr" : {
@@ -3982,6 +4928,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ja bitte!! ❤️"
+          }
+        }
+      }
+    },
+    "you" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "toi"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "du"
           }
         }
       }
@@ -4002,6 +4964,38 @@
         }
       }
     },
+    "you sent %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tu as envoyé %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "du hast %@ geschickt"
+          }
+        }
+      }
+    },
+    "you sent %@ %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tu as envoyé %1$@ %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "du hast %1$@ geschickt · %2$@"
+          }
+        }
+      }
+    },
     "your love" : {
       "localizations" : {
         "fr" : {
@@ -4014,6 +5008,182 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "deine Liebe"
+          }
+        }
+      }
+    },
+    "· %@ saw it ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· %@ l’a vu ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· %@ hat es gesehen ♡"
+          }
+        }
+      }
+    },
+    "· on its way" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· en route"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· unterwegs"
+          }
+        }
+      }
+    },
+    "· send it back ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· renvoie-le ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· schick es zurück ♡"
+          }
+        }
+      }
+    },
+    "💤 %@'s mac is asleep · %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 le mac de %1$@ dort · %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 %1$@s Mac schläft · %2$@"
+          }
+        }
+      }
+    },
+    "💤 asleep" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 endormi"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 schläft"
+          }
+        }
+      }
+    },
+    "💤 mac asleep · %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 mac endormi · %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 Mac schläft · %@"
+          }
+        }
+      }
+    },
+    "🙈 %@ hid the notch for now" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 %@ a caché l’encoche pour l’instant"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 %@ hat die Notch versteckt"
+          }
+        }
+      }
+    },
+    "🙈 %@'s hiding till %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 %1$@ se cache jusqu’à %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 %1$@ versteckt sich bis %2$@"
+          }
+        }
+      }
+    },
+    "🙈 hid the notch" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 encoche cachée"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 Notch versteckt"
+          }
+        }
+      }
+    },
+    "🙈 hiding" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 caché"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 versteckt"
+          }
+        }
+      }
+    },
+    "🙈 hiding till %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 caché jusqu’à %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 versteckt bis %@"
           }
         }
       }

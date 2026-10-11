@@ -38,6 +38,23 @@ final class AppState {
     var isHidden: Bool { Hide.isHidden(until: hiddenUntil) }
     /// The banner, held back while hidden so it scrolls when OurNotch comes back.
     var visibleBanner: Message? { isHidden ? nil : banner }
+    /// How my love is, for the line beside the gear: hidden, their Mac asleep or off, or around (nil).
+    enum PartnerStatus: Equatable {
+        case hidden(until: Date?)
+        case asleep(since: Date)
+
+        static func of(_ outbox: Outbox, now: Date = .now) -> PartnerStatus? {
+            if Hide.isHidden(until: outbox.awayUntil, now: now) {
+                return .hidden(until: outbox.awayUntil == .distantFuture ? nil : outbox.awayUntil)
+            }
+            // Builds before 1.0.13 never say "I'm here": no status rather than a wrong one.
+            if let seen = outbox.lastSeen, now.timeIntervalSince(seen) > Config.Presence.asleepAfter { return .asleep(since: seen) }
+            return nil
+        }
+    }
+
+    func partnerStatus(now: Date = .now) -> PartnerStatus? { PartnerStatus.of(partnerOutbox, now: now) }
+
     /// Whether my love has hidden their OurNotch ("away" in my closed notch).
     func partnerIsAway(now: Date = .now) -> Bool { Hide.isHidden(until: partnerOutbox.awayUntil, now: now) }
     /// The latest photo my partner sent me, shown on Home.
@@ -84,6 +101,7 @@ final class AppState {
     /// Labels this identity's lines in the diagnostics log ("me", or "sim" for the Partner Simulator).
     @ObservationIgnored private let who: String
     @ObservationIgnored private var saveTask: Task<Void, Never>?
+    @ObservationIgnored private var quietTask: Task<Void, Never>?
     /// When the last emoji save started, so a burst of taps goes out as one save every few seconds.
     @ObservationIgnored private var lastEmojiSave = Date.distantPast
     /// The receipts the mailbox has; starts as the outbox's (builds before 1.0.7 kept them there).
@@ -175,6 +193,11 @@ final class AppState {
             var interval = self.checkInterval
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
+                if Date.now.timeIntervalSince(self.myOutbox.lastSeen ?? .distantPast) >= Config.Presence.heartbeat {
+                    self.myOutbox.lastSeen = .now // saved quietly with the receipts below
+                    self.store.myOutbox = self.myOutbox
+                    self.syncNow(.poll)
+                }
                 if self.checkInterval != interval {
                     interval = self.checkInterval
                     self.note("checks now every \(interval)\(interval == self.mailbox.pollInterval ? " (idle)" : " (active)")")
@@ -198,15 +221,31 @@ final class AppState {
 
     // MARK: Sending
 
-    /// Counts the emoji locally right away. The first tap saves at once; taps within `Config.emojiSaveGap`
-    /// of that save go out together in the next one. Every save pings the partner, and Apple holds silent
-    /// pings back when an app sends too many (Beta 1.0.6: one save per tap, none delivered for 30 min).
+    /// Counts the emoji locally right away, then `saveSoon`.
     func sendEmoji(_ char: String, mode: EmojiMode) {
         lastActivity = .now
         myOutbox.emojisSent += 1
         myOutbox.lastEmoji = SentEmoji(char: char, mode: mode, sentAt: .now)
         store.myOutbox = myOutbox
         note("tap: emoji #\(myOutbox.emojisSent) \(char) (\(mode.rawValue))")
+        saveSoon()
+    }
+
+    /// The pet goes in the receipts record, which doesn't ping the partner; taps within a second save once.
+    private func saveQuietSoon() {
+        guard quietTask == nil else { return }
+        quietTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(1))
+            guard let self else { return }
+            self.quietTask = nil
+            await self.saveReceipts()
+        }
+    }
+
+    /// For taps that come in bursts (emojis): the first saves at once; taps within
+    /// `Config.emojiSaveGap` of that save go out together in the next one. Every save pings the partner, and
+    /// Apple holds silent pings back when an app sends too many (Beta 1.0.6: none delivered for 30 min).
+    private func saveSoon() {
         guard saveTask == nil else { return } // the save already waiting carries this tap too
         let wait = Config.emojiSaveGap - Date.now.timeIntervalSince(lastEmojiSave)
         saveTask = Task { [weak self] in
@@ -260,6 +299,37 @@ final class AppState {
         store.myOutbox = myOutbox
         note("tap: mood \(emoji ?? "cleared")")
         Task { await save() }
+    }
+
+    // MARK: Pet
+
+    /// Ours, from both outboxes; nil until one of us adopts.
+    var pet: Pet? { Pet.from(mine: myOutbox, theirs: partnerOutbox) }
+
+    func adoptPet(_ kind: PetKind, name: String) {
+        guard pet == nil else { return }
+        let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        myOutbox.petAdoption = PetAdoption(kind: kind, name: name.isEmpty ? Config.Pet.names[kind]! : name, adoptedAt: .now)
+        store.myOutbox = myOutbox
+        note("tap: adopted a \(kind.rawValue)")
+        saveQuietSoon()
+    }
+
+    func care(_ care: PetCare) {
+        guard pet != nil else { return }
+        lastActivity = .now
+        myOutbox.petCare = Array(((myOutbox.petCare ?? []) + [PetAction(care: care, at: .now)]).suffix(Config.Pet.careKept))
+        store.myOutbox = myOutbox
+        note("tap: pet \(care.rawValue)")
+        saveQuietSoon()
+    }
+
+    func setPetLook(coat: PetCoat? = nil, accessory: PetAccessory? = nil) {
+        guard let current = pet?.look else { return }
+        myOutbox.petLook = PetLook(coat: coat ?? current.coat, accessory: accessory ?? current.accessory, setAt: .now)
+        store.myOutbox = myOutbox
+        note("tap: pet look")
+        saveQuietSoon()
     }
 
     // MARK: Anniversary
@@ -419,6 +489,10 @@ final class AppState {
         }
 
         var found: [String] = []
+        if hasFetchedPartner, partner.petAdoption != previous.petAdoption || partner.petCare != previous.petCare || partner.petLook != previous.petLook {
+            found.append("pet")
+            if !(isNotchOpen && visibleTab == .pet) { unseen.insert(.pet) }
+        }
         if partner.mood != previous.mood, hasFetchedPartner {
             found.append("mood \(partner.mood ?? "cleared")")
             // Closed, the mood shows beside the camera; open, only on Home and Mood.
@@ -532,7 +606,7 @@ final class AppState {
             let sealed = try Crypto.seal(JSONEncoder().encode(receipts), with: key)
             try await mailbox.saveReceipts(sealed, owner: pairing.myId)
             savedReceipts = receipts
-            note("saved receipts (seen emojis \(receipts.seenEmojis)) in \(Self.ms(since: started))",
+            note("saved receipts (seen emojis \(receipts.seenEmojis)\(receipts.petAdoption == nil ? "" : ", pet")) in \(Self.ms(since: started))",
                  metric: Metric(kind: .cloud, name: "save", ms: Metric.ms(since: started), detail: "receipts"))
         } catch {
             note("receipts save FAILED, will retry: \(error.diagnosticDescription)",
@@ -550,6 +624,7 @@ final class AppState {
         if new.togetherSince != old.togetherSince { parts.append("date") }
         if new.licenceKey != old.licenceKey { parts.append("licence") }
         if new.awayUntil != old.awayUntil { parts.append(new.awayUntil == nil ? "back" : "away") }
+        if new.petAdoption != old.petAdoption || new.petCare != old.petCare || new.petLook != old.petLook { parts.append("pet") }
         if new.seenEmojis != old.seenEmojis { parts.append("seen emojis \(new.seenEmojis)") }
         if new.seenMessageId != old.seenMessageId { parts.append("seen note") }
         if new.seenPhotoId != old.seenPhotoId { parts.append("seen photo") }

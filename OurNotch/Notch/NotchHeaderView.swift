@@ -77,6 +77,17 @@ struct NotchHeaderView: View {
             // and must never be wider than it, or it pushes the closed row off-center.
             Spacer(minLength: 0)
 
+            if isOpen {
+                TimelineView(.everyMinute) { context in
+                    if let status = state.partnerStatus(now: context.date) {
+                        StatusPill(lines: lines(for: status, now: context.date))
+                            .frame(maxWidth: statusRoom, alignment: .trailing)
+                            .padding(.trailing, 8)
+                            .transition(.opacity)
+                    }
+                }
+            }
+
             Button { showsSettings.toggle() } label: {
                 Image(systemName: showsSettings ? "gearshape.fill" : "gearshape")
                     .font(.system(size: 16))
@@ -87,6 +98,49 @@ struct NotchHeaderView: View {
             .buttonStyle(.plain)
         }
         .padding(.horizontal, Config.Notch.margin) // the notch view already insets past the ears
+    }
+}
+
+extension NotchHeaderView {
+    /// Room between the camera and the gear, so the line never runs under the camera.
+    fileprivate var statusRoom: CGFloat {
+        let content = Config.Notch.contentSize.width
+        return max(0, content / 2 - notchSize.width / 2 - 28 - 8 - 6)
+    }
+
+    /// The full line first, then shorter ones; the first that fits shows.
+    fileprivate func lines(for status: AppState.PartnerStatus, now: Date) -> [String] {
+        let name = state.partnerName.lowercased()
+        switch status {
+        case .hidden(let until?):
+            let time = until.formatted(date: .omitted, time: .shortened).lowercased()
+            return [String(localized: "🙈 \(name)'s hiding till \(time)"), String(localized: "🙈 hiding till \(time)"), String(localized: "🙈 hiding")]
+        case .hidden(nil):
+            return [String(localized: "🙈 \(name) hid the notch for now"), String(localized: "🙈 hid the notch"), String(localized: "🙈 hiding")]
+        case .asleep(let since):
+            let ago = shortAgo(since, now: now)
+            return [String(localized: "💤 \(name)'s mac is asleep · \(ago)"), String(localized: "💤 mac asleep · \(ago)"), String(localized: "💤 asleep")]
+        }
+    }
+}
+
+/// A soft grey pill beside the gear: the longest of `lines` that fits, never cut off.
+private struct StatusPill: View {
+    let lines: [String]
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            ForEach(lines, id: \.self) { line in
+                Text(verbatim: line)
+                    .lineLimit(1)
+                    .fixedSize()
+                    .font(.system(size: 11.5, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.75))
+                    .padding(.horizontal, 10)
+                    .frame(height: 22)
+                    .background(Color.notchField, in: Capsule())
+            }
+        }
     }
 }
 

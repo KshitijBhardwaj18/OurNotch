@@ -625,3 +625,98 @@ struct NoteHistoryTests {
         #expect(lines.filter { !$0.isMine }.map(\.message.text) == (3...12).map { "note \($0)" })
     }
 }
+
+struct PetTests {
+    let adopted = Date(timeIntervalSince1970: 1_800_000_000)
+    let noon: Calendar = { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "UTC")!; return c }()
+
+    func pet(mine: [PetAction] = [], theirs: [PetAction] = []) -> Pet {
+        var me = Outbox(), them = Outbox()
+        me.petAdoption = PetAdoption(kind: .cat, name: "Mochi", adoptedAt: adopted)
+        me.petCare = mine
+        them.petCare = theirs
+        return Pet.from(mine: me, theirs: them)!
+    }
+
+    /// Noon UTC on day `d` after adoption, so it's never bedtime.
+    func day(_ d: Double, hours: Double = 0) -> Date {
+        noon.date(bySettingHour: 12, minute: 0, second: 0, of: adopted)!.addingTimeInterval(d * 86400 + hours * 3600)
+    }
+
+    @Test func eitherOfUsCaresAndTheNewestCareCounts() {
+        let p = pet(mine: [PetAction(care: .feed, at: day(0))], theirs: [PetAction(care: .pet, at: day(0, hours: 1))])
+        #expect(p.care.count == 2 && p.care.last?.mine == false)
+        #expect(p.fullness(now: day(0, hours: 12)) == 0.5)
+        #expect(p.feeling(now: day(0, hours: 2), calendar: noon) == .happy)
+        #expect(p.feeling(now: day(0, hours: 20), calendar: noon) == .hungry)
+    }
+
+    @Test func forgottenForTwoDaysItFallsSickAndAMealNursesItBack() {
+        let p = pet(mine: [PetAction(care: .feed, at: day(0))])
+        #expect(p.feeling(now: day(2, hours: 1), calendar: noon) == .sick)
+        let fed = pet(mine: [PetAction(care: .feed, at: day(0)), PetAction(care: .feed, at: day(2, hours: 1))])
+        #expect(fed.feeling(now: day(2, hours: 2), calendar: noon) == .recovering)
+        #expect(fed.feeling(now: day(2, hours: 8), calendar: noon) != .recovering) // better a few hours later
+    }
+
+    @Test func itGrowsUpAndSleepsAtNight() {
+        let p = pet(mine: [PetAction(care: .feed, at: day(20))])
+        #expect(pet().stage(now: day(1), calendar: noon) == .baby)
+        #expect(p.stage(now: day(20), calendar: noon) == .grown)
+        let night = noon.date(bySettingHour: 2, minute: 0, second: 0, of: day(20, hours: 12))!
+        #expect(p.feeling(now: night, calendar: noon) == .sleeping)
+    }
+
+    @Test func theEarlierAdoptionWinsAndTheNewerLookShows() {
+        var me = Outbox(), them = Outbox()
+        me.petAdoption = PetAdoption(kind: .cat, name: "Mochi", adoptedAt: adopted.addingTimeInterval(5))
+        them.petAdoption = PetAdoption(kind: .dog, name: "Biscuit", adoptedAt: adopted)
+        me.petLook = PetLook(coat: .grey, accessory: .bow, setAt: adopted.addingTimeInterval(100))
+        them.petLook = PetLook(coat: .choco, accessory: .cap, setAt: adopted.addingTimeInterval(50))
+        let p = Pet.from(mine: me, theirs: them)!
+        #expect(p.adoption.name == "Biscuit" && p.look.coat == .grey && p.look.accessory == .bow)
+    }
+}
+
+@MainActor
+struct PetSyncTests {
+    @Test func adoptingAndFeedingReachTheOtherMac() async throws {
+        let people = TwoPartners()
+        let (you, partner) = try await people.paired()
+        you.adoptPet(.dog, name: " Biscuit ")
+        try await Task.sleep(for: .milliseconds(1200)) // the pet saves quietly within a second
+        await partner.sync()
+        #expect(partner.pet?.adoption.name == "Biscuit")
+        partner.adoptPet(.cat, name: "Second") // already adopted: ignored
+        partner.care(.feed)
+        try await Task.sleep(for: .milliseconds(1200))
+        #expect(try await people.mailbox.fetchOutbox(owner: people.partner.myId).map { _ in true } == nil) // no outbox save, no ping
+        await you.sync()
+        #expect(you.pet?.care.last?.action.care == .feed && you.pet?.care.last?.mine == false)
+        #expect(you.unseen.contains(.pet))
+    }
+}
+
+struct PartnerStatusTests {
+    @Test func hiddenAsleepOrAround() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        var outbox = Outbox()
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == nil) // an older build: says nothing
+        outbox.lastSeen = now.addingTimeInterval(-60)
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == nil) // around
+        outbox.lastSeen = now.addingTimeInterval(-Config.Presence.asleepAfter - 1)
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == .asleep(since: outbox.lastSeen!))
+        outbox.awayUntil = now.addingTimeInterval(3600)
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == .hidden(until: now.addingTimeInterval(3600))) // hiding wins
+        outbox.awayUntil = .distantFuture
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == .hidden(until: nil))
+    }
+
+    @Test func iAmHereTravelsQuietly() {
+        var outbox = Outbox(), receipts = Receipts()
+        receipts.lastSeen = Date(timeIntervalSince1970: 5)
+        outbox.lastSeen = Date(timeIntervalSince1970: 3)
+        #expect(outbox.with(receipts).lastSeen == Date(timeIntervalSince1970: 5))
+        #expect(outbox.content.lastSeen == nil) // never pings
+    }
+}
