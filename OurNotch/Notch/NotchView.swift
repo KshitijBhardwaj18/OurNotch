@@ -71,7 +71,7 @@ struct NotchView: View {
         .sensoryFeedback(.alignment, trigger: isOpen)
         .onChange(of: isOpen) { _, open in
             PerfMonitor.shared.track(open ? "notch open" : "notch close", seconds: 0.7)
-            if open { state.notchOpened() } else { state.notchClosed(); showsSettings = false }
+            if open { state.notchOpened() } else { state.notchClosed(); showsSettings = false; isEditing = false }
         }
         .onChange(of: tab) { _, tab in PerfMonitor.shared.track("\(tab) tab", seconds: 0.5) }
         .onChange(of: isEditing) { _, editing in
@@ -100,8 +100,18 @@ struct NotchView: View {
         hoverTask?.cancel()
         hoverTask = Task {
             try? await Task.sleep(for: hovering ? Config.Notch.hoverOpenDelay : Config.Notch.hoverCloseDelay)
-            guard !Task.isCancelled, hovering || !isEditing else { return }
+            guard !Task.isCancelled, hovering || !isTyping() else { return }
             isOpen = hovering
         }
+    }
+
+    /// Typing keeps the notch open, but only while a text field really has the keyboard: a field removed
+    /// mid-typing (adopting the pet swaps its name field away) never reports "done", which left
+    /// `isEditing` stuck and the notch unable to close (Beta 1.0.9).
+    private func isTyping() -> Bool {
+        guard isEditing else { return false }
+        if NSApp.windows.contains(where: { $0.firstResponder is NSTextView && $0.isKeyWindow }) { return true }
+        isEditing = false
+        return false
     }
 }
