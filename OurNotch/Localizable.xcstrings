@@ -601,7 +601,8 @@
             "value" : "Erlaube Mitteilungen, damit dein Mac sofort merkt, wenn etwas ankommt: Es ist in einer Sekunde in deiner Notch. OurNotch zeigt nie Banner und macht keine Töne."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "And not one of them wasted ♡" : {
       "localizations" : {
@@ -2349,7 +2350,8 @@
             "value" : "Nicht jetzt"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Not set yet" : {
       "localizations" : {
@@ -2396,6 +2398,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nichts"
+          }
+        }
+      }
+    },
+    "Notifications are off for OurNotch. Turn them on in System Settings, under Notifications, then OurNotch. This screen moves on by itself. OurNotch never shows banners or sounds." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les notifications sont désactivées pour OurNotch. Active-les dans Réglages Système, sous Notifications, puis OurNotch. Cet écran avance tout seul. OurNotch n’affiche jamais de bannière ni de son."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen sind für OurNotch aus. Schalte sie in den Systemeinstellungen unter Mitteilungen, dann OurNotch, ein. Dieser Bildschirm geht von selbst weiter. OurNotch zeigt nie Banner und macht keine Töne."
           }
         }
       }
@@ -2497,6 +2515,22 @@
         }
       }
     },
+    "Open System Settings" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Réglages Système"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Systemeinstellungen öffnen"
+          }
+        }
+      }
+    },
     "Open System Settings…" : {
       "localizations" : {
         "fr" : {
@@ -2576,6 +2610,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OurNotch %@"
+          }
+        }
+      }
+    },
+    "OurNotch needs notifications so your Mac hears the moment something arrives, and it's in your notch within a second. It never shows banners or sounds." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch a besoin des notifications pour que ton Mac sache dès qu’une chose arrive : elle est dans ton encoche en une seconde. Jamais de bannière ni de son."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch braucht Mitteilungen, damit dein Mac sofort merkt, wenn etwas ankommt: Es ist in einer Sekunde in deiner Notch. Nie Banner, nie Töne."
           }
         }
       }

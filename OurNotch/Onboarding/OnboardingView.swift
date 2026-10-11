@@ -277,22 +277,52 @@ final class OnboardingModel {
 
     // MARK: Notifications
 
-    /// Pings that carry a badge reach the Mac within a second (silent ones Apple holds back); the badge needs
+    /// Required: badge pings reach the Mac within a second (silent ones Apple holds back), and a badge needs
     /// notification permission. OurNotch never shows a banner.
     func allowNotifications() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.badge]) { granted, _ in
             Task { @MainActor in
                 Diagnostics.shared.record("onboarding: notifications \(granted ? "allowed" : "not allowed")")
-                self.go(to: .login)
+                if granted { self.go(to: .login) } else { self.waitForNotificationsInSettings() }
             }
         }
     }
 
-    /// Asked already (a reinstall, or a second pairing): nothing to ask.
+    /// Turned off before (a "Don't Allow", or a reinstall): macOS won't ask again, so it's System Settings.
+    private(set) var notificationsOff = false
+    @ObservationIgnored private var settingsWatch: Task<Void, Never>?
+
+    func openNotificationSettings() {
+        let id = Bundle.main.bundleIdentifier ?? ""
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=\(id)")!)
+    }
+
+    /// Already allowed: nothing to ask. Turned off: say where to turn them on.
     private func skipNotificationsIfAnswered() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            let answered = settings.authorizationStatus != .notDetermined
-            Task { @MainActor in if answered, self.step == .notifications { self.go(to: .login) } }
+            let status = settings.authorizationStatus
+            Task { @MainActor in
+                guard self.step == .notifications else { return }
+                if status == .authorized { self.go(to: .login) } else if status == .denied { self.waitForNotificationsInSettings() }
+            }
+        }
+    }
+
+    /// Checks every second while this step shows, and carries on as soon as they're switched on.
+    private func waitForNotificationsInSettings() {
+        notificationsOff = true
+        settingsWatch?.cancel()
+        settingsWatch = Task {
+            while !Task.isCancelled, step == .notifications {
+                let status = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+                if status == .authorized {
+                    Diagnostics.shared.record("onboarding: notifications switched on in System Settings")
+                    notificationsOff = false
+                    go(to: .login)
+                    return
+                }
+                try? await Task.sleep(for: .seconds(1))
+            }
         }
     }
 
@@ -402,7 +432,9 @@ struct OnboardingView: View {
             }
         case .notifications:
             Screen(symbol: "bell.badge.fill", title: "Let love arrive instantly",
-                   message: "Allow notifications so your Mac hears the moment something arrives, and it's in your notch within a second. OurNotch never shows banners or sounds.") {}
+                   message: model.notificationsOff
+                       ? "Notifications are off for OurNotch. Turn them on in System Settings, under Notifications, then OurNotch. This screen moves on by itself. OurNotch never shows banners or sounds."
+                       : "OurNotch needs notifications so your Mac hears the moment something arrives, and it's in your notch within a second. It never shows banners or sounds.") {}
         case .login:
             Screen(symbol: "laptopcomputer", title: "Keep your love close",
                    message: "Your notch will be there every time you open your Mac.") {
@@ -522,8 +554,6 @@ struct OnboardingView: View {
         switch model.step {
         case .date:
             Button("Skip for Now") { model.go(to: .notifications) }.buttonStyle(.link)
-        case .notifications:
-            Button("Not Now") { model.go(to: .login) }.buttonStyle(.link)
         default:
             HStack(spacing: 6) {
                 ForEach(model.path, id: \.self) { step in
@@ -543,7 +573,7 @@ struct OnboardingView: View {
         case .icloud: "Try Again"
         case .invite: nil // advances by itself when your love joins
         case .join: model.awaitingAnswer ? nil : (model.foundInvite == nil ? "Continue" : "Yes, Ask to Join")
-        case .notifications: "Allow Notifications"
+        case .notifications: model.notificationsOff ? "Open System Settings" : "Allow Notifications"
         case .done: "Done"
         default: "Continue"
         }
@@ -569,7 +599,7 @@ struct OnboardingView: View {
         case .invite: break
         case .join: model.foundInvite == nil ? model.lookUpCode() : model.join()
         case .date: model.saveTogetherSince()
-        case .notifications: model.allowNotifications()
+        case .notifications: model.notificationsOff ? model.openNotificationSettings() : model.allowNotifications()
         case .login: model.go(to: .done)
         case .done: model.finish()
         }
