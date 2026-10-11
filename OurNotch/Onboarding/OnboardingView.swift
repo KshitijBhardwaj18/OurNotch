@@ -1,4 +1,5 @@
 import SwiftUI
+import UserNotifications
 
 /// Drives the first-launch steps, starting at the licence gate (`spec-m2.md > Licence Gate`).
 /// Buyer: gate → licence key → name → invite → date → login → done. Partner: gate → name → join → login → done.
@@ -7,7 +8,7 @@ import SwiftUI
 @MainActor
 @Observable
 final class OnboardingModel {
-    enum Step { case gate, licenceKey, welcome, icloud, name, invite, join, date, login, done }
+    enum Step { case gate, licenceKey, welcome, icloud, name, invite, join, date, notifications, login, done }
 
     var step: Step {
         didSet {
@@ -66,8 +67,8 @@ final class OnboardingModel {
     /// The steps on the current path, for the page dots.
     var path: [Step] {
         joining || pairing?.role == .joiner
-            ? [start, .name, .join, .login, .done]
-            : (start == .gate ? [.gate, .licenceKey] : [.welcome]) + [.name, .invite, .date, .login, .done]
+            ? [start, .name, .join, .notifications, .login, .done]
+            : (start == .gate ? [.gate, .licenceKey] : [.welcome]) + [.name, .invite, .date, .notifications, .login, .done]
     }
 
     func go(to step: Step) {
@@ -75,6 +76,7 @@ final class OnboardingModel {
         if step != .invite { waitTask?.cancel() }
         self.step = step
         if step == .invite { startInvite() }
+        if step == .notifications { skipNotificationsIfAnswered() }
     }
 
     // MARK: Licence gate
@@ -233,7 +235,7 @@ final class OnboardingModel {
                 self.foundInvite = nil // declined, used or expired: back to typing a code
                 throw error
             }
-            self.go(to: .login)
+            self.go(to: .notifications)
         }
     }
 
@@ -270,7 +272,28 @@ final class OnboardingModel {
 
     func saveTogetherSince() {
         store.togetherSince = togetherSince
-        go(to: .login)
+        go(to: .notifications)
+    }
+
+    // MARK: Notifications
+
+    /// Pings that carry a badge reach the Mac within a second (silent ones Apple holds back); the badge needs
+    /// notification permission. OurNotch never shows a banner.
+    func allowNotifications() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.badge]) { granted, _ in
+            Task { @MainActor in
+                Diagnostics.shared.record("onboarding: notifications \(granted ? "allowed" : "not allowed")")
+                self.go(to: .login)
+            }
+        }
+    }
+
+    /// Asked already (a reinstall, or a second pairing): nothing to ask.
+    private func skipNotificationsIfAnswered() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let answered = settings.authorizationStatus != .notDetermined
+            Task { @MainActor in if answered, self.step == .notifications { self.go(to: .login) } }
+        }
     }
 
     func setOpensAtLogin(_ enabled: Bool) {
@@ -377,6 +400,9 @@ struct OnboardingView: View {
                     .font(.system(size: 13, weight: .medium).monospacedDigit())
                     .foregroundStyle(Color.accentPink)
             }
+        case .notifications:
+            Screen(symbol: "bell.badge.fill", title: "Let love arrive instantly",
+                   message: "Allow notifications so your Mac hears the moment something arrives, and it's in your notch within a second. OurNotch never shows banners or sounds.") {}
         case .login:
             Screen(symbol: "laptopcomputer", title: "Keep your love close",
                    message: "Your notch will be there every time you open your Mac.") {
@@ -495,7 +521,9 @@ struct OnboardingView: View {
     @ViewBuilder private var footerLeading: some View {
         switch model.step {
         case .date:
-            Button("Skip for Now") { model.go(to: .login) }.buttonStyle(.link)
+            Button("Skip for Now") { model.go(to: .notifications) }.buttonStyle(.link)
+        case .notifications:
+            Button("Not Now") { model.go(to: .login) }.buttonStyle(.link)
         default:
             HStack(spacing: 6) {
                 ForEach(model.path, id: \.self) { step in
@@ -515,6 +543,7 @@ struct OnboardingView: View {
         case .icloud: "Try Again"
         case .invite: nil // advances by itself when your love joins
         case .join: model.awaitingAnswer ? nil : (model.foundInvite == nil ? "Continue" : "Yes, Ask to Join")
+        case .notifications: "Allow Notifications"
         case .done: "Done"
         default: "Continue"
         }
@@ -540,6 +569,7 @@ struct OnboardingView: View {
         case .invite: break
         case .join: model.foundInvite == nil ? model.lookUpCode() : model.join()
         case .date: model.saveTogetherSince()
+        case .notifications: model.allowNotifications()
         case .login: model.go(to: .done)
         case .done: model.finish()
         }

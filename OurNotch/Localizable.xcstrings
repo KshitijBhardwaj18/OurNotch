@@ -571,6 +571,38 @@
         }
       }
     },
+    "Allow Notifications" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser les notifications"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen erlauben"
+          }
+        }
+      }
+    },
+    "Allow notifications so your Mac hears the moment something arrives, and it's in your notch within a second. OurNotch never shows banners or sounds." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorise les notifications pour que ton Mac sache dès qu’une chose arrive : elle est dans ton encoche en une seconde. OurNotch n’affiche jamais de bannière ni de son."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erlaube Mitteilungen, damit dein Mac sofort merkt, wenn etwas ankommt: Es ist in einer Sekunde in deiner Notch. OurNotch zeigt nie Banner und macht keine Töne."
+          }
+        }
+      }
+    },
     "And not one of them wasted ♡" : {
       "localizations" : {
         "fr" : {
@@ -1995,6 +2027,22 @@
       },
       "extractionState" : "stale"
     },
+    "Let love arrive instantly" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Que l’amour arrive tout de suite"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit Liebe sofort ankommt"
+          }
+        }
+      }
+    },
     "Licence" : {
       "localizations" : {
         "fr" : {
@@ -2283,6 +2331,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Noch kein Flüstern von %@ ♡"
+          }
+        }
+      }
+    },
+    "Not Now" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas maintenant"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht jetzt"
           }
         }
       }
