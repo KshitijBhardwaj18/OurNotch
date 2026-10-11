@@ -97,6 +97,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.checkLicence()
             }
         }
+        // Switching apps or Spaces (WhatsApp, anything full screen): put the notch back in front, in case macOS
+        // moved it behind. The notch space (`NotchSpace`) normally keeps it there already.
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.updateNotchVisibility() }
+        }
         NSApp.registerForRemoteNotifications()
     }
 
@@ -264,7 +271,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func updateNotchVisibility() {
         menu.isHidden = state?.isHidden ?? false
-        if notchVisible { panel?.orderFrontRegardless() } else { panel?.orderOut(nil) }
+        if notchVisible, let panel {
+            panel.orderFrontRegardless()
+            NotchSpace.add(panel)
+        } else {
+            panel?.orderOut(nil)
+        }
     }
 
     private func showLicenceWindow() {
@@ -334,6 +346,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         panel.setFrame(newGeometry.panelFrame, display: false)
         panel.contentView = hostingView
         if notchVisible { panel.orderFrontRegardless() }
+        NotchSpace.add(panel) // stays on top whichever app is in front, full screen included
         panel.alphaValue = 1
         self.panel = panel
     }
