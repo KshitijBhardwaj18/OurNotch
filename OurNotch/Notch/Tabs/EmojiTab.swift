@@ -53,19 +53,30 @@ struct EmojiTab: View {
             } else {
                 Text("Sent \(lastSent)").foregroundStyle(.white)
             }
-        } else if let theirs = state.partnerOutbox.lastEmoji {
-            // What they last sent you, and one tap to send the same back.
+        } else if let latest = latestEmoji {
+            // The newest emoji between you two: yours with whether they saw it, or theirs to send back.
             TimelineView(.everyMinute) { context in
-                Button { send(theirs.char) } label: {
+                let ago = latest.emoji.sentAt.map { context.date.timeIntervalSince($0) < 60 ? String(localized: "just now") : shortAgo($0, now: context.date) }
+                let name = state.partnerName.lowercased()
+                if latest.mine {
                     HStack(spacing: 4) {
-                        Text(verbatim: "💌")
-                        Text(theirs.sentAt.map { String(localized: "\(state.partnerName.lowercased()) sent you \(theirs.char) \(context.date.timeIntervalSince($0) < 60 ? String(localized: "just now") : shortAgo($0, now: context.date))") }
-                             ?? String(localized: "\(state.partnerName.lowercased()) sent you \(theirs.char)"))
+                        Text(verbatim: "💗")
+                        Text(ago.map { String(localized: "you sent \(latest.emoji.char) \($0)") } ?? String(localized: "you sent \(latest.emoji.char)"))
                             .foregroundStyle(Color.secondaryLabel)
-                        Text("· send it back ♡").foregroundStyle(Color.notchBlush)
+                        Text(state.emojiStatus == .delivered ? String(localized: "· \(name) saw it ♡") : String(localized: "· on its way"))
+                            .foregroundStyle(state.emojiStatus == .delivered ? Color.notchBlush : .tertiaryLabel)
                     }
+                } else {
+                    Button { send(latest.emoji.char) } label: {
+                        HStack(spacing: 4) {
+                            Text(verbatim: "💌")
+                            Text(ago.map { String(localized: "\(name) sent you \(latest.emoji.char) \($0)") } ?? String(localized: "\(name) sent you \(latest.emoji.char)"))
+                                .foregroundStyle(Color.secondaryLabel)
+                            Text("· send it back ♡").foregroundStyle(Color.notchBlush)
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
         } else {
             Text("Tap one to send").foregroundStyle(Color.tertiaryLabel)
@@ -82,6 +93,18 @@ struct EmojiTab: View {
                 .buttonStyle(EmojiButtonStyle(isLastSent: char == lastSent))
                 .overlay { TapBurst(char: char, trigger: taps[char, default: 0]) }
             }
+        }
+    }
+
+    /// The newer of my last emoji and theirs (an emoji from an older build, with no time, counts as oldest).
+    private var latestEmoji: (emoji: SentEmoji, mine: Bool)? {
+        let mine = state.myOutbox.lastEmoji, theirs = state.partnerOutbox.lastEmoji
+        switch (mine, theirs) {
+        case let (mine?, theirs?):
+            return (mine.sentAt ?? .distantPast) >= (theirs.sentAt ?? .distantPast) ? (mine, true) : (theirs, false)
+        case let (mine?, nil): return (mine, true)
+        case let (nil, theirs?): return (theirs, false)
+        case (nil, nil): return nil
         }
     }
 

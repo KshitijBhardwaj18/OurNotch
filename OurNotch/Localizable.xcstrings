@@ -4964,6 +4964,38 @@
         }
       }
     },
+    "you sent %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tu as envoyé %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "du hast %@ geschickt"
+          }
+        }
+      }
+    },
+    "you sent %@ %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "tu as envoyé %1$@ %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "du hast %1$@ geschickt · %2$@"
+          }
+        }
+      }
+    },
     "your love" : {
       "localizations" : {
         "fr" : {
@@ -4976,6 +5008,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "deine Liebe"
+          }
+        }
+      }
+    },
+    "· %@ saw it ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· %@ l’a vu ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· %@ hat es gesehen ♡"
+          }
+        }
+      }
+    },
+    "· on its way" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· en route"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· unterwegs"
           }
         }
       }
