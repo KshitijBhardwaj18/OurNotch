@@ -34,6 +34,9 @@ struct Outbox: Codable, Equatable {
     var petAdoption: PetAdoption?
     var petLook: PetLook?
     var petCare: [PetAction]?
+    /// When this Mac last said "I'm here" (every few minutes while OurNotch runs), so my partner can tell
+    /// when it's asleep or off.
+    var lastSeen: Date?
 }
 
 /// What doesn't need a ping, saved apart from my outbox (see `Mailbox.saveReceipts`): what I've seen of my
@@ -46,12 +49,13 @@ struct Receipts: Codable, Equatable {
     var petAdoption: PetAdoption?
     var petLook: PetLook?
     var petCare: [PetAction]?
+    var lastSeen: Date?
 }
 
 extension Outbox {
     var receipts: Receipts {
         Receipts(seenEmojis: seenEmojis, seenMessageId: seenMessageId, seenPhotoId: seenPhotoId,
-                 petAdoption: petAdoption, petLook: petLook, petCare: petCare)
+                 petAdoption: petAdoption, petLook: petLook, petCare: petCare, lastSeen: lastSeen)
     }
 
     /// Everything but the receipts: what's worth saving (and pinging the partner for).
@@ -63,6 +67,7 @@ extension Outbox {
         content.petAdoption = nil
         content.petLook = nil
         content.petCare = nil
+        content.lastSeen = nil
         return content
     }
 
@@ -77,6 +82,7 @@ extension Outbox {
         merged.petAdoption = receipts.petAdoption ?? petAdoption
         merged.petLook = receipts.petLook ?? petLook
         merged.petCare = receipts.petCare ?? petCare
+        merged.lastSeen = [lastSeen, receipts.lastSeen].compactMap { $0 }.max()
         return merged
     }
 

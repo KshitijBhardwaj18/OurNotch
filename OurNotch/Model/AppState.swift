@@ -38,6 +38,23 @@ final class AppState {
     var isHidden: Bool { Hide.isHidden(until: hiddenUntil) }
     /// The banner, held back while hidden so it scrolls when OurNotch comes back.
     var visibleBanner: Message? { isHidden ? nil : banner }
+    /// How my love is, for the line beside the gear: hidden, their Mac asleep or off, or around (nil).
+    enum PartnerStatus: Equatable {
+        case hidden(until: Date?)
+        case asleep(since: Date)
+
+        static func of(_ outbox: Outbox, now: Date = .now) -> PartnerStatus? {
+            if Hide.isHidden(until: outbox.awayUntil, now: now) {
+                return .hidden(until: outbox.awayUntil == .distantFuture ? nil : outbox.awayUntil)
+            }
+            // Builds before 1.0.13 never say "I'm here": no status rather than a wrong one.
+            if let seen = outbox.lastSeen, now.timeIntervalSince(seen) > Config.Presence.asleepAfter { return .asleep(since: seen) }
+            return nil
+        }
+    }
+
+    func partnerStatus(now: Date = .now) -> PartnerStatus? { PartnerStatus.of(partnerOutbox, now: now) }
+
     /// Whether my love has hidden their OurNotch ("away" in my closed notch).
     func partnerIsAway(now: Date = .now) -> Bool { Hide.isHidden(until: partnerOutbox.awayUntil, now: now) }
     /// The latest photo my partner sent me, shown on Home.
@@ -176,6 +193,11 @@ final class AppState {
             var interval = self.checkInterval
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
+                if Date.now.timeIntervalSince(self.myOutbox.lastSeen ?? .distantPast) >= Config.Presence.heartbeat {
+                    self.myOutbox.lastSeen = .now // saved quietly with the receipts below
+                    self.store.myOutbox = self.myOutbox
+                    self.syncNow(.poll)
+                }
                 if self.checkInterval != interval {
                     interval = self.checkInterval
                     self.note("checks now every \(interval)\(interval == self.mailbox.pollInterval ? " (idle)" : " (active)")")

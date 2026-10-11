@@ -116,6 +116,13 @@ enum Config {
         #endif
     }
 
+    enum Presence {
+        /// How often each Mac says "I'm here" (quietly: no ping).
+        static let heartbeat: TimeInterval = 5 * 60
+        /// No word for this long and my love's Mac counts as asleep or off.
+        static let asleepAfter: TimeInterval = 15 * 60
+    }
+
     enum Pet {
         /// From just fed to hungry (fullness 1 → 0), and from cuddled to lonely.
         static let hungerTime: TimeInterval = 24 * 3600

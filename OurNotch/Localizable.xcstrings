@@ -2011,6 +2011,22 @@
         }
       }
     },
+    "Later" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus tard"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Später"
+          }
+        }
+      }
+    },
     "Lazy Sundays included ♡" : {
       "localizations" : {
         "fr" : {
@@ -3512,6 +3528,22 @@
         }
       }
     },
+    "So hearts and whispers reach you within a second. OurNotch never shows banners or sounds." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour que les cœurs et les murmures t’arrivent en une seconde. OurNotch n’affiche jamais de bannière ni de son."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Damit Herzen und Flüstern dich in einer Sekunde erreichen. OurNotch zeigt nie Banner und macht keine Töne."
+          }
+        }
+      }
+    },
     "Soft" : {
       "localizations" : {
         "fr" : {
@@ -3980,6 +4012,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erneut versuchen"
+          }
+        }
+      }
+    },
+    "Turn on notifications for OurNotch" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active les notifications pour OurNotch"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen für OurNotch einschalten"
           }
         }
       }
@@ -4896,6 +4944,134 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "deine Liebe"
+          }
+        }
+      }
+    },
+    "💤 %@'s mac is asleep · %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 le mac de %1$@ dort · %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 %1$@s Mac schläft · %2$@"
+          }
+        }
+      }
+    },
+    "💤 asleep" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 endormi"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 schläft"
+          }
+        }
+      }
+    },
+    "💤 mac asleep · %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 mac endormi · %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "💤 Mac schläft · %@"
+          }
+        }
+      }
+    },
+    "🙈 %@ hid the notch for now" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 %@ a caché l’encoche pour l’instant"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 %@ hat die Notch versteckt"
+          }
+        }
+      }
+    },
+    "🙈 %@'s hiding till %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 %1$@ se cache jusqu’à %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 %1$@ versteckt sich bis %2$@"
+          }
+        }
+      }
+    },
+    "🙈 hid the notch" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 encoche cachée"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 Notch versteckt"
+          }
+        }
+      }
+    },
+    "🙈 hiding" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 caché"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 versteckt"
+          }
+        }
+      }
+    },
+    "🙈 hiding till %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 caché jusqu’à %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🙈 versteckt bis %@"
           }
         }
       }

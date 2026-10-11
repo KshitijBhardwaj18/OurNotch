@@ -696,3 +696,27 @@ struct PetSyncTests {
         #expect(you.unseen.contains(.pet))
     }
 }
+
+struct PartnerStatusTests {
+    @Test func hiddenAsleepOrAround() {
+        let now = Date(timeIntervalSince1970: 1_800_000_000)
+        var outbox = Outbox()
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == nil) // an older build: says nothing
+        outbox.lastSeen = now.addingTimeInterval(-60)
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == nil) // around
+        outbox.lastSeen = now.addingTimeInterval(-Config.Presence.asleepAfter - 1)
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == .asleep(since: outbox.lastSeen!))
+        outbox.awayUntil = now.addingTimeInterval(3600)
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == .hidden(until: now.addingTimeInterval(3600))) // hiding wins
+        outbox.awayUntil = .distantFuture
+        #expect(AppState.PartnerStatus.of(outbox, now: now) == .hidden(until: nil))
+    }
+
+    @Test func iAmHereTravelsQuietly() {
+        var outbox = Outbox(), receipts = Receipts()
+        receipts.lastSeen = Date(timeIntervalSince1970: 5)
+        outbox.lastSeen = Date(timeIntervalSince1970: 3)
+        #expect(outbox.with(receipts).lastSeen == Date(timeIntervalSince1970: 5))
+        #expect(outbox.content.lastSeen == nil) // never pings
+    }
+}

@@ -95,6 +95,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated {
                 Diagnostics.shared.record("Mac woke")
                 self?.syncEveryone(.wake)
+                self?.checkNotifications(remind: false)
                 self?.checkLicence()
             }
         }
@@ -120,6 +121,46 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             guard let onboarding else { continue }
             onboarding.activate(key: key)
             onboardingWindow?.showInFront()
+        }
+    }
+
+    // MARK: Notifications
+
+    /// Badge pings (see `CloudStore.watchPartner`) arrive within a second only with notification permission.
+    /// Logged on every launch and wake (diagnostics show both Macs); never asked: ask now; turned off: a
+    /// gentle reminder, at most once a day.
+    private func checkNotifications(remind: Bool) {
+        Task {
+            let center = UNUserNotificationCenter.current()
+            let status = await center.notificationSettings().authorizationStatus
+            Diagnostics.shared.record("notifications: \(status.word)", metric: Metric(kind: .step, name: "notifications", detail: status.word))
+            switch status {
+            case .notDetermined:
+                let granted = (try? await center.requestAuthorization(options: [.badge])) ?? false
+                Diagnostics.shared.record("notifications: asked, \(granted ? "allowed" : "not allowed")",
+                                          metric: Metric(kind: .step, name: "notifications", detail: granted ? "allowed when asked" : "refused when asked"))
+            case .denied where remind:
+                remindAboutNotifications()
+            default:
+                break
+            }
+        }
+    }
+
+    private func remindAboutNotifications() {
+        let key = "notificationsRemindedAt"
+        if let last = UserDefaults.standard.object(forKey: key) as? Date, Date.now.timeIntervalSince(last) < 24 * 3600 { return }
+        UserDefaults.standard.set(Date.now, forKey: key)
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Turn on notifications for OurNotch")
+        alert.informativeText = String(localized: "So hearts and whispers reach you within a second. OurNotch never shows banners or sounds.")
+        alert.addButton(withTitle: String(localized: "Open System Settings"))
+        alert.addButton(withTitle: String(localized: "Later"))
+        NSApp.activate()
+        let open = alert.runModal() == .alertFirstButtonReturn
+        Diagnostics.shared.record("notifications: reminded, \(open ? "opened System Settings" : "later")")
+        if open {
+            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=\(Bundle.main.bundleIdentifier ?? "")")!)
         }
     }
 
@@ -219,12 +260,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.checkLicence()
         }
         state.start()
-        // Badge pings (see `CloudStore.watchPartner`) need notification permission; asked once.
-        UNUserNotificationCenter.current().requestAuthorization(options: [.badge]) { granted, error in
-            Task { @MainActor in
-                Diagnostics.shared.record("notification permission: \(granted ? "allowed" : "not allowed")\(error.map { " (\($0.diagnosticDescription))" } ?? "")")
-            }
-        }
+        checkNotifications(remind: true)
         startAutoExport()
         self.state = state
         menu.isPaired = true
@@ -424,5 +460,19 @@ extension NSWindow {
         NSApp.activate()
         makeKeyAndOrderFront(nil)
         orderFrontRegardless()
+    }
+}
+
+extension UNAuthorizationStatus {
+    /// For diagnostics.
+    var word: String {
+        switch self {
+        case .authorized: "allowed"
+        case .denied: "turned off"
+        case .notDetermined: "never asked"
+        case .provisional: "provisional"
+        case .ephemeral: "ephemeral"
+        @unknown default: "unknown"
+        }
     }
 }
