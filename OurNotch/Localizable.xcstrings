@@ -199,6 +199,38 @@
         }
       }
     },
+    "%@ sent you %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ t’a envoyé %2$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat dir %2$@ geschickt"
+          }
+        }
+      }
+    },
+    "%@ sent you %@ %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ t’a envoyé %2$@ %3$@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat dir %2$@ geschickt · %3$@"
+          }
+        }
+      }
+    },
     "%@ taught %@ a trick %@" : {
       "localizations" : {
         "fr" : {
@@ -4944,6 +4976,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "deine Liebe"
+          }
+        }
+      }
+    },
+    "· send it back ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· renvoie-le ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "· schick es zurück ♡"
           }
         }
       }

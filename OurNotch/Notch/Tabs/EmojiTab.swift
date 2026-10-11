@@ -53,6 +53,20 @@ struct EmojiTab: View {
             } else {
                 Text("Sent \(lastSent)").foregroundStyle(.white)
             }
+        } else if let theirs = state.partnerOutbox.lastEmoji {
+            // What they last sent you, and one tap to send the same back.
+            TimelineView(.everyMinute) { context in
+                Button { send(theirs.char) } label: {
+                    HStack(spacing: 4) {
+                        Text(verbatim: "💌")
+                        Text(theirs.sentAt.map { String(localized: "\(state.partnerName.lowercased()) sent you \(theirs.char) \(context.date.timeIntervalSince($0) < 60 ? String(localized: "just now") : shortAgo($0, now: context.date))") }
+                             ?? String(localized: "\(state.partnerName.lowercased()) sent you \(theirs.char)"))
+                            .foregroundStyle(Color.secondaryLabel)
+                        Text("· send it back ♡").foregroundStyle(Color.notchBlush)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
         } else {
             Text("Tap one to send").foregroundStyle(Color.tertiaryLabel)
         }
