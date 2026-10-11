@@ -30,6 +30,10 @@ struct Outbox: Codable, Equatable {
     var licenceKey: String?
     /// While I've hidden OurNotch: my partner's notch shows "away" until then, or until I'm back.
     var awayUntil: Date?
+    /// Our pet (`Pet`): set by whoever adopted it, its look as I last chose it, and my latest care.
+    var petAdoption: PetAdoption?
+    var petLook: PetLook?
+    var petCare: [PetAction]?
 }
 
 /// What I've seen of my partner's things, saved apart from my outbox (see `Mailbox.saveReceipts`).

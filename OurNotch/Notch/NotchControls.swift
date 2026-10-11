@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum NotchTab: CaseIterable {
-    case home, stats, note, emoji, mood, photo
+    case home, stats, note, emoji, mood, photo, pet
 
     var label: String {
         switch self {
@@ -11,6 +11,7 @@ enum NotchTab: CaseIterable {
         case .mood: String(localized: "Mood")
         case .photo: String(localized: "Photo")
         case .stats: String(localized: "Together")
+        case .pet: String(localized: "Pet")
         }
     }
 
@@ -22,6 +23,7 @@ enum NotchTab: CaseIterable {
         case .mood: "cloud.sun"
         case .photo: "photo"
         case .stats: "infinity.circle"
+        case .pet: "pawprint"
         }
     }
 

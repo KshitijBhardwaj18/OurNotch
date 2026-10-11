@@ -108,6 +108,23 @@ enum Config {
         #endif
     }
 
+    enum Pet {
+        /// From just fed to hungry (fullness 1 → 0), and from cuddled to lonely.
+        static let hungerTime: TimeInterval = 24 * 3600
+        static let lonelyTime: TimeInterval = 36 * 3600
+        /// Two days without food and it falls sick; a meal nurses it back over a few hours.
+        static let sickAfter: TimeInterval = 48 * 3600
+        static let recoveringFor: TimeInterval = 6 * 3600
+        /// It sleeps through the night, in this Mac's time.
+        static let bedtime = 23
+        static let wakeUp = 7
+        /// Days since adoption when it becomes young, grown up, and wise.
+        static let stageDays = (young: 3, grown: 14, wise: 60)
+        /// Care each of you keeps in your outbox; older care drops off.
+        static let careKept = 12
+        static let names: [PetKind: String] = [.cat: "Mochi", .dog: "Biscuit"]
+    }
+
     enum Message {
         static let maxWords = 10
         static let maxCharacters = 60

@@ -198,15 +198,20 @@ final class AppState {
 
     // MARK: Sending
 
-    /// Counts the emoji locally right away. The first tap saves at once; taps within `Config.emojiSaveGap`
-    /// of that save go out together in the next one. Every save pings the partner, and Apple holds silent
-    /// pings back when an app sends too many (Beta 1.0.6: one save per tap, none delivered for 30 min).
+    /// Counts the emoji locally right away, then `saveSoon`.
     func sendEmoji(_ char: String, mode: EmojiMode) {
         lastActivity = .now
         myOutbox.emojisSent += 1
         myOutbox.lastEmoji = SentEmoji(char: char, mode: mode, sentAt: .now)
         store.myOutbox = myOutbox
         note("tap: emoji #\(myOutbox.emojisSent) \(char) (\(mode.rawValue))")
+        saveSoon()
+    }
+
+    /// For taps that come in bursts (emojis, pet care): the first saves at once; taps within
+    /// `Config.emojiSaveGap` of that save go out together in the next one. Every save pings the partner, and
+    /// Apple holds silent pings back when an app sends too many (Beta 1.0.6: none delivered for 30 min).
+    private func saveSoon() {
         guard saveTask == nil else { return } // the save already waiting carries this tap too
         let wait = Config.emojiSaveGap - Date.now.timeIntervalSince(lastEmojiSave)
         saveTask = Task { [weak self] in
@@ -260,6 +265,37 @@ final class AppState {
         store.myOutbox = myOutbox
         note("tap: mood \(emoji ?? "cleared")")
         Task { await save() }
+    }
+
+    // MARK: Pet
+
+    /// Ours, from both outboxes; nil until one of us adopts.
+    var pet: Pet? { Pet.from(mine: myOutbox, theirs: partnerOutbox) }
+
+    func adoptPet(_ kind: PetKind, name: String) {
+        guard pet == nil else { return }
+        let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        myOutbox.petAdoption = PetAdoption(kind: kind, name: name.isEmpty ? Config.Pet.names[kind]! : name, adoptedAt: .now)
+        store.myOutbox = myOutbox
+        note("tap: adopted a \(kind.rawValue)")
+        Task { await save() }
+    }
+
+    func care(_ care: PetCare) {
+        guard pet != nil else { return }
+        lastActivity = .now
+        myOutbox.petCare = Array(((myOutbox.petCare ?? []) + [PetAction(care: care, at: .now)]).suffix(Config.Pet.careKept))
+        store.myOutbox = myOutbox
+        note("tap: pet \(care.rawValue)")
+        saveSoon()
+    }
+
+    func setPetLook(coat: PetCoat? = nil, accessory: PetAccessory? = nil) {
+        guard let current = pet?.look else { return }
+        myOutbox.petLook = PetLook(coat: coat ?? current.coat, accessory: accessory ?? current.accessory, setAt: .now)
+        store.myOutbox = myOutbox
+        note("tap: pet look")
+        saveSoon()
     }
 
     // MARK: Anniversary
@@ -419,6 +455,10 @@ final class AppState {
         }
 
         var found: [String] = []
+        if hasFetchedPartner, partner.petAdoption != previous.petAdoption || partner.petCare != previous.petCare || partner.petLook != previous.petLook {
+            found.append("pet")
+            if !(isNotchOpen && visibleTab == .pet) { unseen.insert(.pet) }
+        }
         if partner.mood != previous.mood, hasFetchedPartner {
             found.append("mood \(partner.mood ?? "cleared")")
             // Closed, the mood shows beside the camera; open, only on Home and Mood.
@@ -550,6 +590,7 @@ final class AppState {
         if new.togetherSince != old.togetherSince { parts.append("date") }
         if new.licenceKey != old.licenceKey { parts.append("licence") }
         if new.awayUntil != old.awayUntil { parts.append(new.awayUntil == nil ? "back" : "away") }
+        if new.petAdoption != old.petAdoption || new.petCare != old.petCare || new.petLook != old.petLook { parts.append("pet") }
         if new.seenEmojis != old.seenEmojis { parts.append("seen emojis \(new.seenEmojis)") }
         if new.seenMessageId != old.seenMessageId { parts.append("seen note") }
         if new.seenPhotoId != old.seenPhotoId { parts.append("seen photo") }
