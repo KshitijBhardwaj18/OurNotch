@@ -24,15 +24,15 @@ enum Config {
         #if DEBUG
         static let pollInterval: Duration = .seconds(3)
         #else
-        // Pings deliver in 1 to 3 s (Beta 1.0.5); this only catches a lost one. Waking the Mac and opening
-        // the notch check straight away too.
-        static let pollInterval: Duration = .seconds(300)
+        // Pings usually deliver in 1 to 3 s, but Apple holds silent pings back when an app sends many
+        // (Beta 1.0.6: none for 30 min, then 26 at once), so this check carries the load meanwhile.
+        static let pollInterval: Duration = .seconds(60)
         #endif
         /// Checks while the notch is open: you're looking, so a lost ping costs at most this.
         static let openPollInterval: Duration = .seconds(3)
         /// Checks within `activeWindow` of sending or receiving, when a reply is likely.
         /// Load at 1,000 Macs, ~2 % with the notch open and ~8 % mid-conversation:
-        /// 900/300 + 20/3 + 80/10 ≈ 18 requests/s, under CloudKit's ~40/s starting allowance.
+        /// 900/60 + 20/3 + 80/10 ≈ 30 requests/s, under CloudKit's ~40/s starting allowance.
         static let activePollInterval: Duration = .seconds(10)
         static let activeWindow: TimeInterval = 180
         /// A read that gets no data for this long fails, so the next check retries instead of waiting.
