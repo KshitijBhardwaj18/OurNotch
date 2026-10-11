@@ -5,12 +5,20 @@ import SwiftUI
 enum Config {
     /// After an emoji save, further taps wait this long and go out together in one save (one ping).
     static let emojiSaveGap: TimeInterval = 3
-    /// The one-tap emojis on the Emoji tab.
-    static let emojis = ["❤️", "🥰", "😘", "💋", "🫶", "🤗", "🌹"]
+    /// The one-tap emojis on the Emoji tab: a row of love, a row of fun and frustration.
+    static let emojis = ["❤️", "🥰", "😘", "💋", "🫶", "🤗", "🌹",
+                         "😂", "🤪", "🥳", "🙈", "🙄", "😤", "😡"]
     /// Moods for the Mood tab: the emoji travels; the label explains it.
     static let moods: [(emoji: String, label: String)] = [
-        ("🥰", String(localized: "In love")), ("😊", String(localized: "Happy")), ("🥺", String(localized: "Missing you")), ("🎉", String(localized: "Excited")), ("☕️", String(localized: "On a break")), ("🍕", String(localized: "Hungry")),
-        ("💻", String(localized: "Busy")), ("🎧", String(localized: "Focused")), ("🏃", String(localized: "Out")), ("😴", String(localized: "Sleepy")), ("😔", String(localized: "Low")), ("🤒", String(localized: "Unwell")),
+        // Good vibes
+        ("🥰", String(localized: "In love")), ("😊", String(localized: "Happy")), ("🥺", String(localized: "Missing you")), ("🎉", String(localized: "Excited")),
+        ("🤪", String(localized: "Silly")), ("🥳", String(localized: "Partying")), ("😌", String(localized: "Calm")),
+        // What I'm up to
+        ("☕️", String(localized: "On a break")), ("🍕", String(localized: "Hungry")), ("💻", String(localized: "Busy")), ("🎧", String(localized: "Focused")),
+        ("🏃", String(localized: "Out")), ("🎮", String(localized: "Gaming")), ("😴", String(localized: "Sleepy")),
+        // Rough moments
+        ("🥱", String(localized: "Bored")), ("😔", String(localized: "Low")), ("🤒", String(localized: "Unwell")), ("😩", String(localized: "Stressed")),
+        ("🙄", String(localized: "Annoyed")), ("😤", String(localized: "Frustrated")), ("😡", String(localized: "Angry")),
     ]
 
     /// The word for a mood emoji, in this Mac's language (only the emoji travels between Macs).

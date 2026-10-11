@@ -4,7 +4,7 @@ import SwiftUI
 struct MoodTab: View {
     let state: AppState
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 6)
+    private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -18,7 +18,7 @@ struct MoodTab: View {
                         state.setMood(selected ? nil : mood.emoji)
                     } label: {
                         VStack(spacing: 3) {
-                            Text(mood.emoji).font(.system(size: 26))
+                            Text(mood.emoji).font(.system(size: 22))
                             Text(mood.label)
                                 .font(.system(size: 10.5, weight: .medium))
                                 .foregroundStyle(selected ? Color.white : .secondaryLabel)
@@ -26,7 +26,7 @@ struct MoodTab: View {
                                 .minimumScaleFactor(0.8)
                         }
                         .frame(maxWidth: .infinity)
-                        .frame(height: 68)
+                        .frame(height: 52)
                         .background(selected ? Color.notchPressed : .notchField, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                         .overlay {
                             if selected {

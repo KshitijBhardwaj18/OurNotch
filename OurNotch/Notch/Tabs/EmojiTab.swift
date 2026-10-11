@@ -58,11 +58,12 @@ struct EmojiTab: View {
         }
     }
 
+    /// Two rows: love on top, fun and frustration underneath.
     private var emojiRow: some View {
-        HStack(spacing: 6) {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 7), spacing: 6) {
             ForEach(Config.emojis, id: \.self) { char in
                 Button { send(char) } label: {
-                    Text(char).font(.system(size: 32))
+                    Text(char).font(.system(size: 26))
                 }
                 .buttonStyle(EmojiButtonStyle(isLastSent: char == lastSent))
                 .overlay { TapBurst(char: char, trigger: taps[char, default: 0]) }
@@ -85,7 +86,7 @@ private struct EmojiButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .frame(maxWidth: .infinity)
-            .frame(height: 66)
+            .frame(height: 54)
             .background(fill(pressed: configuration.isPressed), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay {
                 if isLastSent {

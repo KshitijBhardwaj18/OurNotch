@@ -588,6 +588,38 @@
       },
       "extractionState" : "stale"
     },
+    "Angry" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En colère"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wütend"
+          }
+        }
+      }
+    },
+    "Annoyed" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agacé"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genervt"
+          }
+        }
+      }
+    },
     "Appears" : {
       "localizations" : {
         "fr" : {
@@ -621,6 +653,22 @@
         }
       }
     },
+    "Bored" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ennuyé"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelangweilt"
+          }
+        }
+      }
+    },
     "Bow" : {
       "localizations" : {
         "fr" : {
@@ -649,6 +697,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Beschäftigt"
+          }
+        }
+      }
+    },
+    "Calm" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calme"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entspannt"
           }
         }
       }
@@ -1429,6 +1493,22 @@
       },
       "extractionState" : "stale"
     },
+    "Frustrated" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frustré"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frustriert"
+          }
+        }
+      }
+    },
     "Full screen" : {
       "localizations" : {
         "fr" : {
@@ -1441,6 +1521,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vollbild"
+          }
+        }
+      }
+    },
+    "Gaming" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je joue"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Am Zocken"
           }
         }
       }
@@ -2503,6 +2599,22 @@
     "Partner Simulator…" : {
       "shouldTranslate" : false
     },
+    "Partying" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fête"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Party"
+          }
+        }
+      }
+    },
     "Paste your licence key to use OurNotch here again." : {
       "localizations" : {
         "fr" : {
@@ -3238,6 +3350,22 @@
         }
       }
     },
+    "Silly" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fou-fou"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albern"
+          }
+        }
+      }
+    },
     "Skip for Now" : {
       "localizations" : {
         "fr" : {
@@ -3331,6 +3459,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Immer noch nicht aktiv. Wenn du denkst, dass das ein Fehler ist, schreib uns."
+          }
+        }
+      }
+    },
+    "Stressed" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stressé"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gestresst"
           }
         }
       }

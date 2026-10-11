@@ -2,6 +2,7 @@ import CloudKit
 import os
 import Sparkle
 import SwiftUI
+import UserNotifications
 
 @main
 struct OurNotchApp: App {
@@ -128,6 +129,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func application(_ application: NSApplication, didReceiveRemoteNotification userInfo: [String: Any]) {
         let subscription = CKNotification(fromRemoteNotificationDictionary: userInfo)?.subscriptionID ?? "unknown"
         Diagnostics.shared.record("ping received (subscription \(subscription))", metric: Metric(kind: .ping, name: "ping", detail: subscription))
+        NSApp.dockTile.badgeLabel = nil // the badge only made the ping fast; it shows if a Dock icon ever appears
         syncEveryone(.ping)
     }
 
@@ -217,6 +219,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.checkLicence()
         }
         state.start()
+        // Badge pings (see `CloudStore.watchPartner`) need notification permission; asked once.
+        UNUserNotificationCenter.current().requestAuthorization(options: [.badge]) { granted, error in
+            Task { @MainActor in
+                Diagnostics.shared.record("notification permission: \(granted ? "allowed" : "not allowed")\(error.map { " (\($0.diagnosticDescription))" } ?? "")")
+            }
+        }
         startAutoExport()
         self.state = state
         menu.isPaired = true

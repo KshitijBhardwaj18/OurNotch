@@ -222,7 +222,11 @@ struct CloudStore: Mailbox {
                                                subscriptionID: "outbox-\(partnerId)",
                                                options: [.firesOnRecordCreation, .firesOnRecordUpdate])
         let info = CKSubscription.NotificationInfo()
-        info.shouldSendContentAvailable = true // silent: wakes the app, shows nothing
+        info.shouldSendContentAvailable = true // wakes the app
+        // A badge makes it a "visible" push, which Apple delivers right away; silent-only pushes are held
+        // back past a few an hour (Beta 1.0.10: 30 arrived at once). OurNotch has no Dock icon, so the
+        // badge itself never shows, and the app clears it on arrival.
+        info.shouldBadge = true
         subscription.notificationInfo = info
         do {
             _ = try await database.save(subscription)

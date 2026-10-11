@@ -681,14 +681,16 @@ struct PetTests {
 @MainActor
 struct PetSyncTests {
     @Test func adoptingAndFeedingReachTheOtherMac() async throws {
-        let (you, partner) = try await TwoPartners().paired()
+        let people = TwoPartners()
+        let (you, partner) = try await people.paired()
         you.adoptPet(.dog, name: " Biscuit ")
-        try await Task.sleep(for: .milliseconds(150))
+        try await Task.sleep(for: .milliseconds(1200)) // the pet saves quietly within a second
         await partner.sync()
         #expect(partner.pet?.adoption.name == "Biscuit")
         partner.adoptPet(.cat, name: "Second") // already adopted: ignored
         partner.care(.feed)
-        try await Task.sleep(for: .milliseconds(300))
+        try await Task.sleep(for: .milliseconds(1200))
+        #expect(try await people.mailbox.fetchOutbox(owner: people.partner.myId).map { _ in true } == nil) // no outbox save, no ping
         await you.sync()
         #expect(you.pet?.care.last?.action.care == .feed && you.pet?.care.last?.mine == false)
         #expect(you.unseen.contains(.pet))

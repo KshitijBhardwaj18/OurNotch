@@ -84,6 +84,7 @@ final class AppState {
     /// Labels this identity's lines in the diagnostics log ("me", or "sim" for the Partner Simulator).
     @ObservationIgnored private let who: String
     @ObservationIgnored private var saveTask: Task<Void, Never>?
+    @ObservationIgnored private var quietTask: Task<Void, Never>?
     /// When the last emoji save started, so a burst of taps goes out as one save every few seconds.
     @ObservationIgnored private var lastEmojiSave = Date.distantPast
     /// The receipts the mailbox has; starts as the outbox's (builds before 1.0.7 kept them there).
@@ -208,7 +209,18 @@ final class AppState {
         saveSoon()
     }
 
-    /// For taps that come in bursts (emojis, pet care): the first saves at once; taps within
+    /// The pet goes in the receipts record, which doesn't ping the partner; taps within a second save once.
+    private func saveQuietSoon() {
+        guard quietTask == nil else { return }
+        quietTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(1))
+            guard let self else { return }
+            self.quietTask = nil
+            await self.saveReceipts()
+        }
+    }
+
+    /// For taps that come in bursts (emojis): the first saves at once; taps within
     /// `Config.emojiSaveGap` of that save go out together in the next one. Every save pings the partner, and
     /// Apple holds silent pings back when an app sends too many (Beta 1.0.6: none delivered for 30 min).
     private func saveSoon() {
@@ -278,7 +290,7 @@ final class AppState {
         myOutbox.petAdoption = PetAdoption(kind: kind, name: name.isEmpty ? Config.Pet.names[kind]! : name, adoptedAt: .now)
         store.myOutbox = myOutbox
         note("tap: adopted a \(kind.rawValue)")
-        Task { await save() }
+        saveQuietSoon()
     }
 
     func care(_ care: PetCare) {
@@ -287,7 +299,7 @@ final class AppState {
         myOutbox.petCare = Array(((myOutbox.petCare ?? []) + [PetAction(care: care, at: .now)]).suffix(Config.Pet.careKept))
         store.myOutbox = myOutbox
         note("tap: pet \(care.rawValue)")
-        saveSoon()
+        saveQuietSoon()
     }
 
     func setPetLook(coat: PetCoat? = nil, accessory: PetAccessory? = nil) {
@@ -295,7 +307,7 @@ final class AppState {
         myOutbox.petLook = PetLook(coat: coat ?? current.coat, accessory: accessory ?? current.accessory, setAt: .now)
         store.myOutbox = myOutbox
         note("tap: pet look")
-        saveSoon()
+        saveQuietSoon()
     }
 
     // MARK: Anniversary
@@ -572,7 +584,7 @@ final class AppState {
             let sealed = try Crypto.seal(JSONEncoder().encode(receipts), with: key)
             try await mailbox.saveReceipts(sealed, owner: pairing.myId)
             savedReceipts = receipts
-            note("saved receipts (seen emojis \(receipts.seenEmojis)) in \(Self.ms(since: started))",
+            note("saved receipts (seen emojis \(receipts.seenEmojis)\(receipts.petAdoption == nil ? "" : ", pet")) in \(Self.ms(since: started))",
                  metric: Metric(kind: .cloud, name: "save", ms: Metric.ms(since: started), detail: "receipts"))
         } catch {
             note("receipts save FAILED, will retry: \(error.diagnosticDescription)",
