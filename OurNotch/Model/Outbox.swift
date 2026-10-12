@@ -34,6 +34,9 @@ struct Outbox: Codable, Equatable {
     var petAdoption: PetAdoption?
     var petLook: PetLook?
     var petCare: [PetAction]?
+    /// When this Mac last started OurNotch. Part of the outbox (so it pings): both Macs then check every 2 s
+    /// for a while (`Config.Cloud.launchBoostWindow`).
+    var launchedAt: Date?
     /// When this Mac last said "I'm here" (every few minutes while OurNotch runs), so my partner can tell
     /// when it's asleep or off.
     var lastSeen: Date?

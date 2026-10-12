@@ -554,6 +554,9 @@ struct CheckPaceTests {
         #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, idle: idle, now: now) == Config.Cloud.openPollInterval)
         #expect(CheckPace.interval(notchOpen: false, lastActivity: now.addingTimeInterval(-179), idle: idle, now: now) == Config.Cloud.activePollInterval)
         #expect(CheckPace.interval(notchOpen: false, lastActivity: now.addingTimeInterval(-181), idle: idle, now: now) == .seconds(60))
+        // Just after either Mac started OurNotch: every 2 s, notch open or not, for 10 minutes.
+        #expect(CheckPace.interval(notchOpen: false, lastActivity: nil, boostUntil: now.addingTimeInterval(60), idle: idle, now: now) == .seconds(2))
+        #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, boostUntil: now.addingTimeInterval(-1), idle: idle, now: now) == Config.Cloud.openPollInterval)
         // Never slower than the idle pace (Debug's 3 s).
         #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, idle: .seconds(3), now: now) == .seconds(3))
     }

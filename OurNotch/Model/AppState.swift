@@ -111,13 +111,15 @@ final class AppState {
     /// A ping or wake that arrived mid-check; it runs right after, so a fresh change isn't missed.
     @ObservationIgnored private var queuedSync: SyncSource?
     @ObservationIgnored private var hasFetchedPartner = false
+    /// Checks every 2 s until then: 10 minutes from either Mac starting OurNotch.
+    @ObservationIgnored private var boostUntil: Date?
     /// Checks speed up while the notch is open and for a few minutes after sending or receiving.
     @ObservationIgnored private var isNotchOpen = false
     @ObservationIgnored private var lastActivity: Date?
     @ObservationIgnored private var lastCheck = Date.distantPast
 
     private var checkInterval: Duration {
-        CheckPace.interval(notchOpen: isNotchOpen, lastActivity: lastActivity, idle: mailbox.pollInterval)
+        CheckPace.interval(notchOpen: isNotchOpen, lastActivity: lastActivity, boostUntil: boostUntil, idle: mailbox.pollInterval)
     }
 
     /// Returns nil until this identity has paired.
@@ -185,6 +187,10 @@ final class AppState {
     func start() {
         guard syncTask == nil else { return }
         scheduleReturn()
+        // Started: check fast for a while, and tell my love's Mac to do the same (saved with the first check).
+        boostUntil = Date.now.addingTimeInterval(Config.Cloud.launchBoostWindow)
+        myOutbox.launchedAt = .now
+        store.myOutbox = myOutbox
         note("started: paired with \(pairing.partnerName) as \(pairing.role.rawValue); checks every \(mailbox.pollInterval) when idle")
         syncTask = Task { [weak self] in
             guard let self else { return }
@@ -471,6 +477,14 @@ final class AppState {
         partnerOutbox = partner
         if hasFetchedPartner { logReceipts(old: previous, new: partner, source: source) }
         hasFetchedPartner = true
+        // My love's Mac just started OurNotch: check fast here too, until 10 minutes after their start.
+        if let launched = partner.launchedAt, launched != previous.launchedAt {
+            let until = launched.addingTimeInterval(Config.Cloud.launchBoostWindow)
+            if until > Date.now, until > (boostUntil ?? .distantPast) {
+                boostUntil = until
+                note("[\(source.rawValue)] partner started OurNotch: checking every \(Config.Cloud.launchBoostInterval) for a while")
+            }
+        }
         if let date = partner.togetherSince, date != togetherSince,
            togetherSince == nil || (partner.togetherSinceSetAt ?? .distantPast) > (myOutbox.togetherSinceSetAt ?? .distantPast) {
             togetherSince = date
@@ -624,6 +638,7 @@ final class AppState {
         if new.togetherSince != old.togetherSince { parts.append("date") }
         if new.licenceKey != old.licenceKey { parts.append("licence") }
         if new.awayUntil != old.awayUntil { parts.append(new.awayUntil == nil ? "back" : "away") }
+        if new.launchedAt != old.launchedAt { parts.append("started") }
         if new.petAdoption != old.petAdoption || new.petCare != old.petCare || new.petLook != old.petLook { parts.append("pet") }
         if new.seenEmojis != old.seenEmojis { parts.append("seen emojis \(new.seenEmojis)") }
         if new.seenMessageId != old.seenMessageId { parts.append("seen note") }
@@ -639,8 +654,10 @@ final class AppState {
 
 /// How often to check the partner's row, kept pure for tests.
 enum CheckPace {
-    /// Fastest while the notch is open, fast soon after sending or receiving (a reply is likely), otherwise `idle`.
-    static func interval(notchOpen: Bool, lastActivity: Date?, idle: Duration, now: Date = .now) -> Duration {
+    /// Fastest just after either Mac started OurNotch, fast while the notch is open or soon after sending or
+    /// receiving (a reply is likely), otherwise `idle`.
+    static func interval(notchOpen: Bool, lastActivity: Date?, boostUntil: Date? = nil, idle: Duration, now: Date = .now) -> Duration {
+        if let boostUntil, now < boostUntil { return min(idle, Config.Cloud.launchBoostInterval) }
         if notchOpen { return min(idle, Config.Cloud.openPollInterval) }
         let recent = lastActivity.map { now.timeIntervalSince($0) < Config.Cloud.activeWindow } ?? false
         return recent ? min(idle, Config.Cloud.activePollInterval) : idle
