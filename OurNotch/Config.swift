@@ -38,10 +38,11 @@ enum Config {
         #endif
         /// Checks while the notch is open: you're looking, so a lost ping costs at most this.
         static let openPollInterval: Duration = .seconds(3)
-        /// Checks within `activeWindow` of sending or receiving, when a reply is likely.
-        /// Load at 1,000 Macs, ~2 % with the notch open and ~8 % mid-conversation:
-        /// 900/60 + 20/3 + 80/10 ≈ 30 requests/s, under CloudKit's ~40/s starting allowance.
-        static let activePollInterval: Duration = .seconds(10)
+        /// Checks within `activeWindow` of sending or receiving, when a reply is likely. As fast as with the notch
+        /// open: pings can stop for minutes (Beta 1.0.17: none for 2.5 min, emojis waited up to 18 s at 10 s).
+        // ponytail: at 1,000 Macs (~2 % notch open, ~8 % mid-conversation) 900/60 + 100/3 ≈ 48 requests/s, past
+        // CloudKit's ~40/s starting allowance; a live connection (Durable Objects) replaces this when it matters.
+        static let activePollInterval: Duration = .seconds(3)
         static let activeWindow: TimeInterval = 180
         /// A read that gets no data for this long fails, so the next check retries instead of waiting.
         /// CloudKit's default is 60 s: Beta 1.0 logged a check stuck 64 s on a dropped connection.
