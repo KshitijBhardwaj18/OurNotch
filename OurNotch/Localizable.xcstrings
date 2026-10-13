@@ -263,6 +263,22 @@
         }
       }
     },
+    "%@ wants to join ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ veut te rejoindre ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ möchte beitreten ♡"
+          }
+        }
+      }
+    },
     "%@ · %@" : {
       "shouldTranslate" : false
     },
@@ -2500,6 +2516,22 @@
         }
       }
     },
+    "Notifications are off for OurNotch. Turn them on in System Settings, under Notifications, then OurNotch. This screen moves on by itself." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les notifications sont désactivées pour OurNotch. Active-les dans Réglages Système, sous Notifications, puis OurNotch. Cet écran avance tout seul."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitteilungen sind für OurNotch aus. Schalte sie in den Systemeinstellungen unter Mitteilungen und dann OurNotch ein. Dieser Bildschirm geht von selbst weiter."
+          }
+        }
+      }
+    },
     "Notifications are off for OurNotch. Turn them on in System Settings, under Notifications, then OurNotch. This screen moves on by itself. OurNotch never shows banners or sounds." : {
       "localizations" : {
         "fr" : {
@@ -2514,7 +2546,8 @@
             "value" : "Mitteilungen sind für OurNotch aus. Schalte sie in den Systemeinstellungen unter Mitteilungen, dann OurNotch, ein. Dieser Bildschirm geht von selbst weiter. OurNotch zeigt nie Banner und macht keine Töne."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Now %@ %@" : {
       "localizations" : {
@@ -2610,6 +2643,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nur wer OurNotch gekauft hat, kann einladen. Geh zurück und wähle „Ich habe einen Einladungscode“."
+          }
+        }
+      }
+    },
+    "Open OurNotch and say yes." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre OurNotch et dis oui."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne OurNotch und sag ja."
           }
         }
       }
@@ -2741,6 +2790,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OurNotch braucht Mitteilungen, damit dein Mac sofort merkt, wenn etwas ankommt: Es ist in einer Sekunde in deiner Notch. Nie Banner, nie Töne."
+          }
+        }
+      },
+      "extractionState" : "stale"
+    },
+    "OurNotch needs notifications so your Mac hears the moment something arrives, and it's in your notch within a second. The only banner it shows is when your love asks to join." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch a besoin des notifications pour que ton Mac sache dès qu’un message arrive, et il est dans ton encoche en une seconde. La seule bannière qu’il affiche, c’est quand ta personne demande à te rejoindre."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OurNotch braucht Mitteilungen, damit dein Mac sofort merkt, wenn etwas ankommt, und es in einer Sekunde in deiner Notch ist. Das einzige Banner erscheint, wenn dein Mensch beitreten möchte."
           }
         }
       }
@@ -4014,6 +4080,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Danach einmalig %@ für euch beide · vor dem 3. Tag kündigen und nichts zahlen"
+          }
+        }
+      }
+    },
+    "They tap yes on their Mac. Not at it right now? Close OurNotch and enter the code again later ♡" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta personne dit oui sur son Mac. Pas devant ? Ferme OurNotch et retape le code plus tard ♡"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Mensch tippt auf seinem Mac auf Ja. Gerade nicht da? Schließe OurNotch und gib den Code später noch mal ein ♡"
           }
         }
       }
