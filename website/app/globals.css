@@ -293,6 +293,7 @@ button{font-family:inherit}
 .y-calm-copy > p{margin-top:16px;font-size:17px;color:var(--ink2);max-width:440px}
 .y-amt{display:flex;align-items:baseline;gap:8px;margin-top:26px;font:800 clamp(52px,6vw,72px)/1 var(--disp);letter-spacing:-.05em}
 .y-amt small{font:500 16px var(--body);letter-spacing:0;color:var(--ink2)}
+.y-amt .y-was{font-size:.5em;align-self:center}
 .y-then{margin-top:8px;font-size:14.5px;color:var(--ink2)}
 .y-was{opacity:.55;text-decoration-thickness:2px}.y-offer{display:inline-block;align-self:flex-start;width:fit-content;margin-top:12px;font:600 12.5px/1 var(--body);letter-spacing:.04em;text-transform:uppercase;color:#fff;background:var(--pink);border-radius:999px;padding:9px 14px}
 .y-calm ul{list-style:none;padding:0;margin:20px 0 26px;display:grid;gap:6px}

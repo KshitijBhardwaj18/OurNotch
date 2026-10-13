@@ -26,7 +26,7 @@ const en = {
     h1a: 'Send love,', h1b: 'notch to notch.',
     sub: 'OurNotch keeps your person at the top of your MacBook screen. Send them a whisper, a kiss or a photo, and it appears in their notch.',
     cta: 'Try it free', how: 'See how it works',
-    underB: '3 days free.', under: 'Then {price} once, for both your Macs.',
+    underB: '3 days free.', under: 'Then {price} for lifetime, for both your Macs.',
   },
   fits: {
     kicker: 'What fits in a notch', h2: 'Tiny things. Big feelings.',
@@ -61,9 +61,9 @@ const en = {
     ] as [string, string, string][],
   },
   buy: {
-    tag: '3 days free · launch offer', kicker: 'Pricing', h2: 'Try it free for 3 days.',
+    tag: '3 days free · launch offer', kicker: 'Pricing', h2: 'One price. Yours for life.',
     p: "Start free on your Mac and your person's. Keep it and you pay once, on day 3. Never again.",
-    free: 'Free', forDays: 'for 3 days', then: 'then {price} once · cancel before day 3 and pay nothing', offer: 'launch offer until {date}',
+    lifetime: 'lifetime', then: '3 days free first · pay once, yours forever · cancel before day 3 and pay nothing', offer: 'launch offer until {date}',
     points: ["Your Mac and your person's", 'Whispers, kisses, moods and photos', 'Your time together, counted live'],
     cta: 'Start my 3 free days',
     fine: 'Needs macOS 14 Sonoma or later on both Macs. Your love can {download} and join with your invite.',
@@ -192,7 +192,7 @@ const fr: Copy = {
     h1a: 'De l’amour,', h1b: 'd’encoche à encoche.',
     sub: 'OurNotch garde ta personne tout en haut de l’écran de ton MacBook. Envoie-lui un murmure, un bisou ou une photo, et ça apparaît dans son encoche.',
     cta: 'Essayer gratuitement', how: 'Voir comment ça marche',
-    underB: '3 jours gratuits.', under: 'Puis {price} une seule fois, pour vos deux Mac.',
+    underB: '3 jours gratuits.', under: 'Puis {price} à vie, pour vos deux Mac.',
   },
   fits: {
     kicker: 'Ce qui tient dans une encoche', h2: 'Petites choses. Grands sentiments.',
@@ -227,9 +227,9 @@ const fr: Copy = {
     ],
   },
   buy: {
-    tag: '3 jours gratuits · offre de lancement', kicker: 'Prix', h2: 'Essaie-le gratuitement 3 jours.',
+    tag: '3 jours gratuits · offre de lancement', kicker: 'Prix', h2: 'Un prix. À vie.',
     p: 'Commence gratuitement sur ton Mac et celui de ta personne. Tu le gardes ? Tu paies une seule fois, le 3e jour. Plus jamais ensuite.',
-    free: 'Gratuit', forDays: 'pendant 3 jours', then: 'puis {price} une fois · annule avant le 3e jour et tu ne paies rien', offer: 'offre de lancement jusqu’au {date}',
+    lifetime: 'à vie', then: '3 jours gratuits d’abord · tu paies une fois, à toi pour toujours · annule avant le 3e jour et tu ne paies rien', offer: 'offre de lancement jusqu’au {date}',
     points: ['Ton Mac et celui de ta personne', 'Murmures, bisous, humeurs et photos', 'Votre temps ensemble, compté en direct'],
     cta: 'Commencer mes 3 jours gratuits',
     fine: 'Nécessite macOS 14 Sonoma ou plus récent sur les deux Mac. Ton amour peut {download} et te rejoindre avec ton invitation.',
@@ -356,7 +356,7 @@ const de: Copy = {
     h1a: 'Liebe senden,', h1b: 'von Notch zu Notch.',
     sub: 'OurNotch hält deinen Menschen ganz oben auf deinem MacBook-Bildschirm. Schick ein Flüstern, einen Kuss oder ein Foto – und es erscheint in der Notch.',
     cta: 'Gratis testen', how: 'So funktioniert’s',
-    underB: '3 Tage gratis.', under: 'Danach einmalig {price}, für eure beiden Macs.',
+    underB: '3 Tage gratis.', under: 'Danach {price} lebenslang, für eure beiden Macs.',
   },
   fits: {
     kicker: 'Was in eine Notch passt', h2: 'Kleine Dinge. Große Gefühle.',
@@ -391,9 +391,9 @@ const de: Copy = {
     ],
   },
   buy: {
-    tag: '3 Tage gratis · Einführungsangebot', kicker: 'Preis', h2: '3 Tage gratis testen.',
+    tag: '3 Tage gratis · Einführungsangebot', kicker: 'Preis', h2: 'Ein Preis. Für immer.',
     p: 'Starte gratis auf deinem Mac und dem deines Menschen. Behältst du es, zahlst du einmal, am 3. Tag. Danach nie wieder.',
-    free: 'Gratis', forDays: '3 Tage lang', then: 'danach einmalig {price} · vor dem 3. Tag kündigen und nichts zahlen', offer: 'Einführungsangebot bis {date}',
+    lifetime: 'lebenslang', then: 'erst 3 Tage gratis · einmal zahlen, für immer deins · vor dem 3. Tag kündigen und nichts zahlen', offer: 'Einführungsangebot bis {date}',
     points: ['Dein Mac und der deines Menschen', 'Flüstern, Küsse, Launen und Fotos', 'Eure gemeinsame Zeit, live gezählt'],
     cta: 'Meine 3 Gratis-Tage starten',
     fine: 'Benötigt macOS 14 Sonoma oder neuer auf beiden Macs. Deine Liebe kann {download} und mit deiner Einladung beitreten.',
