@@ -34,8 +34,8 @@ const Notch = ({ zoom, ...p }: { zoom: number; mood: string; ticker?: string; ta
 
 const CARDS: Record<string, () => React.ReactNode> = {
   hero: () => (
-    <Frame size="square" bg="y-blush s-hero" title={<>Your notch was empty.<br /><em>Now it isn&apos;t ♡</em></>}>
-      <Notch zoom={3.2} mood="🥰" tall ticker="miss you already ♡" />
+    <Frame size="feed" bg="y-blush s-hero" title={<>Your notch was empty.<br /><em>Now it isn&apos;t ♡</em></>}>
+      <Notch zoom={3.6} mood="🥰" tall ticker="miss you already ♡" />
       <div className="s-pals"><Char kind="pip" className="is-love" /><Char kind="bun" className="is-happy" /></div>
     </Frame>
   ),
@@ -81,15 +81,25 @@ const CARDS: Record<string, () => React.ReactNode> = {
       <div className="s-list">{t.details.items.slice(0, 4).map(([ic, hd, p]) => <div key={hd}><span>{ic}</span><div><b>{hd}</b><p>{p}</p></div></div>)}</div>
     </Frame>
   ),
+  how: () => (
+    <Frame size="feed" bg="y-butter" kicker="How it works" title={<>Three steps<br /><em>to their notch.</em></>}>
+      <div className="s-list">{[
+        ['💻', 'Get OurNotch', 'Free for 3 days on your Mac. Then once, for both of you.'],
+        ['💌', 'Invite your love', 'Send them a code. They download it free and join.'],
+        ['♡', 'Send love, notch to notch', 'Notes, hearts, moods and photos land in their notch.'],
+      ].map(([ic, hd, p]) => <div key={hd}><span>{ic}</span><div><b>{hd}</b><p>{p}</p></div></div>)}</div>
+      <div className="s-pals s-one s-right s-small"><Char kind="bun" className="is-love" /></div>
+    </Frame>
+  ),
   price: () => (
-    <Frame size="feed" bg="y-mint" kicker="Pricing" title={<>One purchase.<br /><em>Both Macs.</em></>}>
+    <Frame size="feed" bg="y-mint" kicker="Pricing" title={<>3 days free.<br /><em>Then just once.</em></>}>
       <div className="s-prices"><span>$9</span><span>₹999</span><span>€9</span></div>
-      <p className="s-body">One time, no subscription. Your love downloads it free and joins with your invite code.</p>
+      <p className="s-body">Keep it and you pay once, never again. Your love downloads it free and joins with your invite code.</p>
       <div className="s-pals"><Char kind="pip" className="is-happy" /><Char kind="bun" className="is-love" /></div>
     </Frame>
   ),
   story: () => (
-    <Frame size="story" bg="y-blush s-story" kicker="Launching this week" title={<>Send love,<br /><em>notch to notch.</em></>}>
+    <Frame size="story" bg="y-blush s-story" kicker="Out now" title={<>Send love,<br /><em>notch to notch.</em></>}>
       <Notch zoom={4} mood="🥰" tall ticker="see you at 1 ♡" />
       <p className="s-body">Notes, emoji, moods and photos that appear in your person&apos;s MacBook notch.</p>
       <div className="s-pals s-big"><Char kind="pip" className="is-love" /><Char kind="bun" className="is-happy" /></div>
@@ -112,9 +122,9 @@ const CARDS: Record<string, () => React.ReactNode> = {
     </Frame>
   ),
   'demo-story': () => (
-    <Frame size="story" bg="s-white" kicker="Launching this week" title={<>Send love,<br /><em>notch to notch.</em></>}>
+    <Frame size="story" bg="s-white" kicker="Out now" title={<>Send love,<br /><em>notch to notch.</em></>}>
       <div className="s-demo s-demo-story"><HeroDemo t={t.demo} tour={t.tour} /></div>
-      <p className="s-body s-center">One purchase covers both your Macs.</p>
+      <p className="s-body s-center">3 days free · one purchase for both your Macs.</p>
     </Frame>
   ),
 };
@@ -161,7 +171,7 @@ export default async function Social({ searchParams }: { searchParams: Promise<{
         .s-list span{font-size:56px;line-height:1}.s-list b{font:800 38px var(--disp);letter-spacing:-.03em}.s-list p{margin:6px 0 0;font:500 26px/1.35 var(--body);color:var(--ink3)}
         .s-prices{display:flex;gap:22px}.s-prices span{background:#fff;border-radius:36px;padding:28px 40px;font:800 84px/1 var(--disp);letter-spacing:-.05em}
         .s-demo{width:100%;margin-top:120px}.s-demo-story{margin-top:200px}
-        .s-hero .s-title{font-size:88px;margin-top:40px}.s-hero .s-art{gap:36px;padding-top:20px}
+        .s-hero .s-title{font-size:92px;margin-top:48px}.s-hero .s-art{gap:64px}.s-hero .s-pals .char{width:290px}
         .s-small{bottom:-60px}.s-small .char{width:170px}
         .s-story .s-title{font-size:132px;margin-top:90px}.s-story .s-body{font-size:42px}.s-story .s-kicker{font-size:26px}
         .s-og{position:relative;width:1200px;height:630px;box-sizing:border-box;padding:80px 90px;display:flex;align-items:center;gap:56px;overflow:hidden}
