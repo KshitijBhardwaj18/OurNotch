@@ -7,7 +7,7 @@ import { MadeForTwo } from '@/components/MadeForTwo';
 import { SiteFooter } from '@/components/SiteFooter';
 import { Reveal } from '@/components/bits';
 import { copy, fill, href, type Lang } from '@/lib/i18n';
-import { checkoutUrl, priceFor } from '@/lib/prices';
+import { checkoutUrl, LAUNCH_ENDS, priceFor, regularFor } from '@/lib/prices';
 
 // Hero hearts: [left %, top %, size px, color], around the headline and beside the video. Phones skip them.
 const PASTEL = ['#FFD3DC', '#FFE9A6', '#CFE3FF', '#CFEFDF', '#FF8FAB'];
@@ -46,7 +46,15 @@ function TwoMacs() {
 export async function Landing({ lang, country }: { lang: Lang; country?: string }) {
   const h = await headers();
   const t = copy[lang];
-  const price = priceFor(country ?? h.get('cf-ipcountry'));
+  const where = country ?? h.get('cf-ipcountry');
+  const price = priceFor(where);
+  const was = regularFor(where);
+  // "Then ~~₹999~~ ₹299 once": the copy's {price} becomes the struck-through regular price and the launch price.
+  const withPrice = (text: string) => {
+    const [before, after] = text.split('{price}');
+    return <>{before}<s className="y-was">{was}</s> <b>{price}</b>{after}</>;
+  };
+  const offerEnds = LAUNCH_ENDS.toLocaleDateString(t.tour.locale, { day: 'numeric', month: 'long', timeZone: 'Asia/Kolkata' });
   const checkout = checkoutUrl(href(lang, '/thanks'));
   const [fineBefore, fineAfter] = t.buy.fine.split('{download}');
 
@@ -81,7 +89,7 @@ export async function Landing({ lang, country }: { lang: Lang; country?: string 
           <a className="y-btn" href={checkout}><Heart />{t.hero.cta}</a>
           <a className="y-link" href="#fits">{t.hero.how}</a>
         </div>
-        <p className="y-under"><b>{t.hero.underB}</b> {fill(t.hero.under, { price })}</p>
+        <p className="y-under"><b>{t.hero.underB}</b> {withPrice(t.hero.under)}</p>
       </header>
 
       <section className="y-sec y-wrap" id="fits">
@@ -123,8 +131,9 @@ export async function Landing({ lang, country }: { lang: Lang; country?: string 
             <span className="y-kicker">{t.buy.kicker}</span>
             <h2>{t.buy.h2}</h2>
             <p>{t.buy.p}</p>
-            <div className="y-amt">{t.buy.free}<small>{t.buy.forDays}</small></div>
-            <p className="y-then">{fill(t.buy.then, { price })}</p>
+            <div className="y-amt"><s className="y-was">{was}</s>{price}<small>{t.buy.lifetime}</small></div>
+            <p className="y-then">{t.buy.then}</p>
+            <p className="y-offer">{fill(t.buy.offer, { date: offerEnds })}</p>
             <ul>{t.buy.points.map(p => <li key={p}>{p}</li>)}</ul>
             <a className="y-btn" href={checkout}><Heart />{t.buy.cta}</a>
             <p className="y-fine">{fineBefore}<a className="y-link" href="/download">{t.buy.downloadFree}</a>{fineAfter}</p>
@@ -151,7 +160,7 @@ export async function Landing({ lang, country }: { lang: Lang; country?: string 
         </div>
         <h2>{t.end.h2}</h2>
         <a className="y-btn" href={checkout}><Heart />{t.end.cta}</a>
-        <p className="y-under"><b>{t.hero.underB}</b> {fill(t.hero.under, { price })}</p>
+        <p className="y-under"><b>{t.hero.underB}</b> {withPrice(t.hero.under)}</p>
       </section>
 
       <SiteFooter lang={lang} />
