@@ -6,9 +6,9 @@ const EURO = new Set('AT BE BG HR CY EE FI FR DE GR IE IT LV LT LU MT NL PT SK S
 
 export function priceFor(country?: string | null): string {
   const c = country?.toUpperCase();
-  if (c === 'IN') return '₹499';
-  if (c && EURO.has(c)) return '€3';
-  return '$4.50';
+  if (c === 'IN') return '₹999';
+  if (c && EURO.has(c)) return '€9';
+  return '$9';
 }
 
 // ponytail: Dodo test mode until launch, then the live product and checkout host.
