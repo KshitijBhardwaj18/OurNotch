@@ -150,9 +150,13 @@ enum Config {
         /// Linked from the invite email. Beta partners get the Beta DMG; the site's /download serves the sold build.
         #if BETA
         static let downloadURL = "https://downloads.ournotch.app/beta/OurNotch.dmg"
+        static let isBeta = true
         #else
         static let downloadURL = "\(Licence.website)/download"
+        static let isBeta = false
         #endif
+        /// ournotch.app emails the designed invite (the Worker in live/, through Resend).
+        static let inviteEmailURL = URL(string: "https://live.ournotch.app/v1/invite")!
     }
 
     enum Presence {

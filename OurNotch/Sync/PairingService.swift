@@ -32,7 +32,7 @@ struct Pairing: Codable, Equatable {
 }
 
 enum PairingError: LocalizedError, Equatable {
-    case invalidCode, usedCode, expiredCode, declined
+    case invalidCode, usedCode, expiredCode, declined, emailNotSent, tooManyEmails
 
     var errorDescription: String? {
         switch self {
@@ -40,6 +40,8 @@ enum PairingError: LocalizedError, Equatable {
         case .usedCode: String(localized: "that code was already used ♡ ask your love for a new one")
         case .expiredCode: String(localized: "this code has expired ♡ ask your love for a new one")
         case .declined: String(localized: "that didn't work ♡ ask your love for a new code")
+        case .emailNotSent: String(localized: "couldn't send the email ♡ try again, or use your Mail app")
+        case .tooManyEmails: String(localized: "that's a lot of invites ♡ try again in an hour, or use your Mail app")
         }
     }
 }
