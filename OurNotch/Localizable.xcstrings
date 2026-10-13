@@ -1214,7 +1214,8 @@
             "value" : "Keinen? Gratis testen"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Done" : {
       "localizations" : {
@@ -1636,7 +1637,8 @@
             "value" : "OurNotch wieder holen"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Get OurNotch for %@" : {
       "localizations" : {
@@ -2708,7 +2710,8 @@
             "value" : "OurNotch ist ausgeschaltet"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "OurNotch needs notifications so your Mac hears the moment something arrives, and it's in your notch within a second. It never shows banners or sounds." : {
       "localizations" : {
@@ -3964,7 +3967,8 @@
             "value" : "Danach einmalig %@ für euch beide · vor dem 3. Tag kündigen und nichts zahlen"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "This happens when a purchase is refunded, or when a licence is misused (shared publicly or used with a modified copy), as our terms explain. If you think this is a mistake, write to us at %@." : {
       "localizations" : {
@@ -3996,7 +4000,8 @@
             "value" : "Das passiert, wenn der Gratis-Test gekündigt wurde, eine Zahlung nicht geklappt hat, ein Kauf erstattet wurde oder eine Lizenz missbraucht wurde, wie unsere Bedingungen erklären. Du kannst jederzeit neu starten oder uns an %@ schreiben."
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "This key is already in use on another Mac. Choose Remove from This Mac there, or write to us at %@." : {
       "localizations" : {
@@ -4142,7 +4147,8 @@
             "value" : "3 Tage gratis testen"
           }
         }
-      }
+      },
+      "extractionState" : "stale"
     },
     "Turn on notifications for OurNotch" : {
       "localizations" : {
