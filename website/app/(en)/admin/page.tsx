@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { adminAllowed } from '@/lib/admin';
 import { hasKey, keys, sales } from '@/lib/dodo';
+import { TEST } from '@/lib/prices';
 import { free, restore, revoke } from './actions';
 
 export const metadata: Metadata = { title: 'Admin · OurNotch', robots: { index: false } };
@@ -20,7 +21,7 @@ export default async function Admin() {
     return (
       <main className="y-wrap a-page">
         <h1>Admin</h1>
-        <p className="a-note">Add your Dodo test-mode API key to <code>website/.env.local</code> as <code>DODO_API_KEY=…</code>, then restart the dev server. The file is ignored by git.</p>
+        <p className="a-note">Add a Dodo API key to <code>website/.env.local</code> as <code>DODO_API_KEY=…</code> (with <code>DODO_MODE=test</code> for a test-mode key), then restart the dev server. The file is ignored by git.</p>
       </main>
     );
   }
@@ -28,7 +29,7 @@ export default async function Admin() {
   return (
     <main className="y-wrap a-page">
       <h1>Admin</h1>
-      <p className="a-note">Live from Dodo (test mode). Revoking a key locks both Macs of the pair at their next daily check.</p>
+      <p className="a-note">Live from Dodo{TEST ? ' (test mode)' : ''}. Revoking a key locks both Macs of the pair at their next daily check.</p>
 
       <h2>Sales <small>{s.length}</small></h2>
       <div className="a-scroll">

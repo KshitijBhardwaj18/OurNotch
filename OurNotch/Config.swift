@@ -85,22 +85,42 @@ enum Config {
     }
 
     enum Licence {
-        // ponytail: every build uses Dodo's test mode until slice 9 adds the sold Release build with live values.
+        // Test couples (Debug and Beta) use Dodo's test mode: test cards, nothing charged. The sold build is live.
+        // The 3-day free trial: a Dodo subscription that charges the one-time price once, on day 3, and lasts
+        // 20 years. Its key works from the first day; Dodo switches it off if the trial is cancelled or the
+        // payment fails, and the hourly check then locks both Macs.
+        #if DEBUG || BETA
         /// Dodo's public licence endpoints (activate / validate / deactivate need no API key).
         static let baseURL = URL(string: "https://test.dodopayments.com")!
-        static let productId = "pdt_0Np1n3lC4hykWhTwMaNVV"
+        static let productId = "pdt_0NpQhZeQ6pJ3R92rDOQAr"
+        static let portalURL = URL(string: "https://test.customer.dodopayments.com/login/bus_0Np1laPQgg48PHzDsmzgI")!
+        #else
+        static let baseURL = URL(string: "https://live.dodopayments.com")!
+        static let productId = "pdt_0NpdhF0Z52hC8dx2GAuwk"
+        static let portalURL = URL(string: "https://customer.dodopayments.com/login/bus_0Np1laPQgg48PHzDsmzgI")!
+        #endif
         #if DEBUG
         static let website = "http://localhost:3000"
         #else
         static let website = "https://ournotch.app"
         #endif
-        /// Dodo's hosted checkout; it picks $4.50 / ₹499 / €3 from the buyer's currency, then returns to the
-        /// thank-you page with `license_key`, whose Open OurNotch button activates this app.
+        /// The website starts Dodo's checkout for the trial (with India's ₹999 card limit); it picks $9 / ₹999 / €9
+        /// from the buyer's currency, then returns to the thank-you page with `license_key`, whose Open OurNotch
+        /// button activates this app.
+        #if BETA
+        // ournotch.app sells the live build, so Beta's button goes straight to the test checkout.
         static let checkoutURL = URL(string: "https://test.checkout.dodopayments.com/buy/\(productId)?quantity=1&redirect_url=\(website)/thanks")!
-        /// The price on the gate. The Mac doesn't know the buyer's country, so checkout shows the local price.
-        static let priceLabel = "$4.50"
-        /// Dodo's customer portal: the buyer enters their purchase email and sees their key.
-        static let portalURL = URL(string: "https://test.customer.dodopayments.com/login/bus_0Np1laPQgg48PHzDsmzgI")!
+        #else
+        static let checkoutURL = URL(string: "\(website)/buy")!
+        #endif
+        /// The price on the gate, from the Mac's region, matching the website's `priceFor` and Dodo's prices.
+        // ponytail: the euro list is copied from website/lib/prices.ts; keep the two in step.
+        static var priceLabel: String {
+            let region = Locale.current.region?.identifier ?? ""
+            if region == "IN" { return "₹999" }
+            if "AT BE BG HR CY EE FI FR DE GR IE IT LV LT LU MT NL PT SK SI ES AD MC SM VA ME XK".split(separator: " ").contains(Substring(region)) { return "€9" }
+            return "$9"
+        }
         /// How often each Mac asks Dodo "still valid?" (also on launch, wake, and opening the notch), so a revoke
         /// lands within the hour. One small request per Mac per hour; Dodo's validate call is free.
         static let checkInterval: Duration = .seconds(60 * 60)

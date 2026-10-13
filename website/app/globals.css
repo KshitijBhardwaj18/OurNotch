@@ -293,6 +293,7 @@ button{font-family:inherit}
 .y-calm-copy > p{margin-top:16px;font-size:17px;color:var(--ink2);max-width:440px}
 .y-amt{display:flex;align-items:baseline;gap:8px;margin-top:26px;font:800 clamp(52px,6vw,72px)/1 var(--disp);letter-spacing:-.05em}
 .y-amt small{font:500 16px var(--body);letter-spacing:0;color:var(--ink2)}
+.y-then{margin-top:8px;font-size:14.5px;color:var(--ink2)}
 .y-calm ul{list-style:none;padding:0;margin:20px 0 26px;display:grid;gap:6px}
 .y-calm li{padding-left:26px;position:relative;font-size:16px}
 .y-calm li::before{content:"♥";position:absolute;left:2px;color:var(--pink);font-size:13px;top:2px}
