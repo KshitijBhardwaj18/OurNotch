@@ -4,6 +4,18 @@
 // Countries that pay in euros (eurozone, Bulgaria since 2026, and euro-using microstates).
 const EURO = new Set('AT BE BG HR CY EE FI FR DE GR IE IT LV LT LU MT NL PT SK SI ES AD MC SM VA ME XK'.split(' '));
 
+// The launch offer: Dodo charges the launch price until this day. Shown with the regular price struck through.
+// ponytail: manual end. After it, set the live product back to $9 / ₹999 / 9 € in Dodo, then make priceFor
+// return regularFor and drop the struck-through price and the offer tag.
+export const LAUNCH_ENDS = new Date('2026-10-31T23:59:59+05:30');
+
+export function regularFor(country?: string | null): string {
+  const c = country?.toUpperCase();
+  if (c === 'IN') return '₹999';
+  if (c && EURO.has(c)) return '9 €';
+  return '$9';
+}
+
 export function priceFor(country?: string | null): string {
   const c = country?.toUpperCase();
   if (c === 'IN') return '₹299';
