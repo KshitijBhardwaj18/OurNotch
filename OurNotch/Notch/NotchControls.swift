@@ -3,6 +3,9 @@ import SwiftUI
 enum NotchTab: CaseIterable {
     case home, stats, note, emoji, mood, photo, pet
 
+    /// The tabs in the bar: all of them, less the pet while `Config.Pet.enabled` is off.
+    static var shown: [NotchTab] { allCases.filter { $0 != .pet || Config.Pet.enabled } }
+
     var label: String {
         switch self {
         case .home: String(localized: "Home")
@@ -42,7 +45,7 @@ struct NotchTabBar: View {
 
     var body: some View {
         HStack(spacing: 2) {
-            ForEach(NotchTab.allCases, id: \.self) { tab in
+            ForEach(NotchTab.shown, id: \.self) { tab in
                 let selected = tab == selection && !dimmed
                 Button { selection = tab } label: {
                     VStack(spacing: 2) {
