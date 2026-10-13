@@ -92,8 +92,8 @@ const CARDS: Record<string, () => React.ReactNode> = {
     </Frame>
   ),
   price: () => (
-    <Frame size="feed" bg="y-mint" kicker="Pricing" title={<>3 days free.<br /><em>Then just once.</em></>}>
-      <div className="s-prices"><span>$9</span><span>₹999</span><span>€9</span></div>
+    <Frame size="feed" bg="y-mint" kicker="Launch price" title={<>3 days free.<br /><em>Then just once.</em></>}>
+      <div className="s-prices"><span>$4.90</span><span>₹299</span><span>4,90 €</span></div>
       <p className="s-body">Keep it and you pay once, never again. Your love downloads it free and joins with your invite code.</p>
       <div className="s-pals"><Char kind="pip" className="is-happy" /><Char kind="bun" className="is-love" /></div>
     </Frame>
@@ -169,7 +169,7 @@ export default async function Social({ searchParams }: { searchParams: Promise<{
         .s-polas .b-shot .char{width:150px}
         .s-list{display:grid;gap:26px;width:100%}.s-list>div{display:flex;gap:26px;align-items:flex-start;background:#fff;border-radius:32px;padding:30px 34px}
         .s-list span{font-size:56px;line-height:1}.s-list b{font:800 38px var(--disp);letter-spacing:-.03em}.s-list p{margin:6px 0 0;font:500 26px/1.35 var(--body);color:var(--ink3)}
-        .s-prices{display:flex;gap:22px}.s-prices span{background:#fff;border-radius:36px;padding:28px 40px;font:800 84px/1 var(--disp);letter-spacing:-.05em}
+        .s-prices{display:flex;gap:18px}.s-prices span{background:#fff;border-radius:36px;padding:28px 30px;font:800 72px/1 var(--disp);letter-spacing:-.05em;white-space:nowrap}
         .s-demo{width:100%;margin-top:120px}.s-demo-story{margin-top:200px}
         .s-hero .s-title{font-size:92px;margin-top:48px}.s-hero .s-art{gap:64px}.s-hero .s-pals .char{width:290px}
         .s-small{bottom:-60px}.s-small .char{width:170px}
