@@ -1,3 +1,4 @@
+import { CookieSettings } from '@/components/MetaPixel';
 import { copy, href, LANG_NAMES, LANGS, SUPPORT, type Lang } from '@/lib/i18n';
 
 // On every page: help, legal and contact links (Dodo's review and the PRD ask for them everywhere) and the language switch.
@@ -13,6 +14,7 @@ export function SiteFooter({ lang, path = '/' }: { lang: Lang; path?: string }) 
             <a href={href(lang, '/privacy')}>{t.privacy}</a>
             <a href={href(lang, '/terms')}>{t.terms}</a>
             <a href={href(lang, '/refunds')}>{t.refunds}</a>
+            <CookieSettings label={t.cookies} />
           </nav>
           <a className="y-foot-mail" href={`mailto:${SUPPORT}`}>{t.contact}: <b>{SUPPORT}</b></a>
         </div>

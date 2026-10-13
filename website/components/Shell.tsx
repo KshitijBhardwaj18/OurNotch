@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Bricolage_Grotesque, Inter_Tight } from 'next/font/google';
+import { MetaPixel } from '@/components/MetaPixel';
 import { copy, type Lang } from '@/lib/i18n';
 import '../app/globals.css';
 
@@ -24,7 +25,7 @@ export function siteMetadata(lang: Lang): Metadata {
 export function Shell({ lang, children }: { lang: Lang; children: React.ReactNode }) {
   return (
     <html lang={lang} className={`${disp.variable} ${body.variable}`}>
-      <body>{children}</body>
+      <body>{children}<MetaPixel t={copy[lang].consent} /></body>
     </html>
   );
 }
