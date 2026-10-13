@@ -180,6 +180,7 @@ final class OnboardingModel {
     /// A fresh code, e.g. after the old one expired (24 h) or went to the wrong person.
     func newCode() {
         inviteCode = nil
+        inviteSentTo = nil
         pendingJoin = nil
         declined = []
         startInvite()
@@ -191,7 +192,32 @@ final class OnboardingModel {
         NSPasteboard.general.setString(inviteCode, forType: .string)
     }
 
-    /// Opens the user's own Mail app with a pre-written invite. No email server needed.
+    /// Their email, for the invite ournotch.app sends.
+    var partnerEmail = ""
+    private(set) var inviteSentTo: String?
+    var canSendInvite: Bool { partnerEmail.contains("@") && partnerEmail.contains(".") && !isWorking }
+
+    /// Has ournotch.app email the invite in the landing page's look (`live/src/invite.js`).
+    func sendInvite() {
+        guard let inviteCode, canSendInvite else { return }
+        let to = partnerEmail.trimmingCharacters(in: .whitespacesAndNewlines)
+        let body: [String: Any] = ["to": to, "name": trimmedName, "code": inviteCode,
+                                   "lang": Bundle.main.preferredLocalizations.first ?? "en", "beta": Config.Pairing.isBeta]
+        run("send invite email") {
+            var request = URLRequest(url: Config.Pairing.inviteEmailURL, timeoutInterval: 15)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+            let status = (try? await URLSession.shared.data(for: request)).flatMap { ($0.1 as? HTTPURLResponse)?.statusCode }
+            switch status {
+            case 200: self.inviteSentTo = to
+            case 429: throw PairingError.tooManyEmails
+            default: throw PairingError.emailNotSent
+            }
+        }
+    }
+
+    /// Opens the user's own Mail app with a pre-written plain invite: the fallback when ournotch.app can't send.
     func sendInviteEmail() {
         guard let inviteCode else { return }
         let body = String(localized: """
@@ -488,10 +514,23 @@ struct OnboardingView: View {
                 .background(.background, in: RoundedRectangle(cornerRadius: 8))
                 .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.separator))
             HStack {
+                TextField("Their email", text: $model.partnerEmail)
+                    .textFieldStyle(.roundedBorder)
+                    .textContentType(.emailAddress)
+                    .frame(width: 210)
+                    .onSubmit(model.sendInvite)
+                Button("Send Invite ♡", action: model.sendInvite).disabled(!model.canSendInvite)
+            }
+            .padding(.top, 6)
+            if let to = model.inviteSentTo {
+                Text("Invite sent to \(to) ♡").font(.system(size: 12)).foregroundStyle(.secondary)
+            }
+            HStack {
                 Button("Copy Code", action: model.copyCode)
-                Button("Send Email…", action: model.sendInviteEmail)
+                Button("Use My Mail App…", action: model.sendInviteEmail)
                 Button("New Code", action: model.newCode)
             }
+            .buttonStyle(.link)
             HStack(spacing: 6) {
                 ProgressView().controlSize(.small)
                 Text("Waiting for your love to join…").font(.system(size: 12)).foregroundStyle(.secondary)

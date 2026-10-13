@@ -1,4 +1,5 @@
-# The doorbell between a couple's two Macs (see src/index.js). Deploy: npx wrangler@4 deploy
+# The doorbell between a couple's two Macs, and the invite email (see src/). Deploy: npx wrangler@4 deploy
+# Secret: RESEND_API_KEY (npx wrangler@4 secret put RESEND_API_KEY), for /v1/invite.
 name = "ournotch-live"
 main = "src/index.js"
 compatibility_date = "2026-09-28"
@@ -12,6 +13,14 @@ LIVE = "on"
 name = "ROOMS"
 class_name = "Room"
 
+[[durable_objects.bindings]]
+name = "LIMITS"
+class_name = "Limit"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Room"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["Limit"]
