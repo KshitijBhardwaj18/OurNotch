@@ -104,7 +104,7 @@ enum Config {
         #else
         static let website = "https://ournotch.app"
         #endif
-        /// The website starts Dodo's checkout for the trial (with India's ₹999 card limit); it picks $9 / ₹999 / €9
+        /// The website starts Dodo's checkout for the trial (with India's ₹299 card limit); it picks $4.90 / ₹299 / €4.90 (the launch price)
         /// from the buyer's currency, then returns to the thank-you page with `license_key`, whose Open OurNotch
         /// button activates this app.
         #if BETA
@@ -117,9 +117,9 @@ enum Config {
         // ponytail: the euro list is copied from website/lib/prices.ts; keep the two in step.
         static var priceLabel: String {
             let region = Locale.current.region?.identifier ?? ""
-            if region == "IN" { return "₹999" }
-            if "AT BE BG HR CY EE FI FR DE GR IE IT LV LT LU MT NL PT SK SI ES AD MC SM VA ME XK".split(separator: " ").contains(Substring(region)) { return "€9" }
-            return "$9"
+            if region == "IN" { return "₹299" }
+            if "AT BE BG HR CY EE FI FR DE GR IE IT LV LT LU MT NL PT SK SI ES AD MC SM VA ME XK".split(separator: " ").contains(Substring(region)) { return "4,90 €" }
+            return "$4.90"
         }
         /// How often each Mac asks Dodo "still valid?" (also on launch, wake, and opening the notch), so a revoke
         /// lands within the hour. One small request per Mac per hour; Dodo's validate call is free.

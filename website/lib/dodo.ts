@@ -45,11 +45,11 @@ export async function keys(): Promise<Key[]> {
   })));
 }
 
-// A checkout for the free trial. Indian cards approve a bank mandate for ₹999, not Dodo's ₹15,000 default.
+// A checkout for the free trial. Indian cards approve a bank mandate for ₹299, not Dodo's ₹15,000 default.
 export const checkoutSession = (returnUrl: string) =>
   dodo<{ checkout_url: string }>('/checkouts', {
     method: 'POST',
-    body: JSON.stringify({ product_cart: [{ product_id: PRODUCT, quantity: 1 }], mandate_min_amount_inr_paise: 99900, return_url: returnUrl }),
+    body: JSON.stringify({ product_cart: [{ product_id: PRODUCT, quantity: 1 }], mandate_min_amount_inr_paise: 29900, return_url: returnUrl }),
   });
 
 // The kill switch: a disabled key answers "not valid", so both Macs of the pair lock at their next check.
