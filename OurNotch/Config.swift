@@ -53,6 +53,20 @@ enum Config {
         static let requestTimeout: TimeInterval = 10
     }
 
+    /// The doorbell (`LiveBell`, the Worker in `live/`): a ring makes the other Mac check iCloud at once.
+    enum Live {
+        static let url = URL(string: "wss://live.ournotch.app")!
+        /// The fast checks (notch open, mid-conversation, after a start) slow to this while both Macs are in
+        /// the room: rings bring changes in under a second, so checks only back them up.
+        static let backupInterval: Duration = .seconds(15)
+        static let keepAlive: Duration = .seconds(30)
+        static let pongWait: Duration = .seconds(10)
+        /// Waits before reconnecting: from this, doubling while Cloudflare can't be reached (or the doorbell
+        /// is switched off), up to `lastRetry`.
+        static let firstRetry: TimeInterval = 2
+        static let lastRetry: TimeInterval = 5 * 60
+    }
+
     enum Diagnostics {
         /// Upload this Mac's event log and measurements to CloudKit so both partners' logs can be read from
         /// either Mac. Debug and Beta (test couples) only: the sold Release build keeps its log on the Mac.

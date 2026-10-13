@@ -1,0 +1,17 @@
+# The doorbell between a couple's two Macs (see src/index.js). Deploy: npx wrangler@4 deploy
+name = "ournotch-live"
+main = "src/index.js"
+compatibility_date = "2026-09-28"
+routes = [{ pattern = "live.ournotch.app", custom_domain = true }]
+
+[vars]
+# The kill switch: "off" turns the doorbell off for everyone; the apps carry on with iCloud alone.
+LIVE = "on"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]

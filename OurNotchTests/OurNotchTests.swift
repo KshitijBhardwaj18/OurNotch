@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import ImageIO
 import Testing
@@ -559,6 +560,32 @@ struct CheckPaceTests {
         #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, boostUntil: now.addingTimeInterval(-1), idle: idle, now: now) == Config.Cloud.openPollInterval)
         // Never slower than the idle pace (Debug's 3 s).
         #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, idle: .seconds(3), now: now) == .seconds(3))
+        // Both Macs at the doorbell: rings bring changes, so fast checks relax; idle stays idle.
+        #expect(CheckPace.interval(notchOpen: true, lastActivity: nil, partnerLive: true, idle: idle, now: now) == Config.Live.backupInterval)
+        #expect(CheckPace.interval(notchOpen: false, lastActivity: nil, boostUntil: now.addingTimeInterval(60), partnerLive: true, idle: idle, now: now) == Config.Live.backupInterval)
+        #expect(CheckPace.interval(notchOpen: false, lastActivity: nil, partnerLive: true, idle: idle, now: now) == .seconds(60))
+    }
+}
+
+/// Needs the doorbell Worker running locally: `cd live && npx wrangler@4 dev --port 8799`, then
+/// OURNOTCH_LIVE_TEST=1 in the test environment. Skipped otherwise.
+@MainActor
+struct LiveBellTests {
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["OURNOTCH_LIVE_TEST"] != nil))
+    func twoMacsHearEachOther() async throws {
+        let key = SymmetricKey(size: .bits256)
+        let url = URL(string: "ws://localhost:8799")!
+        let me = LiveBell(key: key, role: .inviter, url: url), partner = LiveBell(key: key, role: .joiner, url: url)
+        var heard = 0
+        partner.onCheck = { heard += 1 }
+        me.start()
+        partner.start()
+        for _ in 0..<50 where !(me.partnerHere && partner.partnerHere) { try await Task.sleep(for: .milliseconds(100)) }
+        #expect(me.partnerHere && partner.partnerHere)
+        let before = heard
+        me.ring()
+        for _ in 0..<20 where heard == before { try await Task.sleep(for: .milliseconds(100)) }
+        #expect(heard == before + 1)
     }
 }
 

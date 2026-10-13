@@ -261,7 +261,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     /// Starts syncing and shows the notch. Returns false if this Mac isn't paired yet.
     @discardableResult
     private func startNotch() -> Bool {
-        guard let state = AppState(store: store, mailbox: mailbox) else { return false }
+        guard let state = AppState(store: store, mailbox: mailbox, live: true) else { return false }
         // Syncing carries on while locked (a new key from the partner must still arrive); effects don't play.
         state.onEmojisArrived = { [weak self] count, emoji in
             guard let self, !self.isLocked else { return }

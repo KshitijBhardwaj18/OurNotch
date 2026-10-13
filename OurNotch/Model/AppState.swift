@@ -5,7 +5,7 @@ import Observation
 
 /// Why a check of the partner's row ran. Logged with each check, so pings can be told apart from the timer.
 enum SyncSource: String {
-    case launch, poll, ping, wake
+    case launch, poll, ping, wake, live
 }
 
 /// The single source of truth for one partner: my outbox, what my partner sent, and what I've shown.
@@ -117,13 +117,16 @@ final class AppState {
     @ObservationIgnored private var isNotchOpen = false
     @ObservationIgnored private var lastActivity: Date?
     @ObservationIgnored private var lastCheck = Date.distantPast
+    @ObservationIgnored private let live: LiveBell?
 
     private var checkInterval: Duration {
-        CheckPace.interval(notchOpen: isNotchOpen, lastActivity: lastActivity, boostUntil: boostUntil, idle: mailbox.pollInterval)
+        CheckPace.interval(notchOpen: isNotchOpen, lastActivity: lastActivity, boostUntil: boostUntil,
+                           partnerLive: live?.partnerHere == true, idle: mailbox.pollInterval)
     }
 
     /// Returns nil until this identity has paired.
-    init?(store: LocalStore, mailbox: Mailbox, photosRoot: URL = PhotoCache.defaultRoot, who: String = "me") {
+    init?(store: LocalStore, mailbox: Mailbox, photosRoot: URL = PhotoCache.defaultRoot, who: String = "me",
+          live: Bool = false) {
         guard let pairing = store.pairing,
               let key = try? Crypto.sharedKey(myPrivateKey: store.privateKey,
                                               partnerPublicKey: pairing.partnerKey,
@@ -133,6 +136,7 @@ final class AppState {
         self.mailbox = mailbox
         self.store = store
         self.who = who
+        self.live = live ? LiveBell(key: key, role: pairing.role) : nil
         photos = PhotoCache(ownerId: pairing.myId, root: photosRoot)
         myPhoto = photos.load(.mine).flatMap(NSImage.init(data:))
         partnerPhoto = photos.load(.partner).flatMap(NSImage.init(data:))
@@ -191,7 +195,10 @@ final class AppState {
         boostUntil = Date.now.addingTimeInterval(Config.Cloud.launchBoostWindow)
         myOutbox.launchedAt = .now
         store.myOutbox = myOutbox
-        note("started: paired with \(pairing.partnerName) as \(pairing.role.rawValue); checks every \(mailbox.pollInterval) when idle")
+        note("started: paired with \(pairing.partnerName) as \(pairing.role.rawValue); checks every \(checkInterval) for a while, then every \(mailbox.pollInterval) when idle")
+        live?.onCheck = { [weak self] in self?.syncNow(.live) }
+        live?.onNote = { [weak self] in self?.note("live: \($0)") }
+        live?.start()
         syncTask = Task { [weak self] in
             guard let self else { return }
             await self.mailbox.watchPartner(self.pairing.partnerId)
@@ -218,6 +225,7 @@ final class AppState {
     /// Checks now, e.g. after a ping or when the Mac wakes. If a check is already running,
     /// this one runs right after it instead of being dropped.
     func syncNow(_ source: SyncSource) {
+        if source == .wake { live?.reconnect() } // the socket rarely survives sleep
         if isSyncing {
             queuedSync = source
         } else {
@@ -604,7 +612,8 @@ final class AppState {
             try await mailbox.saveOutbox(sealed, owner: pairing.myId)
             savedOutbox = snapshot
             store.savedOutbox = snapshot
-            note("saved outbox (\(changes)) in \(Self.ms(since: started))",
+            live?.ring()
+            note("saved outbox (\(changes)) in \(Self.ms(since: started))\(live?.partnerHere == true ? ", rang" : "")",
                  metric: Metric(kind: .cloud, name: "save", ms: Metric.ms(since: started), detail: changes))
         } catch {
             note("save FAILED (\(changes)), will retry: \(error.diagnosticDescription)",
@@ -655,12 +664,17 @@ final class AppState {
 /// How often to check the partner's row, kept pure for tests.
 enum CheckPace {
     /// Fastest just after either Mac started OurNotch, fast while the notch is open or soon after sending or
-    /// receiving (a reply is likely), otherwise `idle`.
-    static func interval(notchOpen: Bool, lastActivity: Date?, boostUntil: Date? = nil, idle: Duration, now: Date = .now) -> Duration {
-        if let boostUntil, now < boostUntil { return min(idle, Config.Cloud.launchBoostInterval) }
-        if notchOpen { return min(idle, Config.Cloud.openPollInterval) }
+    /// receiving (a reply is likely), otherwise `idle`. While both Macs are at the doorbell (`partnerLive`), rings
+    /// bring changes, so the fast checks relax to a backup pace.
+    static func interval(notchOpen: Bool, lastActivity: Date?, boostUntil: Date? = nil, partnerLive: Bool = false,
+                         idle: Duration, now: Date = .now) -> Duration {
         let recent = lastActivity.map { now.timeIntervalSince($0) < Config.Cloud.activeWindow } ?? false
-        return recent ? min(idle, Config.Cloud.activePollInterval) : idle
+        let fast: Duration
+        if let boostUntil, now < boostUntil { fast = Config.Cloud.launchBoostInterval }
+        else if notchOpen { fast = Config.Cloud.openPollInterval }
+        else if recent { fast = Config.Cloud.activePollInterval }
+        else { return idle }
+        return min(idle, partnerLive ? Config.Live.backupInterval : fast)
     }
 }
 
