@@ -188,6 +188,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     /// The badge ping, which macOS gives the notification system rather than the ping handler above.
     /// Fetch at once and show nothing.
     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        // "Your love wants to join" is ours, not an iCloud ping; while OurNotch is in front, its window shows it already.
+        if notification.request.identifier == "ournotch.join" { return [] }
         let subscription = CKNotification(fromRemoteNotificationDictionary: notification.request.content.userInfo)?.subscriptionID ?? "unknown"
         await MainActor.run {
             Diagnostics.shared.record("ping received via notifications (subscription \(subscription))",
@@ -377,6 +379,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         window.isReleasedWhenClosed = false
         window.center()
         onboardingWindow = window
+        model.onAttention = { [weak window] in window?.showInFront() }
 
         // Closing setup before pairing quits; there's nothing to show in the notch yet.
         NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { [weak self] _ in

@@ -45,6 +45,8 @@ final class OnboardingModel {
     @ObservationIgnored private let service: PairingService
     @ObservationIgnored private let onFinished: () -> Void
     @ObservationIgnored private var waitTask: Task<Void, Never>?
+    /// Brings the setup window forward when your love asks to join (set by the app).
+    @ObservationIgnored var onAttention: (() -> Void)?
 
     init(store: LocalStore, mailbox: Mailbox, onFinished: @escaping () -> Void) {
         self.store = store
@@ -67,8 +69,8 @@ final class OnboardingModel {
     /// The steps on the current path, for the page dots.
     var path: [Step] {
         joining || pairing?.role == .joiner
-            ? [start, .name, .join, .notifications, .login, .done]
-            : (start == .gate ? [.gate, .licenceKey] : [.welcome]) + [.name, .invite, .date, .notifications, .login, .done]
+            ? [start, .name, .notifications, .join, .login, .done]
+            : (start == .gate ? [.gate, .licenceKey] : [.welcome]) + [.name, .notifications, .invite, .date, .login, .done]
     }
 
     func go(to step: Step) {
@@ -134,9 +136,15 @@ final class OnboardingModel {
             return
         }
         Task {
+            if inviteCode == nil, let kept = store.pendingInvite,
+               Date.now.timeIntervalSince(kept.createdAt) < Config.Pairing.codeLifetime - 60 {
+                inviteCode = kept.code // the code in an invite sent before a restart still works
+            }
             if inviteCode == nil {
                 do {
-                    inviteCode = try await service.createInvite(name: trimmedName)
+                    let code = try await service.createInvite(name: trimmedName)
+                    inviteCode = code
+                    store.pendingInvite = PendingInvite(code: code, createdAt: .now)
                 } catch {
                     self.error = String(localized: "Couldn't create an invite. Try again.")
                     return
@@ -153,6 +161,12 @@ final class OnboardingModel {
         waitTask = Task {
             guard let join = try? await service.waitForJoinRequest(code: inviteCode, declined: declined) else { return }
             pendingJoin = join
+            onAttention?()
+            let content = UNMutableNotificationContent()
+            content.title = String(localized: "\(join.joinerName) wants to join ♡")
+            content.body = String(localized: "Open OurNotch and say yes.")
+            content.sound = .default
+            try? await UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: "ournotch.join", content: content, trigger: nil))
         }
     }
 
@@ -161,6 +175,7 @@ final class OnboardingModel {
         guard let join = pendingJoin, let inviteCode else { return }
         run("approve join") {
             self.pairing = try await self.service.approve(join, code: inviteCode)
+            self.store.pendingInvite = nil
             self.pendingJoin = nil
             self.go(to: .date)
         }
@@ -180,6 +195,7 @@ final class OnboardingModel {
     /// A fresh code, e.g. after the old one expired (24 h) or went to the wrong person.
     func newCode() {
         inviteCode = nil
+        store.pendingInvite = nil
         inviteSentTo = nil
         pendingJoin = nil
         declined = []
@@ -261,7 +277,7 @@ final class OnboardingModel {
                 self.foundInvite = nil // declined, used or expired: back to typing a code
                 throw error
             }
-            self.go(to: .notifications)
+            self.go(to: .login)
         }
     }
 
@@ -298,18 +314,19 @@ final class OnboardingModel {
 
     func saveTogetherSince() {
         store.togetherSince = togetherSince
-        go(to: .notifications)
+        go(to: .login)
     }
 
     // MARK: Notifications
 
-    /// Required: badge pings reach the Mac within a second (silent ones Apple holds back), and a badge needs
-    /// notification permission. OurNotch never shows a banner.
+    /// Asked right after the name, before inviting or joining. Required: badge pings reach the Mac within a second
+    /// (silent ones Apple holds back), and a badge needs notification permission. Alerts are for one banner only:
+    /// "your love wants to join", which the inviter mustn't miss while the setup window is hidden.
     func allowNotifications() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.badge]) { granted, _ in
+        UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { granted, _ in
             Task { @MainActor in
                 Diagnostics.shared.record("onboarding: notifications \(granted ? "allowed" : "not allowed")")
-                if granted { self.go(to: .login) } else { self.waitForNotificationsInSettings() }
+                if granted { self.goAfterNotifications() } else { self.waitForNotificationsInSettings() }
             }
         }
     }
@@ -323,13 +340,15 @@ final class OnboardingModel {
         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=\(id)")!)
     }
 
+    private func goAfterNotifications() { go(to: joining ? .join : .invite) }
+
     /// Already allowed: nothing to ask. Turned off: say where to turn them on.
     private func skipNotificationsIfAnswered() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             let status = settings.authorizationStatus
             Task { @MainActor in
                 guard self.step == .notifications else { return }
-                if status == .authorized { self.go(to: .login) } else if status == .denied { self.waitForNotificationsInSettings() }
+                if status == .authorized { self.goAfterNotifications() } else if status == .denied { self.waitForNotificationsInSettings() }
             }
         }
     }
@@ -344,7 +363,7 @@ final class OnboardingModel {
                 if status == .authorized {
                     Diagnostics.shared.record("onboarding: notifications switched on in System Settings")
                     notificationsOff = false
-                    go(to: .login)
+                    goAfterNotifications()
                     return
                 }
                 try? await Task.sleep(for: .seconds(1))
@@ -459,8 +478,8 @@ struct OnboardingView: View {
         case .notifications:
             Screen(symbol: "bell.badge.fill", title: "Let love arrive instantly",
                    message: model.notificationsOff
-                       ? "Notifications are off for OurNotch. Turn them on in System Settings, under Notifications, then OurNotch. This screen moves on by itself. OurNotch never shows banners or sounds."
-                       : "OurNotch needs notifications so your Mac hears the moment something arrives, and it's in your notch within a second. It never shows banners or sounds.") {}
+                       ? "Notifications are off for OurNotch. Turn them on in System Settings, under Notifications, then OurNotch. This screen moves on by itself."
+                       : "OurNotch needs notifications so your Mac hears the moment something arrives, and it's in your notch within a second. The only banner it shows is when your love asks to join.") {}
         case .login:
             Screen(symbol: "laptopcomputer", title: "Keep your love close",
                    message: "Your notch will be there every time you open your Mac.") {
@@ -550,6 +569,8 @@ struct OnboardingView: View {
                         ProgressView().controlSize(.small)
                         Text("Waiting for \(invite.inviterName) to say yes…").font(.system(size: 12)).foregroundStyle(.secondary)
                     }
+                    Text("They tap yes on their Mac. Not at it right now? Close OurNotch and enter the code again later ♡")
+                        .font(.system(size: 12)).foregroundStyle(.secondary).multilineTextAlignment(.center).frame(maxWidth: 300)
                 }
             }
         } else {
@@ -592,7 +613,7 @@ struct OnboardingView: View {
     @ViewBuilder private var footerLeading: some View {
         switch model.step {
         case .date:
-            Button("Skip for Now") { model.go(to: .notifications) }.buttonStyle(.link)
+            Button("Skip for Now") { model.go(to: .login) }.buttonStyle(.link)
         default:
             HStack(spacing: 6) {
                 ForEach(model.path, id: \.self) { step in
@@ -634,7 +655,7 @@ struct OnboardingView: View {
         case .gate: break
         case .licenceKey: model.activate()
         case .welcome, .icloud: model.checkICloud()
-        case .name: model.go(to: model.joining ? .join : .invite)
+        case .name: model.go(to: .notifications)
         case .invite: break
         case .join: model.foundInvite == nil ? model.lookUpCode() : model.join()
         case .date: model.saveTogetherSince()
@@ -647,7 +668,7 @@ struct OnboardingView: View {
     private var backAction: (() -> Void)? {
         switch model.step {
         case .licenceKey, .icloud, .name: model.backToStart
-        case .invite: { model.go(to: .name) }
+        case .invite, .notifications: { model.go(to: .name) }
         case .join: model.awaitingAnswer ? nil : (model.foundInvite == nil ? { model.go(to: .name) } : model.editCode)
         case .done: { model.go(to: .login) }
         default: nil // the welcome screen, and steps after pairing that can't be undone

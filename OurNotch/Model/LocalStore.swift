@@ -59,6 +59,10 @@ struct LocalStore {
         get { decode("pairing") }
         nonmutating set { encode(newValue, "pairing") }
     }
+    var pendingInvite: PendingInvite? {
+        get { decode("pendingInvite") }
+        nonmutating set { encode(newValue, "pendingInvite") }
+    }
     var togetherSince: Date? {
         get { defaults.object(forKey: "togetherSince") as? Date }
         nonmutating set { defaults.set(newValue, forKey: "togetherSince") }

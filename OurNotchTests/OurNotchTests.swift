@@ -757,3 +757,33 @@ struct PartnerStatusTests {
         #expect(outbox.content.lastSeen == nil) // never pings
     }
 }
+
+@MainActor
+struct InviteResumeTests {
+    private func code(of model: OnboardingModel, otherThan old: String? = nil) async throws -> String {
+        for _ in 0..<60 where model.inviteCode == nil || model.inviteCode == old { try await Task.sleep(for: .milliseconds(50)) }
+        return try #require(model.inviteCode)
+    }
+
+    @Test func theEmailedCodeSurvivesARestart() async throws {
+        let store = LocalStore(defaults: UserDefaults(suiteName: UUID().uuidString)!)
+        store.licence = Licence(key: "K", activationId: "lki_1")
+        let mailbox = LocalFileMailbox(directory: FileManager.default.temporaryDirectory.appending(path: UUID().uuidString))
+
+        let first = OnboardingModel(store: store, mailbox: mailbox, onFinished: {})
+        first.name = "kshitij"
+        first.go(to: .invite)
+        let emailed = try await code(of: first)
+
+        // Quit and opened again: the same code, so the one in the email still works.
+        let relaunched = OnboardingModel(store: store, mailbox: mailbox, onFinished: {})
+        relaunched.name = "kshitij"
+        relaunched.go(to: .invite)
+        #expect(try await code(of: relaunched) == emailed)
+
+        // New Code really is new, and it's the one kept from then on.
+        relaunched.newCode()
+        let fresh = try await code(of: relaunched, otherThan: emailed)
+        #expect(fresh != emailed && store.pendingInvite?.code == fresh)
+    }
+}

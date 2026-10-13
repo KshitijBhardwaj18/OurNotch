@@ -18,6 +18,13 @@ struct Join: Codable, Equatable {
     let joinerKey: Data
 }
 
+/// The inviter's code while waiting for their love to join. Kept across restarts, so the code in an emailed invite
+/// keeps working for its whole lifetime instead of being replaced by a fresh one.
+struct PendingInvite: Codable, Equatable {
+    let code: String
+    let createdAt: Date
+}
+
 /// Who I'm paired with, saved once pairing completes on this Mac.
 struct Pairing: Codable, Equatable {
     enum Role: String, Codable { case inviter, joiner }
