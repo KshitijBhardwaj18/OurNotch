@@ -48,7 +48,7 @@ final class MenuState {
 
 /// Shows onboarding until this Mac is paired, then owns the app state, the heart effects, and the notch window.
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     let menu = MenuState()
     let updates = Updates.shared
     let effects = EmojiEffect()
@@ -106,6 +106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ) { [weak self] _ in
             MainActor.assumeIsolated { self?.updateNotchVisibility() }
         }
+        UNUserNotificationCenter.current().delegate = self // hears the badge pings (see `CloudStore.watchPartner`)
         NSApp.registerForRemoteNotifications()
     }
 
@@ -172,6 +173,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Diagnostics.shared.record("ping received (subscription \(subscription))", metric: Metric(kind: .ping, name: "ping", detail: subscription))
         NSApp.dockTile.badgeLabel = nil // the badge only made the ping fast; it shows if a Dock icon ever appears
         syncEveryone(.ping)
+    }
+
+    /// The badge ping, which macOS gives the notification system rather than the ping handler above.
+    /// Fetch at once and show nothing.
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        let subscription = CKNotification(fromRemoteNotificationDictionary: notification.request.content.userInfo)?.subscriptionID ?? "unknown"
+        await MainActor.run {
+            Diagnostics.shared.record("ping received via notifications (subscription \(subscription))",
+                                      metric: Metric(kind: .ping, name: "ping", detail: "\(subscription) via notifications"))
+            syncEveryone(.ping)
+        }
+        try? await center.setBadgeCount(0)
+        return []
     }
 
     func application(_ application: NSApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
