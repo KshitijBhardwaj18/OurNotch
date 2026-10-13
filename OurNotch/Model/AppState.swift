@@ -59,6 +59,10 @@ final class AppState {
     func partnerIsAway(now: Date = .now) -> Bool { Hide.isHidden(until: partnerOutbox.awayUntil, now: now) }
     /// The latest photo my partner sent me, shown on Home.
     private(set) var partnerPhoto: NSImage?
+    #if DEBUG
+    /// Stage mode opens the notch on a tab, or closes it (nil), for filming (`PartnerSimulator.startStage`).
+    var stageTab: NotchTab?
+    #endif
     /// The latest photo I sent, shown on the Photo tab.
     private(set) var myPhoto: NSImage?
     /// The last outbox the mailbox accepted. Differs from `myOutbox` while a save is pending or failed.
@@ -81,7 +85,7 @@ final class AppState {
     }
 
     /// Called when emojis arrive: how many are new, and the latest one (which decides how they appear).
-    @ObservationIgnored var onEmojisArrived: ((Int, SentEmoji) -> Void)?
+    @ObservationIgnored var onEmojisArrived: ((Int, [SentEmoji]) -> Void)?
     /// Called when this Mac's licence changed here (received from the partner, or removed), so it gets checked.
     @ObservationIgnored var onLicenceChanged: (() -> Void)?
     /// Called when the notch opens, so the licence gets re-checked if it's been a while.
@@ -89,7 +93,7 @@ final class AppState {
     /// Called when OurNotch is hidden or shown, so the notch window follows.
     @ObservationIgnored var onHiddenChanged: (() -> Void)?
     /// Emojis that arrived while hidden: they play once, together, when OurNotch comes back.
-    @ObservationIgnored private var heldEmojis: (count: Int, emoji: SentEmoji)?
+    @ObservationIgnored private var heldEmojis: (count: Int, emojis: [SentEmoji])?
     @ObservationIgnored private var returnTask: Task<Void, Never>?
 
     var licence: Licence? { store.licence }
@@ -117,6 +121,8 @@ final class AppState {
     @ObservationIgnored private var isNotchOpen = false
     @ObservationIgnored private var lastActivity: Date?
     @ObservationIgnored private var lastCheck = Date.distantPast
+    @ObservationIgnored private var isSaving = false
+    @ObservationIgnored private var saveAgain = false
     @ObservationIgnored private let live: LiveBell?
 
     private var checkInterval: Duration {
@@ -239,7 +245,9 @@ final class AppState {
     func sendEmoji(_ char: String, mode: EmojiMode) {
         lastActivity = .now
         myOutbox.emojisSent += 1
-        myOutbox.lastEmoji = SentEmoji(char: char, mode: mode, sentAt: .now)
+        let sent = SentEmoji(char: char, mode: mode, sentAt: .now)
+        myOutbox.lastEmoji = sent
+        myOutbox.recentEmojis = Array(((myOutbox.recentEmojis ?? []) + [sent]).suffix(Config.recentEmojis))
         store.myOutbox = myOutbox
         note("tap: emoji #\(myOutbox.emojisSent) \(char) (\(mode.rawValue))")
         saveSoon()
@@ -261,7 +269,8 @@ final class AppState {
     /// Apple holds silent pings back when an app sends too many (Beta 1.0.6: none delivered for 30 min).
     private func saveSoon() {
         guard saveTask == nil else { return } // the save already waiting carries this tap too
-        let wait = Config.emojiSaveGap - Date.now.timeIntervalSince(lastEmojiSave)
+        let gap = live?.partnerHere == true ? Config.liveEmojiSaveGap : Config.emojiSaveGap
+        let wait = gap - Date.now.timeIntervalSince(lastEmojiSave)
         saveTask = Task { [weak self] in
             if wait > 0 { try? await Task.sleep(for: .seconds(wait)) }
             guard let self else { return }
@@ -389,7 +398,7 @@ final class AppState {
         onHiddenChanged?()
         if let held = heldEmojis {
             heldEmojis = nil
-            onEmojisArrived?(held.count, held.emoji)
+            onEmojisArrived?(held.count, held.emojis)
         }
     }
 
@@ -521,15 +530,17 @@ final class AppState {
             if isNotchOpen, partner.mood != nil, visibleTab != .home, visibleTab != .mood { unseen.insert(.home) }
         }
         let newEmojis = Arrival.newCount(partnerSent: partner.emojisSent, lastShown: myOutbox.seenEmojis)
-        if newEmojis > 0, let emoji = partner.lastEmoji {
+        let arrivedEmojis = Arrival.emojis(forNew: newEmojis, recent: partner.recentEmojis, last: partner.lastEmoji)
+        if let emoji = arrivedEmojis.last {
             myOutbox.seenEmojis = partner.emojisSent
             if isHidden {
-                heldEmojis = ((heldEmojis?.count ?? 0) + newEmojis, emoji)
+                heldEmojis = ((heldEmojis?.count ?? 0) + newEmojis,
+                              Array(((heldEmojis?.emojis ?? []) + arrivedEmojis).suffix(Config.recentEmojis)))
             } else {
-                onEmojisArrived?(newEmojis, emoji)
+                onEmojisArrived?(newEmojis, arrivedEmojis)
             }
             let age = emoji.sentAt.map { ", sent \(Self.ms(since: $0)) ago" } ?? ""
-            found.append("\(newEmojis) emoji \(emoji.char) (\(emoji.mode.rawValue)\(age))")
+            found.append("\(newEmojis) emoji \(arrivedEmojis.map(\.char).joined()) (\(emoji.mode.rawValue)\(age))")
             if let sentAt = emoji.sentAt { arrived("emoji", sentAt: sentAt, source: source) }
         }
         if let message = partner.message, message.id != myOutbox.seenMessageId {
@@ -603,7 +614,19 @@ final class AppState {
         }
     }
 
+    /// One save at a time: a save asked for while another runs (a mood change mid-burst) goes out right after it,
+    /// so the same change isn't saved, and rung, twice.
     private func save() async {
+        if isSaving { saveAgain = true; return }
+        isSaving = true
+        defer { isSaving = false }
+        repeat {
+            saveAgain = false
+            await saveOnce()
+        } while saveAgain && myOutbox.content != savedOutbox.content
+    }
+
+    private func saveOnce() async {
         let snapshot = myOutbox
         let changes = Self.changes(from: savedOutbox, to: snapshot)
         let started = Date.now
@@ -621,15 +644,20 @@ final class AppState {
         }
     }
 
-    /// "Seen" goes in its own record, which doesn't ping the partner; their next check reads it.
+    /// "Seen" goes in its own record, which doesn't ping the partner (Apple's budget); the doorbell rings instead.
     private func saveReceipts() async {
         let receipts = myOutbox.receipts
         let started = Date.now
         do {
             let sealed = try Crypto.seal(JSONEncoder().encode(receipts), with: key)
             try await mailbox.saveReceipts(sealed, owner: pairing.myId)
+            // Ring for anything but the 5-minute "still here", so "delivered" shows within a second or two.
+            var heard = receipts
+            heard.lastSeen = savedReceipts.lastSeen
+            let rang = heard != savedReceipts && live?.partnerHere == true
+            if rang { live?.ring() }
             savedReceipts = receipts
-            note("saved receipts (seen emojis \(receipts.seenEmojis)\(receipts.petAdoption == nil ? "" : ", pet")) in \(Self.ms(since: started))",
+            note("saved receipts (seen emojis \(receipts.seenEmojis)\(receipts.petAdoption == nil ? "" : ", pet")) in \(Self.ms(since: started))\(rang ? ", rang" : "")",
                  metric: Metric(kind: .cloud, name: "save", ms: Metric.ms(since: started), detail: "receipts"))
         } catch {
             note("receipts save FAILED, will retry: \(error.diagnosticDescription)",

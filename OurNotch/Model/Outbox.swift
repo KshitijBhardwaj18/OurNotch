@@ -11,6 +11,8 @@ struct Outbox: Codable, Equatable {
     var emojisSent = 0
     /// The most recent emoji and how it should appear. Earlier ones aren't kept.
     var lastEmoji: SentEmoji?
+    /// The last `Config.recentEmojis` sent, oldest first, so a burst plays in full. Builds before 1.0.22 send only `lastEmoji`.
+    var recentEmojis: [SentEmoji]?
     /// The partner's `emojisSent` value this Mac has already shown. Tells the sender "delivered".
     var seenEmojis = 0
     /// The latest note sent. This is the one that scrolls across the partner's notch.
@@ -185,7 +187,15 @@ enum Arrival {
         max(0, partnerSent - lastShown)
     }
 
-    /// The sender's choice decides, except that 3 or more arriving at once (missed while away) always splash.
+    /// The emojis to play for `count` new ones: the newest of the partner's recent list, oldest first.
+    /// An older build sends only its last emoji, which then stands for the lot.
+    static func emojis(forNew count: Int, recent: [SentEmoji]?, last: SentEmoji?) -> [SentEmoji] {
+        guard count > 0 else { return [] }
+        if let recent, !recent.isEmpty { return Array(recent.suffix(count)) }
+        return last.map { [$0] } ?? []
+    }
+
+    /// The sender's choice decides, except that 3 or more arriving at once (a burst, or missed while away) always splash.
     static func effect(forNew count: Int, mode: EmojiMode) -> Effect? {
         if count < 1 { return nil }
         if count >= 3 { return .splash }

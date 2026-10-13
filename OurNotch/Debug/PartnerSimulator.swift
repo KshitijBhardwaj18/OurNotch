@@ -13,6 +13,33 @@ final class PartnerSimulator {
 
     func syncNow(_ source: SyncSource) { model.state?.syncNow(source) }
 
+    /// Stage mode (`OURNOTCH_STAGE=1` with `OURNOTCH_PROFILE`): pairs itself with the notch and takes commands from
+    /// `stageFile`, so an ad can be filmed with no windows on screen. One command per write:
+    /// `photo <path>`, `play <message>`, `note <message>`, `heart`, `kisses`, `mood <emoji>` (as the partner);
+    /// `me <message>` (as this Mac); `open <tab>`, `close` (the notch).
+    static var isStaging: Bool { Profile.name != nil && ProcessInfo.processInfo.environment["OURNOTCH_STAGE"] != nil }
+    static let stageFile = FileManager.default.homeDirectoryForCurrentUser.appending(path: "Library/Caches/OurNotch-stage.txt")
+
+    func startStage(notch store: LocalStore, notchState: @escaping () -> AppState?, onPaired: @escaping () -> Void) {
+        Task {
+            if model.state == nil {
+                do {
+                    try await model.pairForStage(notch: PairingService(mailbox: CloudStore(), store: store))
+                    onPaired()
+                } catch {
+                    Diagnostics.shared.record("stage: pairing failed: \(error.localizedDescription)")
+                }
+            }
+            // ponytail: polls a file, a socket if this ever leaves Debug
+            while true {
+                try? await Task.sleep(for: .milliseconds(300))
+                guard let command = try? String(contentsOf: Self.stageFile, encoding: .utf8) else { continue }
+                try? FileManager.default.removeItem(at: Self.stageFile)
+                await model.run(command.trimmingCharacters(in: .whitespacesAndNewlines), notch: notchState())
+            }
+        }
+    }
+
     func show() {
         if window == nil {
             let window = NSWindow(contentViewController: NSHostingController(rootView: PartnerSimulatorView(model: model)))
@@ -96,6 +123,63 @@ private final class SimulatorModel {
         state = AppState(store: store, mailbox: mailbox, who: "sim")
         state?.start()
     }
+
+    // MARK: Stage
+
+    private(set) var sceneStatus: String?
+
+    /// Stage mode: invites, lets the notch ask to join in code, and says yes, so pairing needs no window.
+    func pairForStage(notch: PairingService) async throws {
+        name = "babe ♡"
+        store.togetherSince = togetherSince
+        let code = try await service.createInvite(name: name)
+        let invite = try await notch.lookUpInvite(code: code)
+        try await notch.requestJoin(code: code, name: "me")
+        let join = try await service.waitForJoinRequest(code: code, declined: [])
+        _ = try await service.approve(join, code: code)
+        _ = try await notch.waitForAnswer(code: code, invite: invite)
+        startIfPaired()
+    }
+
+    /// One stage command (see `PartnerSimulator.startStage`).
+    func run(_ command: String, notch: AppState?) async {
+        guard let state else { return }
+        let (verb, rest) = (command.prefix { $0 != " " }, command.drop { $0 != " " }.trimmingCharacters(in: .whitespaces))
+        Diagnostics.shared.record("stage: \(verb)")
+        switch verb {
+        case "photo":
+            guard let jpeg = try? PhotoProcessing.squareJPEG(from: URL(filePath: rest)) else { return }
+            _ = await state.sendPhoto(jpeg)
+        case "play": await playScene(rest, on: state)
+        case "note": state.sendMessage(rest, mode: .three)
+        // One per command: 3 or more arriving together splash instead of pouring (`Arrival.effect`).
+        case "heart": state.sendEmoji("❤️", mode: .notch)
+        case "kisses": (0..<3).forEach { _ in state.sendEmoji("😘", mode: .fullScreen) }
+        case "mood": state.setMood(rest.isEmpty ? nil : rest)
+        case "me": notch?.sendMessage(rest, mode: .three)
+        case "open": notch?.stageTab = NotchTab.allCases.first { "\($0)" == rest } ?? .home
+        case "close": notch?.stageTab = nil
+        default: break
+        }
+    }
+
+    /// A short scene to film: a countdown to start recording, then hearts out of the notch, the message, and
+    /// kisses across the screen, spaced so each arrives on its own.
+    func playScene(_ message: String, on state: AppState) async {
+        state.setMood("🥺")
+        for second in (1...5).reversed() {
+            sceneStatus = "Starting in \(second)…"
+            try? await Task.sleep(for: .seconds(1))
+        }
+        sceneStatus = "Playing…"
+        (0..<2).forEach { _ in state.sendEmoji("❤️", mode: .notch) }
+        try? await Task.sleep(for: .seconds(5))
+        state.sendMessage(message, mode: .three)
+        try? await Task.sleep(for: .seconds(8))
+        (0..<3).forEach { _ in state.sendEmoji("😘", mode: .fullScreen) }
+        try? await Task.sleep(for: .seconds(4))
+        sceneStatus = nil
+    }
 }
 
 private struct PartnerSimulatorView: View {
@@ -160,6 +244,14 @@ private struct PartnerSimulatorView: View {
     private func controls(_ state: AppState) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Paired with \(state.pairing.partnerName) (\(state.pairing.role.rawValue))")
+
+            HStack {
+                Button("Play scene") { Task { await model.playScene(draft, on: state) } }
+                    .disabled(model.sceneStatus != nil)
+                Text(model.sceneStatus ?? "For recording: mood, hearts, the message below, kisses")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
 
             HStack {
                 Picker("Emoji", selection: $emoji) {

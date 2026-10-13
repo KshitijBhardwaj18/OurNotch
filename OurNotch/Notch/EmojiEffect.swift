@@ -12,11 +12,16 @@ final class EmojiEffect {
     /// Pours currently playing under the notch. Each removes itself when finished.
     private(set) var pours: [Pour] = []
     @ObservationIgnored private var splashWindow: NSWindow?
+    /// What the splash window shows; a burst arriving mid-splash joins it instead of being dropped.
+    @ObservationIgnored private var glyphs = Splash()
+    @ObservationIgnored private var splashEnds = Date.distantPast
 
-    func play(newCount: Int, emoji: SentEmoji) {
-        switch Arrival.effect(forNew: newCount, mode: emoji.mode) {
-        case .pour: pour(emoji.char)
-        case .splash: splash(emoji.char)
+    /// `emojis`: the ones that arrived, oldest first (a burst can mix them). The newest decides pour or splash.
+    func play(newCount: Int, emojis: [SentEmoji]) {
+        guard let newest = emojis.last else { return }
+        switch Arrival.effect(forNew: newCount, mode: newest.mode) {
+        case .pour: emojis.forEach { pour($0.char) }
+        case .splash: splash(emojis.map(\.char))
         case nil: break
         }
     }
@@ -33,8 +38,14 @@ final class EmojiEffect {
 
     /// A separate transparent window covering the whole screen. It ignores the mouse,
     /// so the user can keep working while emojis drift up.
-    func splash(_ char: String) {
-        guard splashWindow == nil, let screen = NotchGeometry.current()?.screenFrame else { return }
+    func splash(_ chars: [String]) {
+        guard !chars.isEmpty, let screen = NotchGeometry.current()?.screenFrame else { return }
+        let floaters = Floater.splash(chars, in: screen.size)
+        splashEnds = max(splashEnds, .now + Floater.length(of: floaters))
+        PerfMonitor.shared.track("splash \(chars.joined())", seconds: Floater.length(of: floaters))
+        // ponytail: at most this many glyphs at once, older (already faded) ones dropped first; enough to fill the screen.
+        glyphs.floaters = Array((glyphs.floaters + floaters).suffix(120))
+        guard splashWindow == nil else { return }
 
         let window = NSPanel(contentRect: screen, styleMask: [.borderless, .nonactivatingPanel],
                              backing: .buffered, defer: false)
@@ -45,15 +56,15 @@ final class EmojiEffect {
         window.hidesOnDeactivate = false
         window.level = NSWindow.Level(rawValue: NSWindow.Level.mainMenu.rawValue + 2)
         window.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary, .ignoresCycle]
-        window.contentView = NSHostingView(rootView: SplashView(floaters: Floater.splash(char, in: screen.size)))
+        window.contentView = NSHostingView(rootView: SplashView(splash: glyphs))
         window.orderFrontRegardless()
         splashWindow = window
-        PerfMonitor.shared.track("splash \(char)", seconds: Floater.longestSplash)
 
         Task {
-            try? await Task.sleep(for: .seconds(Floater.longestSplash))
+            while Date.now < splashEnds { try? await Task.sleep(for: .seconds(splashEnds.timeIntervalSinceNow)) }
             splashWindow?.close()
             splashWindow = nil
+            glyphs.floaters = []
         }
     }
 }
@@ -70,13 +81,19 @@ struct PourView: View {
     }
 }
 
+@MainActor
+@Observable
+final class Splash {
+    var floaters: [Floater] = []
+}
+
 private struct SplashView: View {
-    let floaters: [Floater]
+    let splash: Splash
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             Color.clear
-            ForEach(floaters) { FloatingGlyph(floater: $0).position($0.start) }
+            ForEach(splash.floaters) { FloatingGlyph(floater: $0).position($0.start) }
         }
         .ignoresSafeArea()
     }
@@ -99,6 +116,9 @@ struct Floater: Identifiable {
     static let longestPour = 0.5 + 1.5
     static let longestSplash = 17 * 0.08 + 3.0
 
+    /// How long a set of floaters takes to finish.
+    static func length(of floaters: [Floater]) -> Double { floaters.map { $0.delay + $0.duration }.max() ?? 0 }
+
     static func pour(_ char: String) -> [Floater] {
         (0..<Int.random(in: 2...3)).map { i in
             Floater(char: char,
@@ -112,9 +132,11 @@ struct Floater: Identifiable {
         }
     }
 
-    static func splash(_ char: String, in screen: CGSize) -> [Floater] {
-        (0..<18).map { i in
-            Floater(char: char,
+    /// One emoji rises 18 times; a burst rises more (8 per emoji, up to 60), the emojis taking turns.
+    static func splash(_ chars: [String], in screen: CGSize) -> [Floater] {
+        let count = chars.count == 1 ? 18 : min(60, max(18, chars.count * 8))
+        return (0..<count).map { i in
+            Floater(char: chars[i % chars.count],
                     start: CGPoint(x: .random(in: 40...(screen.width - 40)), y: screen.height + 30),
                     travel: CGSize(width: .random(in: -40...40), height: -.random(in: 320...400)),
                     sway: .random(in: 10...20) * (Bool.random() ? 1 : -1),
