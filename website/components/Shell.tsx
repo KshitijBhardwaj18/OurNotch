@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { Bricolage_Grotesque, Inter_Tight } from 'next/font/google';
 import { MetaPixel } from '@/components/MetaPixel';
 import { copy, type Lang } from '@/lib/i18n';
@@ -21,11 +22,15 @@ export function siteMetadata(lang: Lang): Metadata {
   };
 }
 
+// Where the law needs an opt-in before an ad pixel: EU/EEA, UK, Switzerland. Unknown country (no header): ask.
+const ASK_FIRST = new Set('AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE IS LI NO GB CH'.split(' '));
+
 // The <html> of every page. English and French/German have separate root layouts so each page says its language.
-export function Shell({ lang, children }: { lang: Lang; children: React.ReactNode }) {
+export async function Shell({ lang, children }: { lang: Lang; children: React.ReactNode }) {
+  const country = (await headers()).get('cf-ipcountry')?.toUpperCase();
   return (
     <html lang={lang} className={`${disp.variable} ${body.variable}`}>
-      <body>{children}<MetaPixel t={copy[lang].consent} /></body>
+      <body>{children}<MetaPixel t={copy[lang].consent} ask={!country || ASK_FIRST.has(country)} /></body>
     </html>
   );
 }
