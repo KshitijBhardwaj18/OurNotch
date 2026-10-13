@@ -9,7 +9,7 @@ import { copy } from '@/lib/i18n';
 const t = copy.en;
 const MOODS = ['🥰', '😊', '🥺', '🎉', '☕️', '🍕', '💻', '🎧', '🏃', '😴', '😔', '🤒'];
 
-const SIZES = { square: [1080, 1080], feed: [1080, 1350], story: [1080, 1920] } as const;
+const SIZES = { square: [1080, 1080], feed: [1080, 1350], story: [1080, 1920] } as const; // X header: 1500×500 (xheader card)
 type Size = keyof typeof SIZES;
 
 function Frame({ size, bg, kicker, title, children, foot = 'ournotch.app' }: {
@@ -105,6 +105,15 @@ const CARDS: Record<string, () => React.ReactNode> = {
       <div className="s-pals s-big"><Char kind="pip" className="is-love" /><Char kind="bun" className="is-happy" /></div>
     </Frame>
   ),
+  xheader: () => (
+    <div className="s-og s-xh y-blush">
+      <div>
+        <div className="s-og-line">Send love,<br /><em>notch to notch.</em></div>
+        <div className="s-og-sub">A tiny place in your MacBook notch for the two of you · ournotch.app</div>
+      </div>
+      <div className="s-og-pals"><Char kind="pip" className="is-love" /><Char kind="bun" className="is-happy" /></div>
+    </div>
+  ),
   og: () => (
     <div className="s-og y-blush">
       <img src="/logo.svg" alt="" />
@@ -181,6 +190,7 @@ export default async function Social({ searchParams }: { searchParams: Promise<{
         .s-og-line em{font-style:normal;background:var(--butter);border-radius:.16em;padding:0 .12em}
         .s-og-sub{margin-top:22px;font:500 28px var(--body);color:var(--ink3)}
         .s-og-pals{position:absolute;right:50px;bottom:-34px;display:flex;gap:14px}.s-og-pals .char{width:120px}
+        .s-xh{width:1500px;height:500px;padding:70px 130px 110px}.s-xh .s-og-line{margin-top:0;font-size:84px}.s-xh .s-og-sub{font-size:28px;margin-top:26px}.s-xh .s-og-pals{right:120px;bottom:-26px;gap:24px}.s-xh .s-og-pals .char{width:210px}
         .s-foot{text-align:center;font:800 40px var(--disp);letter-spacing:-.03em;margin-top:28px}
       `}</style>
       {CARDS[card]()}
