@@ -77,6 +77,12 @@ struct ArrivalTests {
         #expect(Arrival.effect(forNew: 1, mode: .fullScreen) == .splash)
         #expect(Arrival.effect(forNew: 3, mode: .notch) == .splash) // missed while away
         #expect(Arrival.effect(forNew: 12, mode: .notch) == .splash)
+
+        let a = SentEmoji(char: "❤️", mode: .notch), b = SentEmoji(char: "😘", mode: .fullScreen), c = SentEmoji(char: "🌹", mode: .notch)
+        #expect(Arrival.emojis(forNew: 2, recent: [a, b, c], last: c) == [b, c]) // the newest two, oldest first
+        #expect(Arrival.emojis(forNew: 30, recent: [a, b, c], last: c) == [a, b, c]) // more than kept: all it has
+        #expect(Arrival.emojis(forNew: 3, recent: nil, last: c) == [c]) // a build before 1.0.22 sends only its last
+        #expect(Arrival.emojis(forNew: 0, recent: [a], last: a).isEmpty)
     }
 
     @Test func emojisSentThenDelivered() {
@@ -408,8 +414,8 @@ struct PartnersTests {
     @Test func emojisArriveAndAreDelivered() async throws {
         let (you, partner) = try await TwoPartners().paired()
         var arrived = 0
-        var latest: SentEmoji?
-        partner.onEmojisArrived = { arrived += $0; latest = $1 }
+        var played: [SentEmoji] = []
+        partner.onEmojisArrived = { arrived += $0; played = $1 }
         you.sendEmoji("❤️", mode: .notch)
         you.sendEmoji("😘", mode: .fullScreen)
         you.sendEmoji("🌹", mode: .notch)
@@ -419,7 +425,8 @@ struct PartnersTests {
         await partner.sync()
         #expect(arrived == 3)
         await you.sync()
-        #expect(latest?.char == "🌹" && latest?.mode == .notch && latest?.sentAt != nil)
+        #expect(played.map(\.char) == ["❤️", "😘", "🌹"]) // the whole burst plays, not just the last one
+        #expect(played.last?.mode == .notch && played.last?.sentAt != nil)
         #expect(you.emojiStatus == .delivered)
     }
 

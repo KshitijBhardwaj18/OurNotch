@@ -82,7 +82,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
         Diagnostics.shared.startUploading(owner: store.myId, mailbox: mailbox)
         PerfMonitor.shared.startWatchdog()
 
-        if !startNotch() { showOnboarding() }
+        #if DEBUG
+        let staging = PartnerSimulator.isStaging
+        if staging {
+            partnerSimulator.startStage(notch: store, notchState: { [weak self] in self?.state }) { [weak self] in
+                if self?.state == nil { _ = self?.startNotch() }
+            }
+        }
+        #else
+        let staging = false
+        #endif
+        if !startNotch() && !staging { showOnboarding() }
         NotificationCenter.default.addObserver(
             forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main
         ) { [weak self] _ in
@@ -263,9 +273,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCent
     private func startNotch() -> Bool {
         guard let state = AppState(store: store, mailbox: mailbox, live: true) else { return false }
         // Syncing carries on while locked (a new key from the partner must still arrive); effects don't play.
-        state.onEmojisArrived = { [weak self] count, emoji in
+        state.onEmojisArrived = { [weak self] count, emojis in
             guard let self, !self.isLocked else { return }
-            self.effects.play(newCount: count, emoji: emoji)
+            self.effects.play(newCount: count, emojis: emojis)
         }
         state.onLicenceChanged = { [weak self] in self?.checkLicence() }
         state.onHiddenChanged = { [weak self] in self?.updateNotchVisibility() }

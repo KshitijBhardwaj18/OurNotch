@@ -5,6 +5,10 @@ import SwiftUI
 enum Config {
     /// After an emoji save, further taps wait this long and go out together in one save (one ping).
     static let emojiSaveGap: TimeInterval = 3
+    /// While both Macs are at the doorbell, which carries the news instead of Apple's pings: a burst goes out every second.
+    static let liveEmojiSaveGap: TimeInterval = 1
+    /// Emojis each outbox keeps, so a burst plays in full on the partner's Mac.
+    static let recentEmojis = 24
     /// The one-tap emojis on the Emoji tab: a row of love, a row of fun and frustration.
     static let emojis = ["❤️", "🥰", "😘", "💋", "🫶", "🤗", "🌹",
                          "😂", "🤪", "🥳", "🙈", "🙄", "😤", "😡"]

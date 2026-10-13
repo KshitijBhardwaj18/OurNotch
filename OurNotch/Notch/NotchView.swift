@@ -74,6 +74,12 @@ struct NotchView: View {
             if open { state.notchOpened() } else { state.notchClosed(); showsSettings = false; isEditing = false }
         }
         .onChange(of: tab) { _, tab in PerfMonitor.shared.track("\(tab) tab", seconds: 0.5) }
+        #if DEBUG
+        .onChange(of: state.stageTab) { _, staged in
+            if let staged { tab = staged }
+            isOpen = staged != nil
+        }
+        #endif
         .onChange(of: isEditing) { _, editing in
             if !editing && !isHovering { isOpen = false }
         }
