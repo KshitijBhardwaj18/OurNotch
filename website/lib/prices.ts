@@ -11,11 +11,12 @@ export function priceFor(country?: string | null): string {
   return '$9';
 }
 
-// ponytail: Dodo test mode until launch, then the live product and checkout host.
+// Live Dodo, unless DODO_MODE=test (website/.env.local, for local development with a test key).
+export const TEST = process.env.DODO_MODE === 'test';
 // The 3-day free trial: a subscription that charges the one-time price once, on day 3, and lasts 20 years
 // (Dodo's longest), so keeping it means paying once.
-export const PRODUCT = 'pdt_0NpQhZeQ6pJ3R92rDOQAr';
-export const CHECKOUT_HOST = 'https://test.checkout.dodopayments.com';
+export const PRODUCT = TEST ? 'pdt_0NpQhZeQ6pJ3R92rDOQAr' : 'pdt_0NpdhF0Z52hC8dx2GAuwk';
+export const CHECKOUT_HOST = TEST ? 'https://test.checkout.dodopayments.com' : 'https://checkout.dodopayments.com';
 
 // Every "Try it free" button: our /buy route starts the checkout, then Dodo returns the buyer to the
 // thank-you page in their language (`/thanks`, `/fr/thanks`, `/de/thanks`) with `license_key` added.
@@ -30,4 +31,4 @@ export function originFrom(h: Headers): string {
 }
 
 // Dodo's customer portal: the buyer enters their purchase email and sees their key ("Find my licence").
-export const portalUrl = 'https://test.customer.dodopayments.com/login/bus_0Np1laPQgg48PHzDsmzgI';
+export const portalUrl = `https://${TEST ? 'test.' : ''}customer.dodopayments.com/login/bus_0Np1laPQgg48PHzDsmzgI`;

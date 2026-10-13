@@ -1,9 +1,9 @@
 // Server-only helper for the owner's admin page. The secret key never reaches the browser:
 // it is read here, in server components and server actions only (devpost/spec-m2.md > Admin Page).
 
-// ponytail: Dodo test mode until launch (slice 10 sets the live base URL).
-const BASE = process.env.DODO_API_BASE ?? 'https://test.dodopayments.com';
-import { PRODUCT } from './prices';
+import { PRODUCT, TEST } from './prices';
+
+const BASE = TEST ? 'https://test.dodopayments.com' : 'https://live.dodopayments.com';
 
 export const hasKey = () => Boolean(process.env.DODO_API_KEY);
 
