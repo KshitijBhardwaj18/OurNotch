@@ -55,6 +55,6 @@ cp "$DMG" "$OUT/updates/"
 
 echo "▸ Uploading to R2"
 npx --yes wrangler r2 object put "$BUCKET/${FEED_DIR}OurNotch-$VERSION.dmg" --file "$DMG" --remote
-npx --yes wrangler r2 object put "$BUCKET/${FEED_DIR}OurNotch.dmg" --file "$DMG" --remote   # what /download points at
+npx --yes wrangler r2 object put "$BUCKET/${FEED_DIR}OurNotch.dmg" --file "$DMG" --cache-control "max-age=300" --remote   # the fallback name; short cache so it never lags a release by hours
 npx --yes wrangler r2 object put "$BUCKET/${FEED_DIR}appcast.xml" --file "$OUT/updates/appcast.xml" --content-type application/xml --remote
 echo "✓ Released OurNotch $VERSION ($CONFIG)"
