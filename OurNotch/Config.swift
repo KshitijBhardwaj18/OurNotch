@@ -171,6 +171,8 @@ enum Config {
     }
 
     enum Pet {
+        /// The Pet tab. Off for launch: its code and sync stay, so turning it back on is this one line.
+        static let enabled = false
         /// From just fed to hungry (fullness 1 → 0), and from cuddled to lonely.
         static let hungerTime: TimeInterval = 24 * 3600
         static let lonelyTime: TimeInterval = 36 * 3600

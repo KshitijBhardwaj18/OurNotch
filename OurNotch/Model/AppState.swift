@@ -522,7 +522,7 @@ final class AppState {
         var found: [String] = []
         if hasFetchedPartner, partner.petAdoption != previous.petAdoption || partner.petCare != previous.petCare || partner.petLook != previous.petLook {
             found.append("pet")
-            if !(isNotchOpen && visibleTab == .pet) { unseen.insert(.pet) }
+            if Config.Pet.enabled, !(isNotchOpen && visibleTab == .pet) { unseen.insert(.pet) }
         }
         if partner.mood != previous.mood, hasFetchedPartner {
             found.append("mood \(partner.mood ?? "cleared")")

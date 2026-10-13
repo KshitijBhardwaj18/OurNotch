@@ -13,7 +13,7 @@ struct OpenNotchView: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                ForEach(NotchTab.allCases, id: \.self) { each in
+                ForEach(NotchTab.shown, id: \.self) { each in
                     if built.contains(each) || each == tab {
                         let shown = each == tab && !showsSettings
                         page(each)

@@ -730,7 +730,7 @@ struct PetSyncTests {
         #expect(try await people.mailbox.fetchOutbox(owner: people.partner.myId).map { _ in true } == nil) // no outbox save, no ping
         await you.sync()
         #expect(you.pet?.care.last?.action.care == .feed && you.pet?.care.last?.mine == false)
-        #expect(you.unseen.contains(.pet))
+        #expect(you.unseen.contains(.pet) == Config.Pet.enabled) // no dot for a hidden tab
     }
 }
 
