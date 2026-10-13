@@ -38,14 +38,33 @@ enum Config {
         #endif
         /// Checks while the notch is open: you're looking, so a lost ping costs at most this.
         static let openPollInterval: Duration = .seconds(3)
-        /// Checks within `activeWindow` of sending or receiving, when a reply is likely.
-        /// Load at 1,000 Macs, ~2 % with the notch open and ~8 % mid-conversation:
-        /// 900/60 + 20/3 + 80/10 ≈ 30 requests/s, under CloudKit's ~40/s starting allowance.
-        static let activePollInterval: Duration = .seconds(10)
+        /// Checks within `activeWindow` of sending or receiving, when a reply is likely. As fast as with the notch
+        /// open: pings can stop for minutes (Beta 1.0.17: none for 2.5 min, emojis waited up to 18 s at 10 s).
+        // ponytail: at 1,000 Macs (~2 % notch open, ~8 % mid-conversation) 900/60 + 100/3 ≈ 48 requests/s, past
+        // CloudKit's ~40/s starting allowance; a live connection (Durable Objects) replaces this when it matters.
+        static let activePollInterval: Duration = .seconds(3)
         static let activeWindow: TimeInterval = 180
+        /// After either Mac starts OurNotch, both check this often for `launchBoostWindow`: pings can take
+        /// minutes to resume after a restart (Beta 1.0.17: none for 2.5 min after both relaunched).
+        static let launchBoostInterval: Duration = .seconds(2)
+        static let launchBoostWindow: TimeInterval = 10 * 60
         /// A read that gets no data for this long fails, so the next check retries instead of waiting.
         /// CloudKit's default is 60 s: Beta 1.0 logged a check stuck 64 s on a dropped connection.
         static let requestTimeout: TimeInterval = 10
+    }
+
+    /// The doorbell (`LiveBell`, the Worker in `live/`): a ring makes the other Mac check iCloud at once.
+    enum Live {
+        static let url = URL(string: "wss://live.ournotch.app")!
+        /// The fast checks (notch open, mid-conversation, after a start) slow to this while both Macs are in
+        /// the room: rings bring changes in under a second, so checks only back them up.
+        static let backupInterval: Duration = .seconds(15)
+        static let keepAlive: Duration = .seconds(30)
+        static let pongWait: Duration = .seconds(10)
+        /// Waits before reconnecting: from this, doubling while Cloudflare can't be reached (or the doorbell
+        /// is switched off), up to `lastRetry`.
+        static let firstRetry: TimeInterval = 2
+        static let lastRetry: TimeInterval = 5 * 60
     }
 
     enum Diagnostics {

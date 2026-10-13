@@ -217,22 +217,29 @@ struct CloudStore: Mailbox {
     /// A silent push whenever the partner's outbox is created or changed. Needs `ownerId` marked
     /// Queryable in CloudKit Console; until then this logs an error and the regular checks still deliver.
     func watchPartner(_ partnerId: String) async {
+        // Silent: reaches the app's ping handler, but Apple holds silent pings back past a few an hour.
+        await subscribe("outbox-\(partnerId)", to: partnerId, badge: false)
+        // With a badge: a user-facing notification, which Apple delivers at once. macOS hands it to the
+        // notification system, not the ping handler, so the app listens there too (see `AppDelegate`).
+        // Beta 1.0.17 sends both; diagnostics show which arrives (`Metric.ping` detail is the subscription).
+        await subscribe("fast-\(partnerId)", to: partnerId, badge: true)
+    }
+
+    private func subscribe(_ id: String, to partnerId: String, badge: Bool) async {
         let subscription = CKQuerySubscription(recordType: "Outbox",
                                                predicate: NSPredicate(format: "ownerId == %@", partnerId),
-                                               subscriptionID: "outbox-\(partnerId)",
+                                               subscriptionID: id,
                                                options: [.firesOnRecordCreation, .firesOnRecordUpdate])
         let info = CKSubscription.NotificationInfo()
-        info.shouldSendContentAvailable = true // silent: wakes the app, shows nothing
-        // Not a badge: Beta 1.0.11 tried one to make pings high priority, and no ping reached the app at all
-        // (macOS keeps badge pushes for itself). Pings stay silent, so they must stay few: only what you send
-        // pings (see `Receipts` for what travels quietly).
+        info.shouldSendContentAvailable = true // wakes the app
+        info.shouldBadge = badge
         subscription.notificationInfo = info
         do {
             _ = try await database.save(subscription)
             let all = (try? await database.allSubscriptions().map(\.subscriptionID)) ?? []
-            await Diagnostics.shared.record("ping subscription saved: \(subscription.subscriptionID); this iCloud user has \(all.count): \(all.joined(separator: ", "))")
+            await Diagnostics.shared.record("ping subscription saved: \(id); this iCloud user has \(all.count): \(all.joined(separator: ", "))")
         } catch {
-            await Diagnostics.shared.record("ping subscription FAILED: \(error.diagnosticDescription)")
+            await Diagnostics.shared.record("ping subscription FAILED: \(id): \(error.diagnosticDescription)")
         }
     }
 
