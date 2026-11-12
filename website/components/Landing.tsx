@@ -133,7 +133,7 @@ export async function Landing({ lang, country }: { lang: Lang; country?: string 
             <p>{t.buy.p}</p>
             <div className="y-amt"><s className="y-was">{was}</s>{price}<small>{t.buy.lifetime}</small></div>
             <p className="y-then">{t.buy.then}</p>
-            <p className="y-offer">{fill(t.buy.offer, { date: offerEnds })}</p>
+            <div className="y-offer"><Heart />{fill(t.buy.offer, { date: offerEnds })}</div>
             <ul>{t.buy.points.map(p => <li key={p}>{p}</li>)}</ul>
             <a className="y-btn" href={checkout}><Heart />{t.buy.cta}</a>
             <p className="y-fine">{fineBefore}<a className="y-link" href="/download">{t.buy.downloadFree}</a>{fineAfter}</p>

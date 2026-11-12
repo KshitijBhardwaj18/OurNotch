@@ -63,7 +63,7 @@ const en = {
   buy: {
     tag: '3 days free · launch offer', kicker: 'Pricing', h2: 'One price. Yours for life.',
     p: "Start free on your Mac and your person's. Keep it and you pay once, on day 3. Never again.",
-    lifetime: 'lifetime', then: '3 days free first · pay once, yours forever · cancel before day 3 and pay nothing', offer: 'launch offer until {date}',
+    lifetime: 'lifetime', then: '3 days free first · pay once, yours forever · cancel before day 3 and pay nothing', offer: 'Launch offer until {date}',
     points: ["Your Mac and your person's", 'Whispers, kisses, moods and photos', 'Your time together, counted live'],
     cta: 'Start my 3 free days',
     fine: 'Needs macOS 14 Sonoma or later on both Macs. Your love can {download} and join with your invite.',
@@ -230,7 +230,7 @@ const fr: Copy = {
   buy: {
     tag: '3 jours gratuits · offre de lancement', kicker: 'Prix', h2: 'Un prix. À vie.',
     p: 'Commence gratuitement sur ton Mac et celui de ta personne. Tu le gardes ? Tu paies une seule fois, le 3e jour. Plus jamais ensuite.',
-    lifetime: 'à vie', then: '3 jours gratuits d’abord · tu paies une fois, à toi pour toujours · annule avant le 3e jour et tu ne paies rien', offer: 'offre de lancement jusqu’au {date}',
+    lifetime: 'à vie', then: '3 jours gratuits d’abord · tu paies une fois, à toi pour toujours · annule avant le 3e jour et tu ne paies rien', offer: 'Offre de lancement jusqu’au {date}',
     points: ['Ton Mac et celui de ta personne', 'Murmures, bisous, humeurs et photos', 'Votre temps ensemble, compté en direct'],
     cta: 'Commencer mes 3 jours gratuits',
     fine: 'Nécessite macOS 14 Sonoma ou plus récent sur les deux Mac. Ton amour peut {download} et te rejoindre avec ton invitation.',
